@@ -24,3 +24,8 @@ sqlite3 p2photo.db
 .tables
 ```
 
+## Gradle
+
+Tutorial: <https://spring.io/guides/gs/gradle/>
+
+Created file `settings.gradle` because of conflict with parent folder.
