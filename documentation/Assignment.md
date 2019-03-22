@@ -14,13 +14,13 @@ P2Photo is a mobile application that allows users to store photos on mobile devi
 
 The P2Photo client is a mobile Android application that users install and run on their devices and allow users to perform the following functions:
 
-**F1**. Sign up.
-**F2**. Log in/out.
-**F3**. Create albums.
-**F4**. Find users.
-**F5**. Add photos to albums.
-**F6**. Add users to albums.
-**F7**. List user’s albums.
+**F1**. Sign up.  
+**F2**. Log in/out.  
+**F3**. Create albums.  
+**F4**. Find users.  
+**F5**. Add photos to albums.  
+**F6**. Add users to albums.  
+**F7**. List user’s albums.  
 **F8**. View album.
 
 The sign up operation (F1) allows users to create a new user account in the system; the user must enter a username and password. The client then contacts the P2Photo server, which must ensure that the new username is unique and adds the user to the user database. If the operation is successful, the user can then log in and start a new session on the client device. 
