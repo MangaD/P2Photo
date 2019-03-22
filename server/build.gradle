@@ -1,1 +1,17 @@
+// project interpreted as a java project
 apply plugin: 'java'
+
+// in order to generate eclipse project
+apply plugin: 'eclipse'
+
+// in order to run the application
+apply plugin: 'application'
+mainClassName = 'server.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.xerial:sqlite-jdbc:3.27.2.1'
+}
