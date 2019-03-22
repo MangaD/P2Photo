@@ -1,7 +1,7 @@
 # P2Photo
 
-**Course:** Mobile and Ubiquitous Computing
-**University:** Instituto Superior Técnico
+**Course:** Mobile and Ubiquitous Computing  
+**University:** Instituto Superior Técnico  
 **Academic year:** 2018-19
 
 ### Team
