@@ -8,7 +8,7 @@
 
 - David Gonçalves
 - João Pires
-- Leonardo Pereira Troeira
+- Leonardo Troeira
 
 ### Assignment
 
