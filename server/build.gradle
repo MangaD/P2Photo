@@ -8,10 +8,10 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 mainClassName = 'server.Main'
 
+// in order to use SQLite
 repositories {
     mavenCentral()
 }
-
 dependencies {
     compile 'org.xerial:sqlite-jdbc:3.27.2.1'
 }

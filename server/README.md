@@ -18,6 +18,14 @@ sqlite3 p2photo.db
 .quit
 ```
 
+### Populate database
+
+```sh
+sqlite3 p2photo.db
+.read populate.sql
+.quit
+```
+
 ### View tables
 
 ```sh
@@ -33,6 +41,8 @@ Tutorial: <http://www.sqlitetutorial.net/sqlite-java/sqlite-jdbc-driver/>
 Generic tutorial: <https://spring.io/guides/gs/gradle/>
 
 Tutorial [SQLite JDBC driver with Gradle](https://stackoverflow.com/questions/50377264/using-sqlite-jdbc-driver-in-a-gradle-java-project).
+
+### Setup notes
 
 Created empty file `settings.gradle` due to conflict with parent folder.
 
