@@ -25,7 +25,7 @@ public class ClientConnection implements Runnable {
 						new InputStreamReader(clientSocket.getInputStream()));
 				) {
 			
-			String inputLine, outputLine;
+			String inputLine;
 			out.println("test");
 
 			while ((inputLine = in.readLine()) != null) {

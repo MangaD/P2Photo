@@ -48,7 +48,7 @@ Created empty file `settings.gradle` due to conflict with parent folder.
 
 Generated Eclipse project using `gradle eclipse` command, while having `apply plugin: 'eclipse'` inside the `build.gradle` file. Tutorial: <http://www.thejavageek.com/2015/05/22/create-eclipse-project-with-gradle/>
 
-Got `.gitignore` file from <https://www.gitignore.io/api/eclipse>.
+Got `.gitignore` file from <https://www.gitignore.io/api/eclipse> and <https://www.gitignore.io/api/java%2Cgradle%2Cintellij>.
 
 ### Build
 
