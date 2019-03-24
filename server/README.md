@@ -62,3 +62,6 @@ gradle build
 gradle run
 ```
 
+## Communication
+
+Communication between client and server is done with TCP sockets.

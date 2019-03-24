@@ -4,8 +4,10 @@ import java.io.IOException;
 
 public class Main {
 
+	public static Database db = null;
+	
 	public static void main(String[] args) {
-		Database db = null;
+		
 		try {
 			db = new Database("p2photo.db");
 		} catch (IOException e) {
@@ -13,6 +15,9 @@ public class Main {
 			System.exit(0);
 		}
 		db.selectAllUsers();
+
+		ClientListener service = new ClientListener(4444, "ServiceThread");
+		service.start();
 	}
 
 }
