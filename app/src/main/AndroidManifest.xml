@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewAlbumActivity"></activity>
+        <activity android:name=".DriveSync"></activity>
+        <activity android:name=".ViewAlbumActivity" />
         <activity android:name=".ListUserAlbumActivity" />
         <activity android:name=".AddUserToAlbumActivity" />
         <activity android:name=".AddPhotoActivity" />
