@@ -4,7 +4,13 @@ import android.app.Application;
 
 public class GlobalClass extends Application {
 
-    private ServerConnection serverConn = new ServerConnection();
+    private ServerConnection serverConn;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        serverConn = new ServerConnection();
+    }
 
     public ServerConnection getConnection() {
         return serverConn;

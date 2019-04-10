@@ -27,20 +27,12 @@ public class ServerConnection {
         return Boolean.valueOf(result);
     }
 
-    public void disconnect() throws IOException {
-        conn.close();
-    }
-
     private String read() throws IOException {
         return in.readUTF();
     }
 
     private void write(String message) throws IOException {
         out.writeUTF(message);
-    }
-
-    public String getAddr() {
-        return conn.getRemoteSocketAddress().toString();
     }
 
 }
