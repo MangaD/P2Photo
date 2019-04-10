@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,13 +21,34 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.Task;
+
+
+import com.google.api.services.drive.model.File;
+
+
 
 public class DriveSync extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 1;
     private String TAG = "ola";
+
+    /**
+     * Handles high-level drive functions like sync
+     */
+    private DriveClient mDriveClient;
+
+    /**
+     * Handle access to Drive resources/files.
+     */
+    private DriveResourceClient mDriveResourceClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +116,27 @@ public class DriveSync extends AppCompatActivity {
                 Log.i(TAG, "Info Perfil: " + personEmail);
             }
 
+            Log.i(TAG, "Antes da criacao dos mDriveCLient e mDriveResourceClient");
+            mDriveClient = Drive.getDriveClient(getApplicationContext(), account);
+            Log.i(TAG, "Depois da criacao do mDriveCLient");
+            // Build a drive resource client.
+            mDriveResourceClient = Drive.getDriveResourceClient(getApplicationContext(), account);
+
+            Log.i(TAG, "Antes do createFOlder");
+
+
+            /*File fileMetadata = new File();
+            fileMetadata.setName("Invoices");
+            fileMetadata.setMimeType("application/vnd.google-apps.folder");
+
+            File file = driveService.files().create(fileMetadata)
+                    .setFields("id")
+                    .execute();
+            System.out.println("Folder ID: " + file.getId());
+
+
+            createFolder();*/
+
             Intent intent = new Intent(DriveSync.this, LoggedInActivity.class);
             startActivity(intent);
 
@@ -109,6 +152,34 @@ public class DriveSync extends AppCompatActivity {
         }
     }
 
+    private void createFolder() {
+
+        Log.i(TAG, "inicio do createFOlder");
+
+        getDriveResourceClient()
+                .getRootFolder()
+                .continueWithTask(task -> {
+                    DriveFolder parentFolder = task.getResult();
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle("New folder")
+                            .setMimeType(DriveFolder.MIME_TYPE)
+                            .setStarred(true)
+                            .build();
+                    return getDriveResourceClient().createFolder(parentFolder, changeSet);
+                })/*
+                .addOnSuccessListener(this,
+                        driveFolder -> {
+                            showMessage(getString(R.string.file_created,
+                                    driveFolder.getDriveId().encodeToString()));
+                            finish();
+                        })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+                    showMessage(getString(R.string.file_create_error));
+                    finish();
+                })*/;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -118,5 +189,13 @@ public class DriveSync extends AppCompatActivity {
         //updateUI(account);
         Log.i(TAG, "onStart()  account= " + account);
 
+    }
+
+    public DriveResourceClient getDriveResourceClient(){
+        return this.mDriveResourceClient;
+    }
+
+    public DriveClient getDriveClient(){
+        return this.mDriveClient;
     }
 }
