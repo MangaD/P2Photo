@@ -26,10 +26,20 @@ public class ClientConnection implements Runnable {
 				) {
 			
 			String inputLine;
-			out.println("test");
+			//out.println("test");
 
 			while ((inputLine = in.readLine()) != null) {
-				if (inputLine.equals("Bye.")) {
+				if (inputLine.equals("login")) {
+					
+					String user = in.readLine();
+					String password = in.readLine();
+					
+					if (Main.db.login(user, password)) {
+						out.println("true");
+					} else {
+						out.println("false");
+					}
+					
 					break;
 				}
 			}

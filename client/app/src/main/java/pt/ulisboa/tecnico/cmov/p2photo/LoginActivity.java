@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -17,7 +19,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
         initializeButtons();
-        login();
     }
 
     private void initializeButtons() {
@@ -28,9 +29,15 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(LoginActivity.this, LoggedInActivity.class);
-                Intent intent = new Intent(LoginActivity.this, DriveSync.class);
-                startActivity(intent);
+                boolean valid = login();
+                if (valid) {
+                    Intent intent = new Intent(LoginActivity.this, DriveSync.class);
+                    startActivity(intent);
+                } else {
+                    String msg = "Login invalid.";
+                    Log.d("LoginActivity", msg);
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                }
             }
         });
         /*
@@ -46,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void login() {
+    private boolean login() {
         GlobalClass context = (GlobalClass) getApplicationContext();
         ServerConnection conn = context.getConnection();
         try {
@@ -55,7 +62,23 @@ public class LoginActivity extends AppCompatActivity {
             String msg = "Failed to connect to the server.";
             Log.d("LoginActivity", msg);
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            return false;
         }
+
+        EditText usernameEdit = findViewById(R.id.login_username);
+        String username = usernameEdit.getText().toString();
+        EditText passwordEdit = findViewById(R.id.login_password);
+        String password = passwordEdit.getText().toString();
+        try {
+            conn.login(username, password);
+        } catch (IOException e) {
+            String msg = "Failed to contact the server.";
+            Log.d("LoginActivity", msg);
+            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 
 }

@@ -19,8 +19,28 @@ public class ServerConnection {
         in = new DataInputStream(conn.getInputStream());
     }
 
+    public boolean login(String user, String password) throws IOException {
+        write("login");
+        write(user);
+        write(password);
+        String result = read();
+        return Boolean.valueOf(result);
+    }
+
     public void disconnect() throws IOException {
         conn.close();
+    }
+
+    private String read() throws IOException {
+        return in.readUTF();
+    }
+
+    private void write(String message) throws IOException {
+        out.writeUTF(message);
+    }
+
+    public String getAddr() {
+        return conn.getRemoteSocketAddress().toString();
     }
 
 }

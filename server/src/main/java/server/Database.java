@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -67,5 +68,32 @@ public class Database {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	public boolean login(String user, String password) {
+		String sql = "SELECT username, password FROM users WHERE username = ? AND password = ?";
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+
+			pstmt.setString(1, user);
+			pstmt.setString(2, password);
+
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				String u = rs.getString("username");
+				String p = rs.getString("password");
+				
+				if (u == user && p == password) {
+					return true;
+				}
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+		
+		return false;
 	}
 }
