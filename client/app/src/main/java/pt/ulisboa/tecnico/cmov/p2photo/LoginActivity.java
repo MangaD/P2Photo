@@ -28,15 +28,15 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean valid = login();
-                if (valid) {
-                    Intent intent = new Intent(LoginActivity.this, DriveSync.class);
+                //boolean valid = login();
+                //if (valid) {
+                    Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
                     startActivity(intent);
-                } else {
-                    String msg = "Login invalid.";
-                    Log.d("LoginActivity", msg);
-                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-                }
+                //} else {
+                //    String msg = "Login invalid.";
+                //    Log.d("LoginActivity", msg);
+                //    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                //}
             }
         });
         /*
