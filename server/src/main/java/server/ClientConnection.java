@@ -33,7 +33,9 @@ public class ClientConnection implements Runnable {
 					
 					String user = in.readLine();
 					String password = in.readLine();
-					
+
+					System.out.println("Received login from '" + user + "' with password '" + "'" + password + "'.");
+
 					if (Main.db.login(user, password)) {
 						out.println("true");
 					} else {

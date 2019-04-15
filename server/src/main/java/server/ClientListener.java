@@ -40,7 +40,7 @@ public class ClientListener implements Runnable {
 	}
 
 	public void start() {
-		System.out.println("Starting " + threadName);
+		System.out.println("Starting " + threadName + " on port " + portNumber + ".");
 		if (t == null) {
 			t = new Thread(this, threadName);
 			t.start();
