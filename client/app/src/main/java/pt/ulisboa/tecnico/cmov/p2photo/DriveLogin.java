@@ -23,13 +23,16 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.signin.SignInOptions;
 import com.google.android.gms.tasks.Task;
 
 /**
@@ -42,6 +45,7 @@ public class DriveLogin extends AppCompatActivity {
     private static final int REQUEST_CODE_SIGN_IN = 0;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
+    //private GoogleSignInAccount account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +99,6 @@ public class DriveLogin extends AppCompatActivity {
                     mDriveResourceClient =
                             Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
 
-
                     setDriveVars();
 
                     Intent intent = new Intent(DriveLogin.this, LoggedInActivity.class);
@@ -110,5 +113,6 @@ public class DriveLogin extends AppCompatActivity {
         // Set mDriveClient and mDriveResourceCliente in global/application context
         globalVariable.setmDriveClient(mDriveClient);
         globalVariable.setmDriveResourceClient(mDriveResourceClient);
+        //globalVariable.setAccount(account);
     }
 }
