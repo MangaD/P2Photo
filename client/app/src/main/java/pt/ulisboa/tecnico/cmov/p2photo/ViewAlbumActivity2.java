@@ -65,14 +65,6 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
 
     private DataBufferAdapter<Metadata> mResultsAdapter;
 
-    private TaskCompletionSource<DriveId> mOpenItemTaskSource;
-
-    /**
-     * Request code for the Drive picker
-     */
-    protected static final int REQUEST_CODE_OPEN_ITEM = 1;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,26 +81,13 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
         ListView mListView = findViewById(R.id.listViewItems);
         mResultsAdapter = new ResultsAdapter(this);
         mListView.setAdapter(mResultsAdapter);
-        Log.e(TAG, "START");
 
         GlobalClass.PhotoAlbum photoAlbumum = globalVariable.findPhotoAlbum(albumName);
         DriveId driveId = photoAlbumum.getDriveid();
 
-        onDriveClientReady(driveId);
+        listFilesInFolder(driveId.asDriveFolder());
     }
 
-
-    protected void onDriveClientReady(DriveId driveId) {
-        Log.e(TAG, "ON DRIVE CLIENT READY");
-        //pickFolder()
-                //.addOnSuccessListener(this,
-                        listFilesInFolder(driveId.asDriveFolder());
-                //.addOnFailureListener(this, e -> {
-                //    Log.e(TAG, "No folder selected");
-
-               //     finish();
-               // });
-    }
 
     /**
      * Clears the result buffer to avoid memory leaks as soon
@@ -125,7 +104,7 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
      * it retrieves results for the first page.
      */
     private void listFilesInFolder(DriveFolder folder) {
-        Log.e(TAG, "LIST FILES IN FOLDER");
+
         Query query = new Query.Builder()
                 .addFilter(Filters.eq(SearchableField.MIME_TYPE, "image/png"))
                 .build();
@@ -134,8 +113,7 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
         // END drive_android_query_children]
         queryTask
                 .addOnSuccessListener(this,
-                        metadataBuffer -> {mResultsAdapter.append(metadataBuffer);
-                            Log.e(TAG, "I want to Die");})
+                        metadataBuffer -> mResultsAdapter.append(metadataBuffer))
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Error retrieving files");
                     //showMessage(getString(R.string.query_failed));
@@ -143,38 +121,4 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Prompts the user to select a folder using OpenFileActivity.
-     *
-     * @return Task that resolves with the selected item's ID.
-     */
-    protected Task<DriveId> pickFolder() {
-        Log.e(TAG, "PICK FOLDER");
-        OpenFileActivityOptions openOptions =
-                new OpenFileActivityOptions.Builder()
-                        .setSelectionFilter(
-                                Filters.eq(SearchableField.MIME_TYPE, DriveFolder.MIME_TYPE))
-                        .setActivityTitle("Select a Folder")
-                        .build();
-        return pickItem(openOptions);
-    }
-
-    /**
-     * Prompts the user to select a folder using OpenFileActivity.
-     *
-     * @param openOptions Filter that should be applied to the selection
-     * @return Task that resolves with the selected item's ID.
-     */
-    private Task<DriveId> pickItem(OpenFileActivityOptions openOptions) {
-        Log.e(TAG, "PICK ITEM");
-        mOpenItemTaskSource = new TaskCompletionSource<>();
-        mDriveClient
-                .newOpenFileActivityIntentSender(openOptions)
-                .continueWith((Continuation<IntentSender, Void>) task -> {
-                    startIntentSenderForResult(
-                            task.getResult(), REQUEST_CODE_OPEN_ITEM, null, 0, 0, 0);
-                    return null;
-                });
-        return mOpenItemTaskSource.getTask();
-    }
 }
