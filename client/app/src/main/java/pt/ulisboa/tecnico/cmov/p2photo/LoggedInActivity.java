@@ -100,7 +100,8 @@ public class LoggedInActivity extends AppCompatActivity {
 
                 setDriveVars();
 
-                Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity.class);
+                //Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity.class);
+                Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity2.class);
                 startActivity(intent);
             }
         });

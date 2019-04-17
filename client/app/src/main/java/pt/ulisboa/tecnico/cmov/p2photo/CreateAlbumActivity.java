@@ -22,10 +22,12 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
+
 public class CreateAlbumActivity extends AppCompatActivity {
 
     private static final String TAG = "create_album";
-
+    private GlobalClass globalVariable;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
 
@@ -35,7 +37,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_album);
 
         // Obtain reference to application context
-        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+        globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
         this.mDriveClient = globalVariable.getmDriveClient();
         this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
@@ -47,7 +49,9 @@ public class CreateAlbumActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String albumName = text.getText().toString();
-                //do something
+
+                //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
+
                 createFolder(albumName);
             }
 
@@ -71,6 +75,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 })
                 .addOnSuccessListener(this,
                         driveFolder -> {
+                            globalVariable.addAlbumToAlbumList(albumN,driveFolder.getDriveId()); // add to local albums
                             showMessage("Album created " +
                                     driveFolder.getDriveId().encodeToString());
                             finish();
@@ -96,4 +101,5 @@ public class CreateAlbumActivity extends AppCompatActivity {
     protected DriveResourceClient getDriveResourceClient() {
         return this.mDriveResourceClient;
     }
+
 }
