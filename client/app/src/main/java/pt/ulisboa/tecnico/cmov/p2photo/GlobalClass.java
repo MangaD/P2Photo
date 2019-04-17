@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.Application;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
 
@@ -11,6 +12,7 @@ public class GlobalClass extends Application {
 
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
+    private GoogleSignInAccount account;
 
     @Override
     public void onCreate() {
@@ -36,5 +38,11 @@ public class GlobalClass extends Application {
 
     public void setmDriveResourceClient(DriveResourceClient mDriveResourceClient) {
         this.mDriveResourceClient = mDriveResourceClient;
+    }
+
+    public GoogleSignInAccount getAccount(){ return this.account;}
+
+    public void setAccount (GoogleSignInAccount acc){
+        this.account = acc;
     }
 }
