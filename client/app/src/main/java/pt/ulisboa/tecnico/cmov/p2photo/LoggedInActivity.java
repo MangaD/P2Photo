@@ -6,12 +6,25 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveResourceClient;
+
 public class LoggedInActivity extends AppCompatActivity {
+
+    private DriveClient mDriveClient;
+    private DriveResourceClient mDriveResourceClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_in);
+
+        // Obtain reference to application context
+        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+        // Get mDriveCliet and mDriveResourceCLient from global/application context
+        this.mDriveClient = globalVariable.getmDriveClient();
+        this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
+
         initializeButtons();
     }
 
@@ -45,6 +58,9 @@ public class LoggedInActivity extends AppCompatActivity {
         buttonAddPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                setDriveVars();
+
                 Intent intent = new Intent(LoggedInActivity.this, AddPhotoActivity.class);
                 startActivity(intent);
             }
@@ -95,5 +111,13 @@ public class LoggedInActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    void setDriveVars(){
+        // Obtain reference to application context
+        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+        // Set mDriveClient and mDriveResourceCliente in global/application context
+        globalVariable.setmDriveClient(mDriveClient);
+        globalVariable.setmDriveResourceClient(mDriveResourceClient);
     }
 }

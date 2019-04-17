@@ -31,7 +31,10 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new LoginTask(LoginActivity.this).execute();
+                //new LoginTask(LoginActivity.this).execute();
+
+                Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
+                startActivity(intent);
             }
         });
         /*
@@ -151,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean result) {
             pd.dismiss();
             if (result) {
-                Intent intent = new Intent(activityReference.get(), DriveSync.class);
+                Intent intent = new Intent(activityReference.get(), DriveLogin.class);
                 activityReference.get().startActivity(intent);
             } else {
                 String msg = "Login invalid.";
