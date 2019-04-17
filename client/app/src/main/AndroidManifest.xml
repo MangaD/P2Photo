@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.ulisboa.tecnico.cmov.p2photo">
 
+    <!--  This permission is for Internet connection established (using sockets). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--  This permission is to check weather Internet connection is available or not -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".GlobalClass"
         android:allowBackup="true"

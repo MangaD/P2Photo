@@ -53,7 +53,7 @@ public class Database {
 	 * Select with parameters: http://www.sqlitetutorial.net/sqlite-java/select/
 	 */
 	public void selectAllUsers() {
-		String sql = "SELECT uid, username FROM users";
+		String sql = "SELECT uid, username, password FROM users";
 
 		// try-with-resources
 		// https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
@@ -63,7 +63,7 @@ public class Database {
 			// loop through the result set
 			while (rs.next()) {
 				System.out.println(rs.getInt("uid") + "\t" +
-						rs.getString("username"));
+						rs.getString("username") + "\t" + rs.getString("password"));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -74,17 +74,15 @@ public class Database {
 		String sql = "SELECT username, password FROM users WHERE username = ? AND password = ?";
 		
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
-
 			pstmt.setString(1, user);
 			pstmt.setString(2, password);
-
+			
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
 				String u = rs.getString("username");
 				String p = rs.getString("password");
-				
-				if (u == user && p == password) {
+				if (u.equals(user) && p.equals(password)) {
 					return true;
 				}
 			}

@@ -26,10 +26,12 @@ public class ClientListener implements Runnable {
 		) {
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
-				ClientConnection cn = new ClientConnection(clientSocket,
-						"Client: " + clientSocket.getInetAddress());
-				cn.start();
-				this.clientConnections.add(cn);
+				try {
+					ClientConnection cn = new ClientConnection(clientSocket,
+							"Client: " + clientSocket.getInetAddress());
+					cn.start();
+					this.clientConnections.add(cn);
+				} catch (IOException e) { System.out.println("Failed to create client thread."); }
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -40,7 +42,7 @@ public class ClientListener implements Runnable {
 	}
 
 	public void start() {
-		System.out.println("Starting " + threadName);
+		System.out.println("Starting " + threadName + " on port " + portNumber + ".");
 		if (t == null) {
 			t = new Thread(this, threadName);
 			t.start();

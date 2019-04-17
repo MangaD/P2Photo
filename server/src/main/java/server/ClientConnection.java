@@ -11,40 +11,49 @@ public class ClientConnection implements Runnable {
 	private Thread t;
 	private String threadName;
 	private Socket clientSocket;
+	private PrintWriter out;
+	private BufferedReader in;
+	
+	private boolean isLoggedIn;
 
-	ClientConnection(Socket s, String name) {
+	ClientConnection(Socket s, String name) throws IOException {
 		threadName = name;
 		clientSocket = s;
+		out = new PrintWriter(clientSocket.getOutputStream(), true);
+		in = new BufferedReader(
+				new InputStreamReader(clientSocket.getInputStream()));
+		isLoggedIn = false;
 	}
 
 	@Override
 	public void run() {
 
-		try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(clientSocket.getInputStream()));
-				) {
+		try {
 			
 			String inputLine;
-			//out.println("test");
 
-			while ((inputLine = in.readLine()) != null) {
+			while ((inputLine = read()) != null) {
+				System.out.println("Received: " + inputLine);
 				if (inputLine.equals("login")) {
 					
-					String user = in.readLine();
-					String password = in.readLine();
-					
+					String user = read();
+					String password = read();
+
+					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
+
 					if (Main.db.login(user, password)) {
+						System.out.println("Login successful.");
 						out.println("true");
+						isLoggedIn = true;
 					} else {
+						System.out.println("Login insuccessful.");
 						out.println("false");
 					}
 					
-					break;
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | NullPointerException e) {
 			e.printStackTrace();
 			return;
 		}
@@ -52,6 +61,10 @@ public class ClientConnection implements Runnable {
 		System.out.println("Thread " + threadName + " exiting.");
 	}
 
+	private String read() throws IOException {
+		return in.readLine().trim();
+	}
+	
 	public void start() {
 		System.out.println("Starting " + threadName);
 		if (t == null) {
