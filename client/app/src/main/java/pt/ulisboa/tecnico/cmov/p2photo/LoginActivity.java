@@ -31,10 +31,10 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //new LoginTask(LoginActivity.this).execute();
+                new LoginTask(LoginActivity.this).execute();
 
-                Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
-                startActivity(intent);
+                /*Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
+                startActivity(intent);*/
             }
         });
         /*
@@ -109,7 +109,9 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
                 conn.connect();
+                Log.d("LoginActivity", "Connected to: " + conn.getAddress());
             } catch (IOException e) {
+                conn.disconnect();
                 String msg = "Failed to connect to the server.";
                 Log.d("LoginActivity", msg);
                 Log.d("LoginActivity", e.getMessage());
@@ -127,10 +129,10 @@ public class LoginActivity extends AppCompatActivity {
             String username = usernameEdit.getText().toString();
             EditText passwordEdit = activityReference.get().findViewById(R.id.login_password);
             String password = passwordEdit.getText().toString();
-            try {
-                conn.login(username, password);
-            } catch (IOException e) {
-                String msg = "Failed to contact the server.";
+
+            if (username.isEmpty() || password.isEmpty()) {
+                conn.disconnect();
+                String msg = "Username and password cannot be empty!";
                 Log.d("LoginActivity", msg);
 
                 activityReference.get().runOnUiThread(new Runnable() {
@@ -142,8 +144,24 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
 
+            Log.d("LoginActivity", "Username: " + username);
+            Log.d("LoginActivity", "Password: " + password);
 
-            return true;
+            try {
+                return conn.login(username, password);
+            } catch (IOException e) {
+                conn.disconnect();
+                String msg = "Failed to contact the server.";
+                Log.d("LoginActivity", msg);
+
+                activityReference.get().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                return false;
+            }
         }
 
         /**

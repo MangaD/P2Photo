@@ -5,23 +5,38 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class ServerConnection {
 
-    public static String addr = "127.0.0.1";
+    /**
+     * To access your PC localhost from Android emulator, use 10.0.2.2 instead of 127.0.0.1.
+     * localhost or 127.0.0.1 refers to the emulated device itself, not the host the emulator is running on.
+     * https://stackoverflow.com/questions/18341652/connect-failed-econnrefused
+     */
+    public static String addr = "10.0.2.2"; //null for loopback address
     public static int port = 4444;
     public static Socket conn;
     private DataOutputStream out;
-    private DataInputStream in;
+    private BufferedReader in;
 
     public void connect() throws IOException {
-        conn = new Socket(addr, port);
-        out = new DataOutputStream(conn.getOutputStream());
-        in = new DataInputStream(conn.getInputStream());
+        if (conn == null || !conn.isConnected() || conn.isClosed()) {
+            conn = new Socket(addr, port);
+            out = new DataOutputStream(conn.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        }
+    }
+
+    public void disconnect() {
+        try {
+            conn.close();
+        } catch (IOException e) {}
     }
 
     public boolean login(String user, String password) throws IOException {
@@ -34,11 +49,15 @@ public class ServerConnection {
     }
 
     private String read() throws IOException {
-        return in.readUTF();
+        return in.readLine();
     }
 
     private void write(String message) throws IOException {
-        out.writeUTF(message);
+        out.writeUTF(message + "\n");
+    }
+
+    public String getAddress() {
+        return conn.getRemoteSocketAddress().toString();
     }
 
     //Checking Internet is available or not
