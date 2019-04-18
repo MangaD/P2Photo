@@ -109,7 +109,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     DriveContents contents = task.getResult();
                     OutputStream outputStream = contents.getOutputStream();
                     try (Writer writer = new OutputStreamWriter(outputStream)) {
-                        writer.write("Inserir URLS");
+                        writer.write("Inserir URLS\n");
                     }
 
                     MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -121,12 +121,16 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     return getDriveResourceClient().createFile(parent, changeSet, contents);
                 })
                 .addOnSuccessListener(this,
-                        driveFile -> showMessage("File created" +
-                                driveFile.getDriveId().encodeToString()))
+                        driveFile -> {
+                                globalVariable.addIndexToIndexList("index"+albumNam, driveFile.getDriveId()); // add to local indexes
+                                showMessage("File created" +
+                                driveFile.getDriveId().encodeToString());
+                })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create file", e);
                     showMessage("File create error");
                 });
+
     }
 
 

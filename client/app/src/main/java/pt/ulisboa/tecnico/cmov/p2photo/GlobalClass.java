@@ -19,6 +19,7 @@ public class GlobalClass extends Application {
     private GoogleSignInAccount account;
 
     private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
+    private ArrayList<IndexAlbum> indexList = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -62,6 +63,7 @@ public class GlobalClass extends Application {
     class PhotoAlbum{
         String name;
         DriveId driveid;
+
         PhotoAlbum(String name,DriveId driveid){
             this.name=name;
             this.driveid=driveid;
@@ -84,6 +86,44 @@ public class GlobalClass extends Application {
         for(PhotoAlbum photoalbum : albumList) {
             if(photoalbum.getName().equals(name)) {
                 return photoalbum;
+            }
+        }
+        return null;
+    }
+
+    class IndexAlbum{
+        String name;
+        DriveId driveid;
+
+        IndexAlbum(String name,DriveId driveid){
+            this.name=name;
+            this.driveid=driveid;
+        }
+
+        public DriveId getDriveid() {
+            return this.driveid;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+        @Override
+        public String toString(){
+            return this.getName();
+        }
+    }
+
+    public ArrayList<IndexAlbum> getIndexList() {return indexList; }
+
+    public void addIndexToIndexList(String indexName,DriveId driveId){
+        IndexAlbum indexAlbum = new IndexAlbum(indexName,driveId);
+        indexList.add(indexAlbum);
+    }
+
+    IndexAlbum findIndexAlbum(String name) {
+        for(IndexAlbum indexalbum : indexList) {
+            if(indexalbum.getName().equals(name)) {
+                return indexalbum;
             }
         }
         return null;

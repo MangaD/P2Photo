@@ -20,6 +20,19 @@
         android:layout_gravity="center_horizontal"
         android:text="Take Picture" />
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/listViewAlbums"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+
+    </LinearLayout>
+
 
 </LinearLayout>
 
