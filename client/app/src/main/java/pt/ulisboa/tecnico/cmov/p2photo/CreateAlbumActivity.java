@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
@@ -22,10 +23,15 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+
 public class CreateAlbumActivity extends AppCompatActivity {
 
     private static final String TAG = "create_album";
-
+    private GlobalClass globalVariable;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
 
@@ -35,27 +41,39 @@ public class CreateAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_album);
 
         // Obtain reference to application context
-        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+        globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
         this.mDriveClient = globalVariable.getmDriveClient();
         this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
 
-        EditText text  = (EditText) findViewById(R.id.albumName);
+        EditText text = (EditText) findViewById(R.id.albumName);
         Button btn = (Button) findViewById(R.id.buttonCreate);
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 String albumName = text.getText().toString();
-                //do something
-                createFolder(albumName);
+
+                //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
+                if (albumNameExists(albumName)) {
+                    showMessage("Album name already exists!");
+                } else {
+                    createFolder(albumName);
+                }
             }
 
         });
-
-
     }
 
+    private boolean albumNameExists(String albumN) {
+        //check if albumName already exists
+        globalVariable = (GlobalClass) getApplicationContext();
+        GlobalClass.PhotoAlbum photoAlbumum = globalVariable.findPhotoAlbum(albumN);
+        if (photoAlbumum == null) {
+            return false;
+        }
+        return true;
+    }
 
     private void createFolder(String albumN) {
         getDriveResourceClient()
@@ -71,6 +89,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 })
                 .addOnSuccessListener(this,
                         driveFolder -> {
+                            globalVariable.addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
+                            insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
                             showMessage("Album created " +
                                     driveFolder.getDriveId().encodeToString());
                             finish();
@@ -81,6 +101,38 @@ public class CreateAlbumActivity extends AppCompatActivity {
                     finish();
                 });
     }
+
+    private void insertIndexFileInAlbum(String albumNam, DriveFolder parent) {
+        getDriveResourceClient()
+                .createContents()
+                .continueWithTask(task -> {
+                    DriveContents contents = task.getResult();
+                    OutputStream outputStream = contents.getOutputStream();
+                    try (Writer writer = new OutputStreamWriter(outputStream)) {
+                        writer.write("Inserir URLS\n");
+                    }
+
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle("index"+albumNam)
+                            .setMimeType("text/plain")
+                            .setStarred(true)
+                            .build();
+
+                    return getDriveResourceClient().createFile(parent, changeSet, contents);
+                })
+                .addOnSuccessListener(this,
+                        driveFile -> {
+                                globalVariable.addIndexToIndexList("index"+albumNam, driveFile.getDriveId()); // add to local indexes
+                                showMessage("File created" +
+                                driveFile.getDriveId().encodeToString());
+                })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+                    showMessage("File create error");
+                });
+
+    }
+
 
     /**
      * Shows a toast message.
@@ -96,4 +148,5 @@ public class CreateAlbumActivity extends AppCompatActivity {
     protected DriveResourceClient getDriveResourceClient() {
         return this.mDriveResourceClient;
     }
+
 }

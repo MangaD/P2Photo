@@ -4,7 +4,11 @@ import android.app.Application;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GlobalClass extends Application {
 
@@ -13,6 +17,9 @@ public class GlobalClass extends Application {
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
     private GoogleSignInAccount account;
+
+    private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
+    private ArrayList<IndexAlbum> indexList = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -44,5 +51,81 @@ public class GlobalClass extends Application {
 
     public void setAccount (GoogleSignInAccount acc){
         this.account = acc;
+    }
+
+    public ArrayList<PhotoAlbum> getAlbumList() {return albumList; }
+
+    public void addAlbumToAlbumList(String albumName,DriveId driveId){
+        PhotoAlbum photoAlbum = new PhotoAlbum(albumName,driveId);
+        albumList.add(photoAlbum);
+    }
+
+    class PhotoAlbum{
+        String name;
+        DriveId driveid;
+
+        PhotoAlbum(String name,DriveId driveid){
+            this.name=name;
+            this.driveid=driveid;
+        }
+
+        public DriveId getDriveid() {
+            return driveid;
+        }
+
+        public String getName() {
+            return name;
+        }
+        @Override
+        public String toString(){
+            return getName();
+        }
+    }
+
+    PhotoAlbum findPhotoAlbum(String name) {
+        for(PhotoAlbum photoalbum : albumList) {
+            if(photoalbum.getName().equals(name)) {
+                return photoalbum;
+            }
+        }
+        return null;
+    }
+
+    class IndexAlbum{
+        String name;
+        DriveId driveid;
+
+        IndexAlbum(String name,DriveId driveid){
+            this.name=name;
+            this.driveid=driveid;
+        }
+
+        public DriveId getDriveid() {
+            return this.driveid;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+        @Override
+        public String toString(){
+            return this.getName();
+        }
+    }
+
+    public ArrayList<IndexAlbum> getIndexList() {return indexList; }
+
+    public void addIndexToIndexList(String indexName,DriveId driveId){
+        IndexAlbum indexAlbum = new IndexAlbum(indexName,driveId);
+        indexList.add(indexAlbum);
+    }
+
+    IndexAlbum findIndexAlbum(String name) {
+        for(IndexAlbum indexalbum : indexList) {
+            if(indexalbum.getName().equals(name)) {
+                return indexalbum;
+            }
+        }
+        return null;
     }
 }

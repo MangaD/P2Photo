@@ -15,7 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DriveLogin"></activity>
+        <activity android:name=".ViewAlbumActivity2"></activity>
+        <activity android:name=".ListUserAlbumActivity2" />
+        <activity android:name=".DriveLogin" />
         <activity android:name=".ViewAlbumActivity" />
         <activity android:name=".ListUserAlbumActivity" />
         <activity android:name=".AddUserToAlbumActivity" />
