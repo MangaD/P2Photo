@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
@@ -9,11 +11,16 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.drive.CreateFileActivityOptions;
@@ -59,6 +66,10 @@ public class AddPhotoActivity extends AppCompatActivity {
     private String itemString = "null";
     Button btnTakePicture;
     Button btnFindPicture;
+    private String imageTitle = "";
+    //private AlertDialog.Builder builder;
+
+    AlertDialog.Builder alertDialogBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,21 +84,27 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         //puts the elements on a list on screen
         albumArrayList = globalVariable.getAlbumList();
-        albumListView = findViewById(R.id.listViewAlbums);
-        albumArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, albumArrayList);
-        albumListView.setAdapter(albumArrayAdapter);
+        //albumListView = findViewById(R.id.listViewAlbums);
+        //albumArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, albumArrayList);
+        //albumListView.setAdapter(albumArrayAdapter);
 
         initButtons();
-        btnFindPicture.setVisibility(View.GONE);
-        btnTakePicture.setVisibility(View.GONE);
+       // btnFindPicture.setVisibility(View.GONE);
+        //btnTakePicture.setVisibility(View.GONE);
 
+        /*albumListView.setVisibility(View.VISIBLE);
         albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
             Object itemAtPosition = adapter.getItemAtPosition(position);
             itemString = itemAtPosition.toString();
             Log.i(TAG, "ALBUM NAME: " + itemString);
             btnFindPicture.setVisibility(View.VISIBLE);
             btnTakePicture.setVisibility(View.VISIBLE);
-        });
+            albumListView.setVisibility(View.GONE);
+        });*/
+
+        //createDialogOpts();
+
+        dialogTest();
 
     }
 
@@ -112,8 +129,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     private Task<DriveFile> createFileIntentSender(DriveContents driveContents, Bitmap image) {
 
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-        DriveId dId = globalVariable.getIndexList().get(0).getDriveid();
-//        DriveId dId = globalVariable.findIndexAlbum("idenx"+itemString).getDriveid();
+        DriveId dId = globalVariable.findIndexAlbum("index"+itemString).getDriveid();
         appendContents(dId.asDriveFile());
 
         Log.i(TAG, "ALBUM NAME: " + itemString);
@@ -181,7 +197,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     MetadataChangeSet metadataChangeSet =
                             new MetadataChangeSet.Builder()
                                     .setMimeType("image/jpeg")
-                                    .setTitle("Android Photo.png")
+                                    .setTitle(imageTitle+".png"/*"Android Photo.png"*/)
                                     .build();
 
                     return mDriveResourceClient.createFile(parent, metadataChangeSet, contents);
@@ -258,7 +274,19 @@ public class AddPhotoActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    saveFileToDrive();
+                   // saveFileToDrive();
+                    //builder.show();
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    try {
+                        alertDialog.show();
+                    } catch (Exception e) {
+                        // WindowManager$BadTokenException will be caught and the app would
+                        // not display the 'Force Close' message
+                        e.printStackTrace();
+                    }
+
                 }
                 break;
             case REQUEST_CODE_CAPTURE_IMAGE:
@@ -269,7 +297,19 @@ public class AddPhotoActivity extends AppCompatActivity {
                     // Store the image data as a bitmap for writing later.
                     mBitmapToSave = (Bitmap) data.getExtras().get("data");
                     Log.i(TAG, "mBitmapToSave: " + mBitmapToSave.toString());
-                    saveFileToDrive();
+                  //  saveFileToDrive();
+                    //builder.show();
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    try {
+                        alertDialog.show();
+                    } catch (Exception e) {
+                        // WindowManager$BadTokenException will be caught and the app would
+                        // not display the 'Force Close' message
+                        e.printStackTrace();
+                    }
+
                 }
                 break;
             case REQUEST_CODE_CREATOR:
@@ -317,10 +357,127 @@ public class AddPhotoActivity extends AppCompatActivity {
         });
     }
 
+    /*void createDialogOpts(){
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle("Insert Photo Title");
+
+
+        final TextView tvChoosenAlbum = new TextView(this);
+        tvChoosenAlbum.setText("Album: ");
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        builder.setAdapter(albumArrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = albumArrayAdapter.getItem(which).getName();
+                AlertDialog.Builder builderInner = new AlertDialog.Builder(builder.getContext());
+                builderInner.setMessage(strName);
+                builderInner.setTitle("Your Selected Item is");
+                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builderInner.show();
+
+               tvChoosenAlbum.setText("Album: " + strName);
+
+                //imageTitle = input.getText().toString();
+                //saveFileToDrive();
+
+            }
+        });
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                imageTitle = input.getText().toString();
+                    saveFileToDrive();
+                }
+        });
+    }*/
+
     /**
      * Shows a toast message.
      */
     protected void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+
+    void dialogTest() {
+        alertDialogBuilder = new AlertDialog.Builder(this);
+
+        LinearLayout layout = new LinearLayout(this);
+        LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setLayoutParams(parms);
+
+        layout.setGravity(Gravity.CLIP_VERTICAL);
+        layout.setPadding(2, 2, 2, 2);
+
+        TextView tv = new TextView(this);
+        tv.setText("Choose Album and Insert Photo Title");
+        tv.setPadding(40, 40, 40, 40);
+        tv.setGravity(Gravity.CENTER);
+        tv.setTextSize(20);
+
+        EditText et = new EditText(this);
+        imageTitle = et.getText().toString();
+        TextView tv1 = new TextView(this);
+        tv1.setText("Insert Photo Title");
+
+
+
+        LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        tv1Params.bottomMargin = 5;
+        layout.addView(tv1, tv1Params);
+        layout.addView(et, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+
+        alertDialogBuilder.setView(layout);
+        alertDialogBuilder.setTitle("Choose Album");
+        // alertDialogBuilder.setMessage("Input Student ID");
+        alertDialogBuilder.setCustomTitle(tv);
+
+        albumArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, albumArrayList);
+        alertDialogBuilder.setAdapter(albumArrayAdapter,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = albumArrayAdapter.getItem(which).getName();
+                itemString = strName;
+                imageTitle = et.getText().toString();
+                saveFileToDrive();
+
+            }
+        });
+
+
+
+
+/*
+        // alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setCancelable(false);
+
+        // Setting Negative "Cancel" Button
+        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });
+
+        // Setting Positive "OK" Button
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });*/
+
     }
 }
