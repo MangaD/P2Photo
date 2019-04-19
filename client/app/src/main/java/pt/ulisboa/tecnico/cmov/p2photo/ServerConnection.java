@@ -49,7 +49,7 @@ public class ServerConnection {
     }
 
     private String read() throws IOException {
-        return in.readLine();
+        return in.readLine().trim();
     }
 
     private void write(String message) throws IOException {
