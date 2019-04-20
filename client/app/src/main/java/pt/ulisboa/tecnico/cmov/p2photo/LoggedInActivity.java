@@ -1,12 +1,15 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -20,6 +23,9 @@ import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.drive.widget.DataBufferAdapter;
 import com.google.android.gms.tasks.Task;
+
+import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 public class LoggedInActivity extends AppCompatActivity {
 
@@ -124,8 +130,7 @@ public class LoggedInActivity extends AppCompatActivity {
         buttonLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LoggedInActivity.this, LoginActivity.class);
-                startActivity(intent);
+                new LogOutTask(LoggedInActivity.this).execute();
             }
         });
 
@@ -153,5 +158,54 @@ public class LoggedInActivity extends AppCompatActivity {
 
     protected DriveResourceClient getDriveResourceClient() {
         return mDriveResourceClient;
+    }
+
+
+    /**
+     * Server side tasks.
+     */
+
+    private static class LogOutTask extends AsyncTask<Void, Void, Void> {
+
+        private WeakReference<LoggedInActivity> activityReference;
+        private ProgressDialog pd;
+        private String msg = "Logged out.";
+
+        private LogOutTask(LoggedInActivity activity) {
+
+            activityReference = new WeakReference<>(activity);
+
+            // Create Progress dialog
+            pd = new ProgressDialog(activity);
+            pd.setMessage("Logging out...");
+            pd.setTitle("");
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... values) {
+            GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
+            ServerConnection conn = context.getConnection();
+
+            conn.disconnect();
+            Log.d("LoggedInActivity", "Disconnected");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            pd.dismiss();
+            Log.d("LoggedInActivity", msg);
+            Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(activityReference.get(), LoginActivity.class);
+            activityReference.get().startActivity(intent);
+        }
     }
 }

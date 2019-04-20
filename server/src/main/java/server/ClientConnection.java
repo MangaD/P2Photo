@@ -75,7 +75,7 @@ public class ClientConnection implements Runnable {
 				}
 			}
 
-		} catch (IOException | NullPointerException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
@@ -84,7 +84,11 @@ public class ClientConnection implements Runnable {
 	}
 
 	private String read() throws IOException {
-		return in.readLine().trim();
+		try {
+			return in.readLine().trim();
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 	
 	public void start() {
