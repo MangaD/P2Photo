@@ -30,6 +30,7 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Query;
@@ -68,7 +69,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     Button btnTakePicture;
     Button btnFindPicture;
     private String imageTitle = "";
-    //private AlertDialog.Builder builder;
+
 
     AlertDialog.Builder alertDialogBuilder;
 
@@ -85,27 +86,10 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         //puts the elements on a list on screen
         albumArrayList = globalVariable.getAlbumList();
-        //albumListView = findViewById(R.id.listViewAlbums);
-        //albumArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, albumArrayList);
-        //albumListView.setAdapter(albumArrayAdapter);
 
         initButtons();
-       // btnFindPicture.setVisibility(View.GONE);
-        //btnTakePicture.setVisibility(View.GONE);
 
-        /*albumListView.setVisibility(View.VISIBLE);
-        albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
-            Object itemAtPosition = adapter.getItemAtPosition(position);
-            itemString = itemAtPosition.toString();
-            Log.i(TAG, "ALBUM NAME: " + itemString);
-            btnFindPicture.setVisibility(View.VISIBLE);
-            btnTakePicture.setVisibility(View.VISIBLE);
-            albumListView.setVisibility(View.GONE);
-        });*/
-
-        //createDialogOpts();
-
-        dialogTest();
+        createDialogOpts();
 
     }
 
@@ -118,9 +102,12 @@ public class AddPhotoActivity extends AppCompatActivity {
         mDriveResourceClient
                 .createContents()
                 .continueWithTask(
-                        task -> createFileIntentSender(task.getResult(), image))
+                        task ->
+                            createFileIntentSender(task.getResult(), image)
+                        )
                 .addOnFailureListener(
                         e -> Log.w(TAG, "Failed to create new contents.", e));
+
     }
 
     /**
@@ -130,8 +117,8 @@ public class AddPhotoActivity extends AppCompatActivity {
     private Task<DriveFile> createFileIntentSender(DriveContents driveContents, Bitmap image) {
 
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-        DriveId dId = globalVariable.findIndexAlbum("index"+itemString).getDriveid();
-        appendContents(dId.asDriveFile());
+        //DriveId diId = globalVariable.findIndexAlbum("index"+itemString).getDriveid();
+        //appendContents(diId.asDriveFile());
 
         Log.i(TAG, "ALBUM NAME: " + itemString);
 
@@ -177,40 +164,6 @@ public class AddPhotoActivity extends AppCompatActivity {
     }*/
 
     private Task<DriveFile> createImageInAlbum(final DriveFolder parent, DriveContents driveContents, Bitmap image) {
-        /*return mDriveResourceClient
-                .createContents()
-                .continueWithTask(task -> {
-                    DriveContents contents = task.getResult();
-                    Log.i(TAG, "New contents created.");
-                    // Get an output stream for the contents.
-                    OutputStream outputStream = driveContents.getOutputStream();
-                    // Write the bitmap data from it.
-                    ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-                    image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
-                    try {
-                        outputStream.write(bitmapStream.toByteArray());
-                    } catch (IOException e) {
-                        Log.w(TAG, "Unable to write file contents.", e);
-                    }
-
-                    // Create the initial metadata - MIME type and title.
-                    // Note that the user will be able to change the title later.
-                    MetadataChangeSet metadataChangeSet =
-                            new MetadataChangeSet.Builder()
-                                    .setMimeType("image/jpeg")
-                                    .setTitle(imageTitle+".png")
-                                    .build();
-
-                    return mDriveResourceClient.createFile(parent, metadataChangeSet, contents);
-                })
-                .addOnSuccessListener(this,
-                        driveFile -> {showMessage("Image created " +
-                                driveFile.getDriveId().encodeToString());
-                                finish();})
-                .addOnFailureListener(this, e -> {
-                    Log.e(TAG, "Unable to create file", e);
-                    showMessage("Image create error");
-                });*/
         // [START drive_android_create_file]
         final Task<DriveFolder> rootFolderTask = mDriveResourceClient.getRootFolder();
         final Task<DriveContents> createContentsTask = mDriveResourceClient.createContents();
@@ -241,7 +194,34 @@ public class AddPhotoActivity extends AppCompatActivity {
                     return mDriveResourceClient.createFile(parent, changeSet, contents);
                 })
                 .addOnSuccessListener(this,
-                        driveFile -> {showMessage("Image created " +
+                        driveFile -> {
+
+                            Log.i("LINK", "DriveID: " + driveFile.getDriveId());
+                            GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+                            GlobalClass.IndexAlbum diId = globalVariable.findIndexAlbum("index"+itemString);
+                            GlobalClass.PhotoAlbum daId = globalVariable.findPhotoAlbum(itemString);
+                            Log.i("LINK", "ALbumID: " + daId.getDriveid() + " IndexID: " + diId.getDriveid());
+
+                            globalVariable.addPhotoToPhotosList(imageTitle, driveFile.getDriveId(), daId, diId);
+                            Log.i("LINK", "Size: " + globalVariable.getPhotosList().size());
+                            Log.i("LINK", "DRIVEID2: " + globalVariable.findPhotoImage(imageTitle).getDriveid());
+                            DriveFile file = globalVariable.findPhotoImage(/*"oi"*/imageTitle).getDriveid().asDriveFile();
+
+                            //DriveFile file = diId.getDriveid().asDriveFile();/*driveFile.getDriveId().asDriveFile();*/
+                            Task<Metadata> queryTask = mDriveResourceClient.getMetadata(file);
+                            queryTask
+                                    .addOnSuccessListener(this,
+                                            Metadata -> {String link = queryTask.getResult().getWebContentLink();
+                                                Log.i("LINK", "Success getting URL " + link);
+                                                showMessage("Success getting URL " + link);
+                                                appendContents(file, link);})
+                                    .addOnFailureListener(this, e -> {
+                                        Log.i("LINK", "Error getting URL");
+                                        showMessage("Error getting URL");
+                                        finish();
+                                    });
+
+                                showMessage("Image created " +
                                 driveFile.getDriveId().encodeToString());
                             finish();
                         })
@@ -253,7 +233,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         return null;
     }
 
-    private void appendContents(DriveFile file) {
+    private void appendContents(DriveFile file, String link) {
+
         // [START drive_android_open_for_append]
         Task<DriveContents> openTask =
                 mDriveResourceClient.openFile(file, DriveFile.MODE_READ_WRITE);
@@ -271,7 +252,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 }
             }
             try (OutputStream out = new FileOutputStream(pfd.getFileDescriptor())) {
-                out.write("Hello world\n".getBytes());
+                //out.write("Hello world\n".getBytes());
+                out.write((link+"\n").getBytes());
             }
             // [START drive_android_commit_contents_with_metadata]
             MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -377,10 +359,6 @@ public class AddPhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Start getContent
-                //Intent cam_ImagesIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                //cam_ImagesIntent.setType("image/*");
-                //startActivityForResult(cam_ImagesIntent, REQUEST_CODE_FIND_IMAGE);
-
                 startActivityForResult(
                         new Intent(Intent.ACTION_GET_CONTENT).setType("image/*"), REQUEST_CODE_FIND_IMAGE);
             }
@@ -399,52 +377,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         });
     }
 
-    /*void createDialogOpts(){
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle("Insert Photo Title");
-
-
-        final TextView tvChoosenAlbum = new TextView(this);
-        tvChoosenAlbum.setText("Album: ");
-        // Set up the input
-        final EditText input = new EditText(this);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-        builder.setAdapter(albumArrayAdapter, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String strName = albumArrayAdapter.getItem(which).getName();
-                AlertDialog.Builder builderInner = new AlertDialog.Builder(builder.getContext());
-                builderInner.setMessage(strName);
-                builderInner.setTitle("Your Selected Item is");
-                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog,int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builderInner.show();
-
-               tvChoosenAlbum.setText("Album: " + strName);
-
-                //imageTitle = input.getText().toString();
-                //saveFileToDrive();
-
-            }
-        });
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                imageTitle = input.getText().toString();
-                    saveFileToDrive();
-                }
-        });
-    }*/
-
     /**
      * Shows a toast message.
      */
@@ -452,8 +384,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-
-    void dialogTest() {
+    void createDialogOpts() {
         alertDialogBuilder = new AlertDialog.Builder(this);
 
         LinearLayout layout = new LinearLayout(this);
@@ -499,27 +430,5 @@ public class AddPhotoActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
-/*
-        // alertDialogBuilder.setMessage(message);
-        alertDialogBuilder.setCancelable(false);
-
-        // Setting Negative "Cancel" Button
-        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-            }
-        });
-
-        // Setting Positive "OK" Button
-        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });*/
-
     }
 }
