@@ -111,17 +111,6 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * view album
-         * */
-        Button buttonViewAlbum = findViewById(R.id.button_view_album);
-        buttonViewAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoggedInActivity.this, ViewAlbumActivity.class);
-                startActivity(intent);
-            }
-        });
 
         /*
          * LOG OUT button

@@ -6,6 +6,12 @@
     android:paddingRight="16dp"
     android:orientation="vertical" >
 
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert album name:" />
+
     <EditText
         android:id="@+id/albumName"
         android:layout_width="match_parent"
