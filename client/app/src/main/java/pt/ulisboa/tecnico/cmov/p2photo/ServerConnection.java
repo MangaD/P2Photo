@@ -48,6 +48,15 @@ public class ServerConnection {
         return Boolean.valueOf(result);
     }
 
+    public String signin(String user, String password) throws IOException {
+        write("signin");
+        write(user);
+        write(password);
+        Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
+        String result = read();
+        return result;
+    }
+
     private String read() throws IOException {
         return in.readLine().trim();
     }

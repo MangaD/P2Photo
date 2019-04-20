@@ -31,10 +31,12 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //new LoginTask(LoginActivity.this).execute();
+                new LoginTask(LoginActivity.this).execute();
 
-                Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
-                startActivity(intent);
+                // Login is working at the server. Run the server and use it please.
+
+                /*Intent intent = new Intent(LoginActivity.this, DriveLogin.class);
+                startActivity(intent);*/
             }
         });
         /*

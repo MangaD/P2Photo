@@ -6,10 +6,12 @@
     android:paddingRight="16dp"
     android:orientation="vertical" >
     <EditText
+        android:id="@+id/signin_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username" />
     <EditText
+        android:id="@+id/signin_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password" />
