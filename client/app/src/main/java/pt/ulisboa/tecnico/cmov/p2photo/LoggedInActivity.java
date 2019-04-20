@@ -49,8 +49,8 @@ public class LoggedInActivity extends AppCompatActivity {
     }
 
     private void initializeButtons() {
-        /*
-         * opens the activity responsible for CREATING ALBUMS
+        /**
+         * CREATE ALBUM
          */
         Button buttonCreateAlbum = findViewById(R.id.button_create_album);
         buttonCreateAlbum.setOnClickListener(new View.OnClickListener() {
@@ -60,9 +60,9 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * Find Users
-         * */
+        /**
+         * FIND USERS
+         */
         Button buttonFindUser = findViewById(R.id.button_find_user);
         buttonFindUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,9 +71,9 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * add photo to album
-         * */
+        /**
+         * ADD PHOTO TO ALBUM
+         */
         Button buttonAddPhoto = findViewById(R.id.button_add_photo);
         buttonAddPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,9 +85,9 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * add user to album
-         * */
+        /**
+         * ADD USER TO ALBUM
+         */
         Button buttonAddUserToAlbum = findViewById(R.id.button_add_user_to_album);
         buttonAddUserToAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,9 +96,9 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * list user albums
-         * */
+        /**
+         * LIST USER'S ALBUNS
+         */
         Button buttonListAlbums = findViewById(R.id.button_list_user_album);
         buttonListAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,9 +111,9 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /*
-         * view album
-         * */
+        /**
+         * VIEW ALBUMS
+         */
         Button buttonViewAlbum = findViewById(R.id.button_view_album);
         buttonViewAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,9 +123,9 @@ public class LoggedInActivity extends AppCompatActivity {
             }
         });
 
-        /*
-         * LOG OUT button
-         * */
+        /**
+         * LOG OUT
+         */
         Button buttonLogOut = findViewById(R.id.button_log_out);
         buttonLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
