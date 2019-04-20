@@ -34,6 +34,7 @@ import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -176,7 +177,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     }*/
 
     private Task<DriveFile> createImageInAlbum(final DriveFolder parent, DriveContents driveContents, Bitmap image) {
-        return mDriveResourceClient
+        /*return mDriveResourceClient
                 .createContents()
                 .continueWithTask(task -> {
                     DriveContents contents = task.getResult();
@@ -197,18 +198,59 @@ public class AddPhotoActivity extends AppCompatActivity {
                     MetadataChangeSet metadataChangeSet =
                             new MetadataChangeSet.Builder()
                                     .setMimeType("image/jpeg")
-                                    .setTitle(imageTitle+".png"/*"Android Photo.png"*/)
+                                    .setTitle(imageTitle+".png")
                                     .build();
 
                     return mDriveResourceClient.createFile(parent, metadataChangeSet, contents);
                 })
                 .addOnSuccessListener(this,
-                        driveFile -> showMessage("Image created " +
-                                driveFile.getDriveId().encodeToString()))
+                        driveFile -> {showMessage("Image created " +
+                                driveFile.getDriveId().encodeToString());
+                                finish();})
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create file", e);
                     showMessage("Image create error");
+                });*/
+        // [START drive_android_create_file]
+        final Task<DriveFolder> rootFolderTask = mDriveResourceClient.getRootFolder();
+        final Task<DriveContents> createContentsTask = mDriveResourceClient.createContents();
+        Tasks.whenAll(rootFolderTask, createContentsTask)
+                .continueWithTask(task -> {
+                    //DriveFolder parent = rootFolderTask.getResult();
+                    DriveContents contents = createContentsTask.getResult();
+                    OutputStream outputStream = contents.getOutputStream();
+
+                    // Write the bitmap data from it.
+                    ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
+                    image.compress(Bitmap.CompressFormat.PNG, 50, bitmapStream);
+                    try {
+                        outputStream.write(bitmapStream.toByteArray());
+                    } catch (IOException e1) {
+                        Log.i("ERROR", "Unable to write file contents.");
+                    }
+                    // isto é do texto
+                    //try (Writer writer = new OutputStreamWriter(outputStream)) {
+                    //    writer.write("Hello World!");
+                    //}
+
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle(imageTitle+".png")
+                            .setMimeType("image/jpeg")
+                            .build();
+
+                    return mDriveResourceClient.createFile(parent, changeSet, contents);
+                })
+                .addOnSuccessListener(this,
+                        driveFile -> {showMessage("Image created " +
+                                driveFile.getDriveId().encodeToString());
+                            finish();
+                        })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+                    finish();
                 });
+        // [END drive_android_create_file]
+        return null;
     }
 
     private void appendContents(DriveFile file) {
