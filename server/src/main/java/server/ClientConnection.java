@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.SQLException;
 
 public class ClientConnection implements Runnable {
 
@@ -33,7 +34,9 @@ public class ClientConnection implements Runnable {
 			String inputLine;
 
 			while ((inputLine = read()) != null) {
+				
 				System.out.println("Received: " + inputLine);
+				
 				if (inputLine.equals("login")) {
 					
 					String user = read();
@@ -48,6 +51,25 @@ public class ClientConnection implements Runnable {
 					} else {
 						System.out.println("Login insuccessful.");
 						out.println("false");
+					}
+					
+				} else if (inputLine.equals("signin")) {
+					
+					String user = read();
+					String password = read();
+
+					System.out.println("Received sign in from '" + user + "' with password '" + password + "'.");
+
+					try {
+						Main.db.signIn(user, password);
+						out.println("Sign in successful.");
+					} catch (SQLException e) {
+						// https://www.sqlite.org/rescode.html#constraint
+						if (e.getErrorCode() == 19) {
+							out.println("User with that name already exists.");
+						} else {
+							out.println("Sign in unsuccessful. Error code: " + e.getErrorCode());
+						}
 					}
 					
 				}

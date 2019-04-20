@@ -94,4 +94,14 @@ public class Database {
 		
 		return false;
 	}
+	
+	public void signIn(String user, String password) throws SQLException {
+		String sql = "INSERT INTO users (username, password) VALUES(?, ?)";
+		
+		PreparedStatement pstmt  = conn.prepareStatement(sql);
+		pstmt.setString(1, user);
+		pstmt.setString(2, password);
+		
+		pstmt.executeUpdate();
+	}
 }
