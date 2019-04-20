@@ -82,8 +82,8 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
         mResultsAdapter = new ResultsAdapter(this);
         mListView.setAdapter(mResultsAdapter);
 
-        GlobalClass.PhotoAlbum photoAlbumum = globalVariable.findPhotoAlbum(albumName);
-        DriveId driveId = photoAlbumum.getDriveid();
+        GlobalClass.PhotoAlbum photoAlbum = globalVariable.findPhotoAlbum(albumName);
+        DriveId driveId = photoAlbum.getDriveid();
 
         listFilesInFolder(driveId.asDriveFolder());
     }
