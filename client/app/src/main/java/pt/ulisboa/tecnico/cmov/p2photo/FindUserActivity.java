@@ -33,25 +33,6 @@ public class FindUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_user);
 
-        // Obtain reference to application context
-        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-
-
-        //puts the elements on a list on screen
-        userArrayList = new ArrayList<>();
-        userListView = findViewById(R.id.listUsers);
-        userArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userArrayList);
-        userListView.setAdapter(userArrayAdapter);
-
-        userListView.setOnItemClickListener((adapter, view, position, arg) -> {
-            Object itemAtPosition = adapter.getItemAtPosition(position);
-            String itemString = itemAtPosition.toString();
-
-            Intent viewAlbumIntent = new Intent(FindUserActivity.this, AddUserToAlbumActivity.class);
-
-            startActivity(viewAlbumIntent);
-        });
-
         new FindUsersTask(FindUserActivity.this).execute();
     }
 
@@ -115,6 +96,21 @@ public class FindUserActivity extends AppCompatActivity {
                     return false;
                 } else {
                     activityReference.get().userArrayList = list;
+
+                    activityReference.get().userListView = activityReference.get().findViewById(R.id.listUsers);
+                    activityReference.get().userArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, activityReference.get().userArrayList);
+                    activityReference.get().userListView.setAdapter(activityReference.get().userArrayAdapter);
+
+                    activityReference.get().userListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                        Object itemAtPosition = adapter.getItemAtPosition(position);
+                        String itemString = itemAtPosition.toString();
+
+                        Intent viewAlbumIntent = new Intent(activityReference.get(), AddUserToAlbumActivity.class);
+
+                        activityReference.get().startActivity(viewAlbumIntent);
+                    });
+
                     return true;
                 }
             } catch (IOException e) {
