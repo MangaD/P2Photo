@@ -93,7 +93,9 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     }
 
-    /** Create a new file and save it to Drive. */
+    /**
+     * Create a new file and save it to Drive.
+     */
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.
         Log.i(TAG, "Creating new contents.");
@@ -103,8 +105,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .createContents()
                 .continueWithTask(
                         task ->
-                            createFileIntentSender(task.getResult(), image)
-                        )
+                                createFileIntentSender(task.getResult(), image)
+                )
                 .addOnFailureListener(
                         e -> Log.w(TAG, "Failed to create new contents.", e));
 
@@ -187,7 +189,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     //}
 
                     MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                            .setTitle(imageTitle+".png")
+                            .setTitle(imageTitle + ".png")
                             .setMimeType("image/jpeg")
                             .build();
 
@@ -196,33 +198,33 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .addOnSuccessListener(this,
                         driveFile -> {
 
-                            Log.i("LINK", "DriveID: " + driveFile.getDriveId());
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
                             GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-                            GlobalClass.IndexAlbum diId = globalVariable.findIndexAlbum("index"+itemString);
-                            GlobalClass.PhotoAlbum daId = globalVariable.findPhotoAlbum(itemString);
-                            Log.i("LINK", "ALbumID: " + daId.getDriveid() + " IndexID: " + diId.getDriveid());
-
-                            globalVariable.addPhotoToPhotosList(imageTitle, driveFile.getDriveId(), daId, diId);
-                            Log.i("LINK", "Size: " + globalVariable.getPhotosList().size());
-                            Log.i("LINK", "DRIVEID2: " + globalVariable.findPhotoImage(imageTitle).getDriveid());
-                            DriveFile file = globalVariable.findPhotoImage(/*"oi"*/imageTitle).getDriveid().asDriveFile();
-
-                            //DriveFile file = diId.getDriveid().asDriveFile();/*driveFile.getDriveId().asDriveFile();*/
-                            Task<Metadata> queryTask = mDriveResourceClient.getMetadata(file);
+                            GlobalClass.IndexAlbum diId = globalVariable.findIndexAlbum("index" + itemString);
+                            DriveFile indexFile = diId.getDriveid().asDriveFile();
+                            Task<Metadata> queryTask = mDriveResourceClient.getMetadata(driveFile);
                             queryTask
                                     .addOnSuccessListener(this,
-                                            Metadata -> {String link = queryTask.getResult().getWebContentLink();
-                                                Log.i("LINK", "Success getting URL " + link);
-                                                showMessage("Success getting URL " + link);
-                                                appendContents(file, link);})
+                                            Metadata -> {
+                                                String link2 = queryTask.getResult().getEmbedLink();
+                                                Log.i("LINK", "Success getting URL Embeded " + link2);
+                                                showMessage("Success getting URL " + link2);
+                                                appendContents(indexFile, link2);
+                                            })
                                     .addOnFailureListener(this, e -> {
                                         Log.i("LINK", "Error getting URL");
                                         showMessage("Error getting URL");
                                         finish();
                                     });
 
-                                showMessage("Image created " +
-                                driveFile.getDriveId().encodeToString());
+
+                            showMessage("Image created " +
+                                    driveFile.getDriveId().encodeToString());
                             finish();
                         })
                 .addOnFailureListener(this, e -> {
@@ -253,7 +255,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             }
             try (OutputStream out = new FileOutputStream(pfd.getFileDescriptor())) {
                 //out.write("Hello world\n".getBytes());
-                out.write((link+"\n").getBytes());
+                out.write((link + "\n").getBytes());
             }
             // [START drive_android_commit_contents_with_metadata]
             MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -298,7 +300,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                   // saveFileToDrive();
+                    // saveFileToDrive();
                     //builder.show();
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -321,7 +323,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     // Store the image data as a bitmap for writing later.
                     mBitmapToSave = (Bitmap) data.getExtras().get("data");
                     Log.i(TAG, "mBitmapToSave: " + mBitmapToSave.toString());
-                  //  saveFileToDrive();
+                    //  saveFileToDrive();
                     //builder.show();
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -350,7 +352,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         }
     }
 
-    void initButtons(){
+    void initButtons() {
         /*
          * opens the activity responsible for CREATING ALBUMS
          */
@@ -407,7 +409,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         tv1.setText("Insert Photo Title");
 
 
-
         LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         tv1Params.bottomMargin = 5;
         layout.addView(tv1, tv1Params);
@@ -420,7 +421,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         alertDialogBuilder.setCustomTitle(tv);
 
         albumArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, albumArrayList);
-        alertDialogBuilder.setAdapter(albumArrayAdapter,new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setAdapter(albumArrayAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String strName = albumArrayAdapter.getItem(which).getName();
