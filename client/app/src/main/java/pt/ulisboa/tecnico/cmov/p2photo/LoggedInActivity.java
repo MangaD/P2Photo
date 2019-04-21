@@ -2,29 +2,17 @@ package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.Metadata;
-import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.drive.widget.DataBufferAdapter;
-import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class LoggedInActivity extends AppCompatActivity {
@@ -108,17 +96,6 @@ public class LoggedInActivity extends AppCompatActivity {
 
                 //Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity.class);
                 Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity2.class);
-                startActivity(intent);
-            }
-        });
-        /**
-         * VIEW ALBUMS
-         */
-        Button buttonViewAlbum = findViewById(R.id.button_view_album);
-        buttonViewAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoggedInActivity.this, ViewAlbumActivity.class);
                 startActivity(intent);
             }
         });

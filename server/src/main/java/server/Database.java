@@ -104,4 +104,35 @@ public class Database {
 		
 		pstmt.executeUpdate();
 	}
+	
+	public void createAlbum(String user, String name) throws SQLException {
+		
+		String sql = "INSERT INTO albums (name, owner_id) " +
+				" VALUES(?, (SELECT uid FROM users WHERE username = ?))";
+		
+		PreparedStatement pstmt  = conn.prepareStatement(sql);
+		pstmt.setString(1, name);
+		pstmt.setString(2, user);
+		
+		pstmt.executeUpdate();
+	}
+	
+	public String getUsers() {
+		String sql = "SELECT username FROM users";
+		String result = "";
+		
+		try (Statement stmt = this.conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			// loop through the result set
+			while (rs.next()) {
+				result += rs.getString("username") + " ";
+			}
+			return result.trim();
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return "fail";
+		}
+	}
 }

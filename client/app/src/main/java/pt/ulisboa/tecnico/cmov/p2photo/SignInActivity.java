@@ -50,7 +50,6 @@ public class SignInActivity extends AppCompatActivity {
         private WeakReference<SignInActivity> activityReference;
         private ProgressDialog pd;
         private String successMsg = "Sign in successful!";
-        private String errorMsg = "Sign in unsuccessful.";
 
         private SignInTask(SignInActivity activity) {
 

@@ -16,6 +16,7 @@ public class ClientConnection implements Runnable {
 	private BufferedReader in;
 	
 	private boolean isLoggedIn;
+	private String user;
 
 	ClientConnection(Socket s, String name) throws IOException {
 		threadName = name;
@@ -24,6 +25,7 @@ public class ClientConnection implements Runnable {
 		in = new BufferedReader(
 				new InputStreamReader(clientSocket.getInputStream()));
 		isLoggedIn = false;
+		this.user = "";
 	}
 
 	@Override
@@ -40,7 +42,13 @@ public class ClientConnection implements Runnable {
 				if (inputLine.equals("login")) {
 					
 					String user = read();
+					while (user.isEmpty()) {
+						user = read();
+					}
 					String password = read();
+					while (password.isEmpty()) {
+						password = read();
+					}
 
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
 
@@ -48,6 +56,7 @@ public class ClientConnection implements Runnable {
 						System.out.println("Login successful.");
 						out.println("true");
 						isLoggedIn = true;
+						this.user = user;
 					} else {
 						System.out.println("Login insuccessful.");
 						out.println("false");
@@ -56,7 +65,13 @@ public class ClientConnection implements Runnable {
 				} else if (inputLine.equals("signin")) {
 					
 					String user = read();
+					while (user.isEmpty()) {
+						user = read();
+					}
 					String password = read();
+					while (password.isEmpty()) {
+						password = read();
+					}
 
 					System.out.println("Received sign in from '" + user + "' with password '" + password + "'.");
 
@@ -72,6 +87,45 @@ public class ClientConnection implements Runnable {
 						}
 					}
 					
+				} else if (inputLine.equals("createalbum")) {
+					
+					if (! isLoggedIn) {
+						out.println("You're not logged in!");
+						continue;
+					}
+					
+					String name = read();
+					while (name.isEmpty()) {
+						name = read();
+					}
+
+					System.out.println("Received create album from '" + user + "' with name '" + name + "'.");
+
+					try {
+						Main.db.createAlbum(user, name);
+						out.println("Album created successfully.");
+					} catch (SQLException e) {
+						// https://www.sqlite.org/rescode.html#constraint
+						if (e.getErrorCode() == 19) {
+							out.println("Album with that name already exists.");
+						} else {
+							out.println("Album creation failed. Error code: " + e.getErrorCode());
+						}
+					}
+					
+				} else if (inputLine.equals("getusers")) {
+					
+					if (! isLoggedIn) {
+						out.println("You're not logged in!");
+						continue;
+					}
+					
+					System.out.println("Received get users from '" + user + ".");
+
+					String res = Main.db.getUsers();
+					
+					System.out.println("Sending: " + res);
+					out.println(res);
 				}
 			}
 

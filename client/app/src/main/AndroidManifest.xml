@@ -18,8 +18,7 @@
         <activity android:name=".ViewAlbumActivity2"></activity>
         <activity android:name=".ListUserAlbumActivity2" />
         <activity android:name=".DriveLogin" />
-        <activity android:name=".ViewAlbumActivity" />
-        <activity android:name=".ListUserAlbumActivity" />
+
         <activity android:name=".AddUserToAlbumActivity" />
         <activity android:name=".AddPhotoActivity" />
         <activity android:name=".FindUserActivity" />

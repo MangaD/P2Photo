@@ -1,13 +1,158 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveResourceClient;
+
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class FindUserActivity extends AppCompatActivity {
+
+    private static final String TAG = "find_user_album";
+    private DriveClient mDriveClient;
+    private DriveResourceClient mDriveResourceClient;
+
+    private ListView userListView;
+    private ArrayList<String> userArrayList;
+    private ArrayAdapter<String> userArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_user);
+
+        // Obtain reference to application context
+        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
+
+
+        //puts the elements on a list on screen
+        userArrayList = new ArrayList<>();
+        userListView = findViewById(R.id.listUsers);
+        userArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userArrayList);
+        userListView.setAdapter(userArrayAdapter);
+
+        userListView.setOnItemClickListener((adapter, view, position, arg) -> {
+            Object itemAtPosition = adapter.getItemAtPosition(position);
+            String itemString = itemAtPosition.toString();
+
+            Intent viewAlbumIntent = new Intent(FindUserActivity.this, AddUserToAlbumActivity.class);
+
+            startActivity(viewAlbumIntent);
+        });
+
+        new FindUsersTask(FindUserActivity.this).execute();
     }
+
+    /**
+     * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
+     * https://www.androidstation.info/networkonmainthreadexception/
+     * <p>
+     * Template meaning:
+     * 1st - argument type of 'doInBackground'
+     * 2nd - argument type of 'onProgressUpdate'
+     * 3rd - argument type of 'onPostExecute'
+     */
+    private static class FindUsersTask extends AsyncTask<Void, Void, Boolean> {
+
+        private WeakReference<FindUserActivity> activityReference;
+        private ProgressDialog pd;
+
+        private FindUsersTask(FindUserActivity activity) {
+
+            activityReference = new WeakReference<>(activity);
+
+            // Create Progress dialog
+            pd = new ProgressDialog(activity);
+            pd.setMessage("Loading user list...");
+            pd.setTitle("");
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+        }
+
+        /**
+         * onPreExecute called before the doInBackgroud start to display progress dialog.
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Show Progress dialog
+            pd.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... values) {
+
+            GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
+            ServerConnection conn = context.getConnection();
+
+            String msg = "Failed to contact the server.";
+
+            try {
+                ArrayList<String> list = conn.getUsers();
+                if (list == null) {
+                    conn.disconnect();
+                    Log.d("FindUserActivity", msg);
+
+                    activityReference.get().runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    return false;
+                } else {
+                    activityReference.get().userArrayList = list;
+                    return true;
+                }
+            } catch (IOException e) {
+                conn.disconnect();
+                Log.d("FindUserActivity", msg);
+
+                activityReference.get().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                return false;
+            }
+        }
+
+        /**
+         * onPostExecute displays the results of the doInBackgroud and also we
+         * can hide progress dialog.
+         */
+        @Override
+        protected void onPostExecute(Boolean success) {
+            pd.dismiss();
+            String successMsg = "Loaded user list successfully.";
+            String errorMsg = "Failed to load user list.";
+            Log.d("FindUserActivity", successMsg);
+            Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+            if (success) {
+                Log.d("LoginActivity", successMsg);
+                for (String s : activityReference.get().userArrayList) {
+                    Log.d("LoginActivity", s);
+                }
+                Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+            } else {
+                Log.d("LoginActivity", errorMsg);
+                Toast.makeText(activityReference.get().getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

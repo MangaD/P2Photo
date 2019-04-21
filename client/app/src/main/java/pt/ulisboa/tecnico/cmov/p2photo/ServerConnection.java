@@ -11,6 +11,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerConnection {
 
@@ -26,10 +27,18 @@ public class ServerConnection {
     private BufferedReader in;
 
     public void connect() throws IOException {
-        if (conn == null || !conn.isConnected() || conn.isClosed()) {
+        if (!isConnected()) {
             conn = new Socket(addr, port);
             out = new DataOutputStream(conn.getOutputStream());
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        }
+    }
+
+    public boolean isConnected() {
+        if (conn == null || !conn.isConnected() || conn.isClosed()) {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -40,6 +49,10 @@ public class ServerConnection {
     }
 
     public boolean login(String user, String password) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return false;
+        }
         write("login");
         write(user);
         write(password);
@@ -49,12 +62,46 @@ public class ServerConnection {
     }
 
     public String signin(String user, String password) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return "Not connected to the server!";
+        }
         write("signin");
         write(user);
         write(password);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
         String result = read();
         return result;
+    }
+
+    public String createAlbum(String name) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return "Not connected to the server!";
+        }
+        write("createalbum");
+        write(name);
+        Log.d("ServerConnection", "Name: '" + name + "'.");
+        String result = read();
+        return result;
+    }
+
+    public ArrayList<String> getUsers() throws IOException {
+        ArrayList<String> list = new ArrayList<String>();
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getusers");
+        Log.d("ServerConnection", "Get users.");
+        String[] result = read().split(" ");
+        if (result[0].equals("failed")) {
+            return null;
+        }
+        for (String s : result) {
+            list.add(s);
+        }
+        return list;
     }
 
     private String read() throws IOException {
