@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
@@ -59,14 +60,16 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
 
         private WeakReference<ListUserAlbumActivity2> activityReference;
         private ProgressDialog pd;
+        Context ctx;
 
         private ListUserAlbumTask(ListUserAlbumActivity2 activity) {
 
             activityReference = new WeakReference<>(activity);
+            ctx = activity.getApplicationContext();
 
             // Create Progress dialog
             pd = new ProgressDialog(activity);
-            pd.setMessage("Loading user's albums...");
+            pd.setMessage(ctx.getString(R.string.load_user_album));
             pd.setTitle("");
             pd.setIndeterminate(true);
             pd.setCancelable(false);
@@ -89,17 +92,17 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
             GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
             ServerConnection conn = context.getConnection();
 
-            String msg = "Failed to contact the server.";
+            //String msg = "Failed to contact the server.";
 
             try {
                 ArrayList<String> list = conn.getUserAlbums();
                 if (list == null) {
                     conn.disconnect();
-                    Log.d("ListUserAlbumActivity2", msg);
+                    Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_connection_fail));
 
                     activityReference.get().runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -127,11 +130,11 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 conn.disconnect();
-                Log.d("ListUserAlbumActivity2", msg);
+                Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_connection_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -146,19 +149,19 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             pd.dismiss();
-            String successMsg = "Loaded user's albums list successfully.";
-            String errorMsg = "Failed to load user's albums list.";
-            Log.d("ListUserAlbumActivity2", successMsg);
-            Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+            //String successMsg = "Loaded user's albums list successfully.";
+            //String errorMsg = "Failed to load user's albums list.";
+            Log.d("ListUserAlbumActivity2", ctx.getString(R.string.load_user_album_success));
+            Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
             if (success) {
-                Log.d("ListUserAlbumActivity2", successMsg);
+                Log.d("ListUserAlbumActivity2", ctx.getString(R.string.load_user_album_success));
                 for (String s : activityReference.get().albumArrayList) {
                     Log.d("ListUserAlbumActivity2", s);
                 }
-                Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
             } else {
-                Log.d("ListUserAlbumActivity2", errorMsg);
-                Toast.makeText(activityReference.get().getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                Log.d("ListUserAlbumActivity2", ctx.getString(R.string.load_user_album_fail));
+                Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -88,13 +89,13 @@ public class CreateAlbumActivity extends AppCompatActivity {
                         driveFolder -> {
                             globalVariable.addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
                             insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
-                            showMessage("Album created " +
+                            showMessage(getString(R.string.album_created) +
                                     driveFolder.getDriveId().encodeToString());
                             finish();
                         })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create file", e);
-                    showMessage("File create error");
+                    showMessage(getString(R.string.file_create_error));
                     finish();
                 });
     }
@@ -121,12 +122,12 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 .addOnSuccessListener(this,
                         driveFile -> {
                                 globalVariable.addIndexToIndexList("index"+albumNam, driveFile.getDriveId()); // add to local indexes
-                                showMessage("File created" +
+                                showMessage(getString(R.string.file_created) +
                                 driveFile.getDriveId().encodeToString());
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create file", e);
-                    showMessage("File create error");
+                    showMessage(getString(R.string.file_create_error));
                 });
 
     }
@@ -161,16 +162,20 @@ public class CreateAlbumActivity extends AppCompatActivity {
 
         private WeakReference<CreateAlbumActivity> activityReference;
         private ProgressDialog pd;
-        private String successMsg = "Album created successfully.";
+
         private String albumName;
+
+        private Context ctx;
 
         private CreateAlbumTask(CreateAlbumActivity activity) {
 
             activityReference = new WeakReference<>(activity);
 
+            ctx = activity.getApplicationContext();
+
             // Create Progress dialog
             pd = new ProgressDialog(activity);
-            pd.setMessage("Creating album...");
+            pd.setMessage(ctx.getString(R.string.create_album));
             pd.setTitle("");
             pd.setIndeterminate(true);
             pd.setCancelable(false);
@@ -198,7 +203,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
 
             if (albumName.isEmpty()) {
                 conn.disconnect();
-                String msg = "Album name cannot be empty!";
+                String msg = ctx.getString(R.string.album_empty_name);
                 Log.d("CreateAlbumActivity", msg);
 
                 activityReference.get().runOnUiThread(new Runnable() {
@@ -216,7 +221,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 return conn.createAlbum(albumName);
             } catch (IOException e) {
                 conn.disconnect();
-                String msg = "Failed to contact the server.";
+                String msg = ctx.getString(R.string.server_connection_fail);
                 Log.d("CreateAlbumActivity", msg);
 
                 activityReference.get().runOnUiThread(new Runnable() {
@@ -238,7 +243,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
             pd.dismiss();
             Log.d("CreateAlbumActivity", msg);
             Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-            if (msg.equals(successMsg)) {
+            if (msg.equals(ctx.getString(R.string.album_create_success))) {
                 //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
                 if (!activityReference.get().albumNameExists(albumName)) {
                     activityReference.get().createFolder(albumName);

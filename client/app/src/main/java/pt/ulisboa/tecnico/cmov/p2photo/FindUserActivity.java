@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -49,14 +50,17 @@ public class FindUserActivity extends AppCompatActivity {
 
         private WeakReference<FindUserActivity> activityReference;
         private ProgressDialog pd;
+        private Context ctx;
 
         private FindUsersTask(FindUserActivity activity) {
 
             activityReference = new WeakReference<>(activity);
 
+            ctx = activity.getApplicationContext();
+
             // Create Progress dialog
             pd = new ProgressDialog(activity);
-            pd.setMessage("Loading user list...");
+            pd.setMessage(ctx.getString(R.string.load_user_list));
             pd.setTitle("");
             pd.setIndeterminate(true);
             pd.setCancelable(false);
@@ -79,17 +83,15 @@ public class FindUserActivity extends AppCompatActivity {
             GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
             ServerConnection conn = context.getConnection();
 
-            String msg = "Failed to contact the server.";
-
             try {
                 ArrayList<String> list = conn.getUsers();
                 if (list == null) {
                     conn.disconnect();
-                    Log.d("FindUserActivity", msg);
+                    Log.d("FindUserActivity", ctx.getString(R.string.server_connection_fail));
 
                     activityReference.get().runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -115,11 +117,11 @@ public class FindUserActivity extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 conn.disconnect();
-                Log.d("FindUserActivity", msg);
+                Log.d("FindUserActivity", ctx.getString(R.string.server_connection_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -134,19 +136,19 @@ public class FindUserActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             pd.dismiss();
-            String successMsg = "Loaded user list successfully.";
-            String errorMsg = "Failed to load user list.";
-            Log.d("FindUserActivity", successMsg);
-            Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+
+
+            Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_success));
+            Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
             if (success) {
-                Log.d("FindUserActivity", successMsg);
+                Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_success));
                 for (String s : activityReference.get().userArrayList) {
                     Log.d("FindUserActivity", s);
                 }
-                Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
             } else {
-                Log.d("FindUserActivity", errorMsg);
-                Toast.makeText(activityReference.get().getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_fail));
+                Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_fail), Toast.LENGTH_LONG).show();
             }
         }
     }
