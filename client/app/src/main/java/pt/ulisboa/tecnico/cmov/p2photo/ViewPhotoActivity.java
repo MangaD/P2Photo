@@ -24,6 +24,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -120,13 +121,25 @@ public class ViewPhotoActivity extends AppCompatActivity  {
         protected Bitmap doInBackground(Void... values) {
             try {
                 URL url = new URL(imageURL);
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                testImageView.setImageBitmap(bmp);
+                InputStream stream = url.openConnection().getInputStream();
+                Bitmap bmp = BitmapFactory.decodeStream(stream);
+                //testImageView.setImageBitmap(bmp);
+                pd.dismiss();
+                return bmp;
             }catch (Exception e){
                 //
             }
             pd.dismiss();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bmp) {
+            super.onPreExecute();
+
+            testImageView.setImageBitmap(bmp);
+
+
         }
     }
 }
