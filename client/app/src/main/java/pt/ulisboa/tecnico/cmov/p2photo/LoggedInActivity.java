@@ -123,6 +123,18 @@ public class LoggedInActivity extends AppCompatActivity {
             }
         });
 
+        /*
+         * View Photo Test
+         * */
+        Button buttonPhotoTest = findViewById(R.id.button_photo_test);
+        buttonPhotoTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoggedInActivity.this, ViewPhotoActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     void setDriveVars() {

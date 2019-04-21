@@ -48,4 +48,11 @@
         android:layout_gravity="center_horizontal"
         android:text="Log Out" />
 
+    <Button
+        android:id="@+id/button_photo_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="See Photo Test" />
+
 </LinearLayout>
