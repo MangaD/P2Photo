@@ -63,7 +63,7 @@ public class ClientConnection implements Runnable {
 						out.println("false");
 					}
 					
-				} else if (inputLine.equals("signin")) {
+				} else if (inputLine.equals("signup")) {
 					
 					String user = read();
 					while (user.isEmpty()) {
@@ -74,17 +74,17 @@ public class ClientConnection implements Runnable {
 						password = read();
 					}
 
-					System.out.println("Received sign in from '" + user + "' with password '" + password + "'.");
+					System.out.println("Received sign up from '" + user + "' with password '" + password + "'.");
 
 					try {
-						Main.db.signIn(user, password);
-						out.println("Sign in successful.");
+						Main.db.signUp(user, password);
+						out.println("Sign up successful.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
 						if (e.getErrorCode() == 19) {
 							out.println("User with that name already exists.");
 						} else {
-							out.println("Sign in unsuccessful. Error code: " + e.getErrorCode());
+							out.println("Sign up unsuccessful. Error code: " + e.getErrorCode());
 						}
 					}
 					

@@ -96,7 +96,7 @@ public class Database {
 		return false;
 	}
 	
-	public void signIn(String user, String password) throws SQLException {
+	public void signUp(String user, String password) throws SQLException {
 		String sql = "INSERT INTO users (username, password) VALUES(?, ?)";
 		
 		PreparedStatement pstmt  = conn.prepareStatement(sql);

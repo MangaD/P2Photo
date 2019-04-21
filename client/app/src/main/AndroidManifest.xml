@@ -21,7 +21,7 @@
         <activity android:name=".AddPhotoActivity" />
         <activity android:name=".FindUserActivity" />
         <activity android:name=".CreateAlbumActivity" />
-        <activity android:name=".SignInActivity" />
+        <activity android:name=".SignUpActivity" />
         <activity android:name=".LoggedInActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity">

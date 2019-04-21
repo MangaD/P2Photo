@@ -61,12 +61,12 @@ public class ServerConnection {
         return Boolean.valueOf(result);
     }
 
-    public String signin(String user, String password) throws IOException {
+    public String signup(String user, String password) throws IOException {
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return "Not connected to the server!";
         }
-        write("signin");
+        write("signup");
         write(user);
         write(password);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");

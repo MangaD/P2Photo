@@ -78,9 +78,6 @@ public class ViewPhotoActivity extends AppCompatActivity  {
             testImageView = activity.testImageView;
         }
 
-        /**
-         * onPreExecute called before the doInBackgroud start to display progress dialog.
-         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
