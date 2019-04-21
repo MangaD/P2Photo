@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -66,14 +67,15 @@ public class LoginActivity extends AppCompatActivity {
 
         private WeakReference<LoginActivity> activityReference;
         private ProgressDialog pd;
+        Context ctx;
 
         private LoginTask(LoginActivity activity) {
 
             activityReference = new WeakReference<>(activity);
-
+            ctx=activity.getApplicationContext();
             // Create Progress dialog
             pd = new ProgressDialog(activity);
-            pd.setMessage("Logging in...");
+            pd.setMessage(ctx.getString(R.string.login));
             pd.setTitle("");
             pd.setIndeterminate(true);
             pd.setCancelable(false);
@@ -97,12 +99,11 @@ public class LoginActivity extends AppCompatActivity {
             ServerConnection conn = context.getConnection();
 
             if (!ServerConnection.isOnline(context)) {
-                String msg = "Network is disabled.";
-                Log.d("LoginActivity", msg);
+                Log.d("LoginActivity", ctx.getString(R.string.network_disabled));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -114,13 +115,13 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("LoginActivity", "Connected to: " + conn.getAddress());
             } catch (IOException e) {
                 conn.disconnect();
-                String msg = "Failed to connect to the server.";
-                Log.d("LoginActivity", msg);
+
+                Log.d("LoginActivity", ctx.getString(R.string.server_connect_fail));
                 Log.d("LoginActivity", e.getMessage());
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -134,12 +135,12 @@ public class LoginActivity extends AppCompatActivity {
 
             if (username.isEmpty() || password.isEmpty()) {
                 conn.disconnect();
-                String msg = "Username and password cannot be empty!";
-                Log.d("LoginActivity", msg);
+                //String msg = "Username and password cannot be empty!";
+                Log.d("LoginActivity", ctx.getString(R.string.user_pass_empty));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -153,12 +154,12 @@ public class LoginActivity extends AppCompatActivity {
                 return conn.login(username, password);
             } catch (IOException e) {
                 conn.disconnect();
-                String msg = "Failed to contact the server.";
-                Log.d("LoginActivity", msg);
+
+                Log.d("LoginActivity", ctx.getString(R.string.server_contact_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -177,9 +178,9 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(activityReference.get(), DriveLogin.class);
                 activityReference.get().startActivity(intent);
             } else {
-                String msg = "Login invalid.";
-                Log.d("LoginActivity", msg);
-                Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+
+                Log.d("LoginActivity", ctx.getString(R.string.login_invalid));
+                Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.login_invalid), Toast.LENGTH_LONG).show();
             }
         }
     }

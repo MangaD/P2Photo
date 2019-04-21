@@ -98,11 +98,11 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
                 ArrayList<String> list = conn.getUserAlbums();
                 if (list == null) {
                     conn.disconnect();
-                    Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_connection_fail));
+                    Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_contact_fail));
 
                     activityReference.get().runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -130,11 +130,11 @@ public class ListUserAlbumActivity2 extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 conn.disconnect();
-                Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_connection_fail));
+                Log.d("ListUserAlbumActivity2", ctx.getString(R.string.server_contact_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 

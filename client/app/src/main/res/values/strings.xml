@@ -10,14 +10,20 @@
     <string name="album_create_success">Album created successfully.</string>
     <string name="create_album">Creating album…</string>
     <string name="album_empty_name">"Album name cannot be empty!"</string>
-    <string name="server_connection_fail">Failed to contact the server.</string>
+    <string name="server_contact_fail">Failed to contact the server.</string>
+    <string name="server_connect_fail">Failed to connect to the server.</string>
     <string name="load_user_list">Loading user list…</string>
     <string name="load_user_list_success">Loaded user list successfully.</string>
     <string name="load_user_list_fail">Failed to load user list.</string>
     <string name="load_user_album">Loading user\'s albums…</string>
     <string name="load_user_album_success">Loaded user\'s albums list successfully.</string>
     <string name="load_user_album_fail">Failed to load user\'s albums list.</string>
+    <string name="login">Logging in…</string>
+    <string name="network_disabled">Logging in…</string>
+    <string name="user_pass_empty">Logging in…</string>
+    <string name="login_invalid">Logging in…</string>
+    <string name="log_out">Logged out.</string>
 
-
+    <string name="logging_out">Logging out...</string>
 
 </resources>
