@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -158,15 +159,15 @@ public class LoggedInActivity extends AppCompatActivity {
 
         private WeakReference<LoggedInActivity> activityReference;
         private ProgressDialog pd;
-        private String msg = "Logged out.";
+        Context ctx;
 
         private LogOutTask(LoggedInActivity activity) {
 
             activityReference = new WeakReference<>(activity);
-
+            ctx = activity.getApplicationContext();
             // Create Progress dialog
             pd = new ProgressDialog(activity);
-            pd.setMessage("Logging out...");
+            pd.setMessage(ctx.getString(R.string.logging_out));
             pd.setTitle("");
             pd.setIndeterminate(true);
             pd.setCancelable(false);
@@ -191,8 +192,8 @@ public class LoggedInActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void v) {
             pd.dismiss();
-            Log.d("LoggedInActivity", msg);
-            Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            Log.d("LoggedInActivity", ctx.getString(R.string.log_out));
+            Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.log_out), Toast.LENGTH_LONG).show();
             Intent intent = new Intent(activityReference.get(), LoginActivity.class);
             activityReference.get().startActivity(intent);
         }
