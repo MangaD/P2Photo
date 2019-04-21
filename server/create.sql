@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS `albums` (
 ---
 CREATE TABLE IF NOT EXISTS `album_slices` (
 	`aid` INTEGER,
+	`uid` INTEGER,
 	`url` TEXT UNIQUE NOT NULL,
-	FOREIGN KEY(`aid`) REFERENCES `albums`(`aid`)
+	FOREIGN KEY(`aid`) REFERENCES `albums`(`aid`),
+	FOREIGN KEY(`uid`) REFERENCES `users`(`uid`)
 );
