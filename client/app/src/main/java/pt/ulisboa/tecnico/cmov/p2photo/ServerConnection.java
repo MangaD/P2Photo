@@ -87,20 +87,40 @@ public class ServerConnection {
     }
 
     public ArrayList<String> getUsers() throws IOException {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
         }
         write("getusers");
         Log.d("ServerConnection", "Get users.");
-        String[] result = read().split(" ");
-        if (result[0].equals("failed")) {
+
+        try {
+            String s;
+            while ((s = read()) != null && !s.isEmpty()) {
+                list.add(s);
+            }
+        } catch (Exception e) { }
+
+        return list;
+    }
+
+    public ArrayList<String> getUserAlbums() throws IOException {
+        ArrayList<String> list = new ArrayList<>();
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
             return null;
         }
-        for (String s : result) {
-            list.add(s);
-        }
+        write("getuseralbums");
+        Log.d("ServerConnection", "Get user's albums.");
+
+        try {
+            String s;
+            while ((s = read()) != null && !s.isEmpty()) {
+                list.add(s);
+            }
+        } catch (Exception e) { }
+
         return list;
     }
 

@@ -139,13 +139,13 @@ public class FindUserActivity extends AppCompatActivity {
             Log.d("FindUserActivity", successMsg);
             Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
             if (success) {
-                Log.d("LoginActivity", successMsg);
+                Log.d("FindUserActivity", successMsg);
                 for (String s : activityReference.get().userArrayList) {
-                    Log.d("LoginActivity", s);
+                    Log.d("FindUserActivity", s);
                 }
                 Toast.makeText(activityReference.get().getApplicationContext(), successMsg, Toast.LENGTH_LONG).show();
             } else {
-                Log.d("LoginActivity", errorMsg);
+                Log.d("FindUserActivity", errorMsg);
                 Toast.makeText(activityReference.get().getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
             }
         }

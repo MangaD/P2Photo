@@ -85,7 +85,7 @@ public class LoggedInActivity extends AppCompatActivity {
             }
         });
         /**
-         * LIST USER'S ALBUNS
+         * LIST USER'S ALBUMS
          */
         Button buttonListAlbums = findViewById(R.id.button_list_user_album);
         buttonListAlbums.setOnClickListener(new View.OnClickListener() {
