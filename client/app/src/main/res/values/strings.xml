@@ -23,7 +23,7 @@
     <string name="user_pass_empty">Logging in…</string>
     <string name="login_invalid">Logging in…</string>
     <string name="log_out">Logged out.</string>
-
-    <string name="logging_out">Logging out...</string>
-
+    <string name="logging_out">Logging out…</string>
+    <string name="sign_up">Signing up…</string>
+    <string name="sign_up_success">Sign up successful!</string>
 </resources>

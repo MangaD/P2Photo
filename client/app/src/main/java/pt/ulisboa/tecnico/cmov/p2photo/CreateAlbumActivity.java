@@ -221,7 +221,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 return conn.createAlbum(albumName);
             } catch (IOException e) {
                 conn.disconnect();
-                String msg = ctx.getString(R.string.server_connection_fail);
+                String msg = ctx.getString(R.string.server_connect_fail);
                 Log.d("CreateAlbumActivity", msg);
 
                 activityReference.get().runOnUiThread(new Runnable() {

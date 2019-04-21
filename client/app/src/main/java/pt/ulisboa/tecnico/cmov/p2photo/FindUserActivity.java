@@ -87,11 +87,11 @@ public class FindUserActivity extends AppCompatActivity {
                 ArrayList<String> list = conn.getUsers();
                 if (list == null) {
                     conn.disconnect();
-                    Log.d("FindUserActivity", ctx.getString(R.string.server_connection_fail));
+                    Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
 
                     activityReference.get().runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -117,11 +117,11 @@ public class FindUserActivity extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 conn.disconnect();
-                Log.d("FindUserActivity", ctx.getString(R.string.server_connection_fail));
+                Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, ctx.getString(R.string.server_connection_fail), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
                     }
                 });
 
