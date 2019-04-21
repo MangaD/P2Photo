@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
@@ -20,6 +21,7 @@ public class GlobalClass extends Application {
 
     private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
     private ArrayList<IndexAlbum> indexList = new ArrayList<>();
+    private ArrayList<PhotoImage> photosList = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -63,19 +65,22 @@ public class GlobalClass extends Application {
     class PhotoAlbum{
         String name;
         DriveId driveid;
+        ArrayList<PhotoImage> imagesArr;
 
         PhotoAlbum(String name,DriveId driveid){
             this.name=name;
             this.driveid=driveid;
+            this.imagesArr = new ArrayList<>();
         }
 
         public DriveId getDriveid() {
             return driveid;
         }
-
         public String getName() {
             return name;
         }
+        public ArrayList<PhotoImage> getImagesArr(){ return imagesArr;}
+
         @Override
         public String toString(){
             return getName();
@@ -86,6 +91,48 @@ public class GlobalClass extends Application {
         for(PhotoAlbum photoalbum : albumList) {
             if(photoalbum.getName().equals(name)) {
                 return photoalbum;
+            }
+        }
+        return null;
+    }
+
+    class PhotoImage{
+        String name;
+        DriveId driveid;
+        PhotoAlbum photoAlbum;
+        IndexAlbum indexAlbum;
+        String url;
+
+        PhotoImage(String name,DriveId driveid, PhotoAlbum pa, IndexAlbum ia){
+            this.name=name;
+            this.driveid=driveid;
+            this.photoAlbum = pa;
+            this.indexAlbum = ia;
+        }
+        public DriveId getDriveid() {
+            return driveid;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getURL(){ return url; }
+        @Override
+        public String toString(){
+            return getName();
+        }
+    }
+
+    public void addPhotoToPhotosList(String name, DriveId driveId, PhotoAlbum pa, IndexAlbum ia){
+        PhotoImage pi = new PhotoImage(name, driveId, pa, ia);
+        photosList.add(pi);
+    }
+
+    public ArrayList<PhotoImage> getPhotosList(){ return this.photosList;}
+
+    public PhotoImage findPhotoImage(String name) {
+        for(PhotoImage photoImage : photosList) {
+            if(photoImage.getName().equals(name)) {
+                return photoImage;
             }
         }
         return null;

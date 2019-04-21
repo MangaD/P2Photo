@@ -23,6 +23,7 @@ import android.util.Log;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -113,6 +114,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
                             .setMimeType("text/plain")
                             .setStarred(true)
                             .build();
+
 
                     return getDriveResourceClient().createFile(parent, changeSet, contents);
                 })
