@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ClientConnection implements Runnable {
 
@@ -120,12 +121,31 @@ public class ClientConnection implements Runnable {
 						continue;
 					}
 					
-					System.out.println("Received get users from '" + user + ".");
+					System.out.println("Received get users from '" + user + "'.");
 
-					String res = Main.db.getUsers();
+					ArrayList<String> res = Main.db.getUsers();
 					
-					System.out.println("Sending: " + res);
-					out.println(res);
+					for (String s : res) {
+						out.println(s);
+					}
+					// send empty string for terminating
+					out.println();
+				} else if (inputLine.equals("getuseralbums")) {
+					
+					if (! isLoggedIn) {
+						out.println("You're not logged in!");
+						continue;
+					}
+					
+					System.out.println("Received get user's albums from '" + user + "'.");
+
+					ArrayList<String> res = Main.db.getUsersAlbums(user);
+					
+					for (String s : res) {
+						out.println(s);
+					}
+					// send empty string for terminating
+					out.println();
 				}
 			}
 

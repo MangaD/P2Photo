@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Database {
 
@@ -117,22 +118,42 @@ public class Database {
 		pstmt.executeUpdate();
 	}
 	
-	public String getUsers() {
+	public ArrayList<String> getUsers() {
 		String sql = "SELECT username FROM users";
-		String result = "";
+		ArrayList<String> result = new ArrayList<>();
 		
 		try (Statement stmt = this.conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
 
 			// loop through the result set
 			while (rs.next()) {
-				result += rs.getString("username") + " ";
+				result.add(rs.getString("username").trim());
 			}
-			return result.trim();
+			return result;
 			
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-			return "fail";
+			return null;
+		}
+	}
+	
+	public ArrayList<String> getUsersAlbums(String username) {
+		String sql = "SELECT name FROM albums WHERE owner_id IN (SELECT uid FROM users WHERE username = ?)";
+		ArrayList<String> result = new ArrayList<>();
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, username);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getString("name").trim());
+			}
+			return result;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return null;
 		}
 	}
 }
