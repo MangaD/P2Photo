@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -81,11 +82,12 @@ public class ViewPhotoActivity extends AppCompatActivity  {
      * <p>
      * Template meaning:
      * 1st - argument type of 'doInBackground'
-     * 2nd - argument type of 'onProgressUpdate'
+     * 2nd - argument type of 'onProgressUpdate' and 'publishProgress'
      * 3rd - argument type of 'onPostExecute'
      */
-    private static class ObtainPhotoTask extends AsyncTask<Void, Void, Bitmap> {
+    private static class ObtainPhotoTask extends AsyncTask<Void, String, Bitmap> {
 
+        private Context ctx;
         private WeakReference<ViewPhotoActivity> activityReference;
         private ProgressDialog pd;
         private String imageURL;
@@ -94,15 +96,9 @@ public class ViewPhotoActivity extends AppCompatActivity  {
         private ObtainPhotoTask(ViewPhotoActivity activity) {
 
             activityReference = new WeakReference<>(activity);
+            ctx = activity.getApplicationContext();
             imageURL = activity.photo_url;
             testImageView = activity.testImageView;
-
-            // Create Progress dialog
-            pd = new ProgressDialog(activity);
-            pd.setMessage("Downloading image...");
-            pd.setTitle("");
-            pd.setIndeterminate(true);
-            pd.setCancelable(false);
         }
 
         /**
@@ -111,22 +107,36 @@ public class ViewPhotoActivity extends AppCompatActivity  {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            // Show Progress dialog
-            pd.show();
         }
 
         @Override
         protected Bitmap doInBackground(Void... values) {
+            return loadImageFromNetwork(imageURL);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            testImageView.setImageBitmap((Bitmap) result);
+        }
+
+        private Bitmap loadImageFromNetwork(String url) {
             try {
-                URL url = new URL(imageURL);
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                testImageView.setImageBitmap(bmp);
-            }catch (Exception e){
-                //
+                URL imageUrl = new URL(url);
+                Bitmap image = BitmapFactory.decodeStream(imageUrl.openStream());
+                if (image != null) {
+                    publishProgress(ctx.getString(R.string.download_success));
+                    Log.i("DL", ctx.getString(R.string.download_success));
+                } else {
+                    publishProgress(ctx.getString(R.string.download_failed_stream));
+                    Log.i("DL", ctx.getString(R.string.download_failed_stream));
+                }
+                return image;
+            } catch (Exception e) {
+                publishProgress(ctx.getString(R.string.download_failed));
+                Log.i("DL", ctx.getString(R.string.download_failed));
+                e.printStackTrace();
+                return null;
             }
-            pd.dismiss();
-            return null;
         }
     }
 }

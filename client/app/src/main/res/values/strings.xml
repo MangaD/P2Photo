@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">P2Photo</string>
+    <string name="download_success">Successfully retrieved file!</string>
+    <string name="download_failed_stream">Failed decoding file from stream!</string>
+    <string name="download_failed">Failed decoding file!</string>
+    <string name="download_started">Download started...</string>
 </resources>
