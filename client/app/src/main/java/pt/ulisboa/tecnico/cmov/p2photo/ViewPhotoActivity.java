@@ -25,6 +25,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -44,8 +45,6 @@ public class ViewPhotoActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_photo);
 
-
-
         testImageView = this.findViewById(R.id.testImageView);
 
         photo_url = "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg"; //example URL to be CHANGED
@@ -53,28 +52,6 @@ public class ViewPhotoActivity extends AppCompatActivity  {
         new ObtainPhotoTask(ViewPhotoActivity.this).execute();
 
     }
-
-       /* private Task<Bitmap> getImageFromUrl (String url_name){
-            try {
-                URL url = new URL(url_name);
-                Log.i(TAG, "AFTER URL.");
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                Log.i(TAG, "AFTER bitmap.");
-
-                testImageView.setImageBitmap(bmp);
-                Log.i(TAG, "AFTER image view.");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                Log.i(TAG, "bad url.");
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.i(TAG, "bad io.");
-            }catch (Exception e) {
-                e.printStackTrace();
-                Log.i(TAG, "random exception.");
-            }
-        return null;
-    }*/
 
     /**
      * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -125,15 +102,15 @@ public class ViewPhotoActivity extends AppCompatActivity  {
                 Bitmap image = BitmapFactory.decodeStream(imageUrl.openStream());
                 if (image != null) {
                     publishProgress(ctx.getString(R.string.download_success));
-                    Log.i("DL", ctx.getString(R.string.download_success));
+                    Log.i("ViewPhotoActivity", ctx.getString(R.string.download_success));
                 } else {
                     publishProgress(ctx.getString(R.string.download_failed_stream));
-                    Log.i("DL", ctx.getString(R.string.download_failed_stream));
+                    Log.i("ViewPhotoActivity", ctx.getString(R.string.download_failed_stream));
                 }
                 return image;
             } catch (Exception e) {
                 publishProgress(ctx.getString(R.string.download_failed));
-                Log.i("DL", ctx.getString(R.string.download_failed));
+                Log.i("ViewPhotoActivity", ctx.getString(R.string.download_failed));
                 e.printStackTrace();
                 return null;
             }
