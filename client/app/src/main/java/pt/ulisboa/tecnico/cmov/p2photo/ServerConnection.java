@@ -6,7 +6,6 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -99,6 +98,20 @@ public class ServerConnection {
         write(Integer.toString(sessionID));
         write(name);
         Log.d("ServerConnection", "Name: '" + name + "'.");
+        String result = read();
+        return result;
+    }
+
+    public String setAlbumIndex(String name, String index) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return "Not connected to the server!";
+        }
+        write("setalbumindex");
+        write(Integer.toString(sessionID));
+        write(name);
+        write(index);
+        Log.d("ServerConnection", "Name: '" + name + "' Index: '" + index + "'.");
         String result = read();
         return result;
     }

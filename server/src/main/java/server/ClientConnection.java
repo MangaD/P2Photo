@@ -124,6 +124,42 @@ public class ClientConnection implements Runnable {
 						}
 					}
 					
+				} else if (inputLine.equals("setalbumindex")) {
+					
+					if (! isLoggedIn) {
+						out.println("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
+					String name = read();
+					while (name.isEmpty()) {
+						name = read();
+					}
+					
+					String index = read();
+					while (index.isEmpty()) {
+						index = read();
+					}
+
+					System.out.println("Received create album from '" + user + "' with name '" +
+							name + "' and index '" + index + "'.");
+
+					try {
+						Main.db.setAlbumIndex(name, user, index);
+						out.println("Album created successfully.");
+					} catch (SQLException e) {
+						// https://www.sqlite.org/rescode.html#constraint
+						if (e.getErrorCode() == 19) {
+							out.println("Album with that name already exists.");
+						} else {
+							out.println("Album creation failed. Error code: " + e.getErrorCode());
+						}
+					}
+					
 				} else if (inputLine.equals("getusers")) {
 					
 					if (! isLoggedIn) {

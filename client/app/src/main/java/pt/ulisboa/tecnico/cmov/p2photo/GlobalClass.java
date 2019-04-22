@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
@@ -9,7 +8,6 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GlobalClass extends Application {
 

@@ -82,7 +82,21 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         Log.d("CreateAlbumActivity", "Album name: " + albumName);
 
         try {
-            return conn.createAlbum(albumName);
+            // Add album to server
+            String msg = conn.createAlbum(albumName);
+
+            // Add album to drive
+            if (msg.equals(context.getString(R.string.album_create_success))) {
+                //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
+                if (!activityReference.get().albumNameExists(albumName)) {
+                    activityReference.get().createFolder(albumName);
+                }
+            }
+
+            // Add index of album to server
+            msg = conn.setAlbumIndex(albumName, activityReference.get().getIndexURL());
+
+            return msg;
         } catch (IOException e) {
             conn.disconnect();
             String msg = context.getString(R.string.server_connect_fail);
@@ -107,11 +121,5 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         pd.dismiss();
         Log.d("CreateAlbumActivity", msg);
         Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-        if (msg.equals(context.getString(R.string.album_create_success))) {
-            //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
-            if (!activityReference.get().albumNameExists(albumName)) {
-                activityReference.get().createFolder(albumName);
-            }
-        }
     }
 }

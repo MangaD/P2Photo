@@ -118,6 +118,19 @@ public class Database {
 		pstmt.executeUpdate();
 	}
 	
+	public void setAlbumIndex(String album_name, String user_name, String index) throws SQLException {
+		
+		String sql = "INSERT INTO album_slices (aid, uid, url) " +
+				" VALUES((SELECT aid FROM albums WHERE name = ?), (SELECT uid FROM users WHERE username = ?), ?)";
+		
+		PreparedStatement pstmt  = conn.prepareStatement(sql);
+		pstmt.setString(1, album_name);
+		pstmt.setString(2, user_name);
+		pstmt.setString(2, index);
+		
+		pstmt.executeUpdate();
+	}
+	
 	public ArrayList<String> getUsers() {
 		String sql = "SELECT username FROM users";
 		ArrayList<String> result = new ArrayList<>();
