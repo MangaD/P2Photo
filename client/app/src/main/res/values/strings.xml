@@ -19,9 +19,9 @@
     <string name="load_user_album_success">Loaded user\'s albums list successfully.</string>
     <string name="load_user_album_fail">Failed to load user\'s albums list.</string>
     <string name="login">Logging in…</string>
-    <string name="network_disabled">Logging in…</string>
-    <string name="user_pass_empty">Logging in…</string>
-    <string name="login_invalid">Logging in…</string>
+    <string name="network_disabled">Network is disabled.</string>
+    <string name="user_pass_empty">Username and password cannot be empty!</string>
+    <string name="login_invalid">Login invalid.</string>
     <string name="log_out">Logged out.</string>
     <string name="logging_out">Logging out…</string>
     <string name="sign_up">Signing up…</string>
