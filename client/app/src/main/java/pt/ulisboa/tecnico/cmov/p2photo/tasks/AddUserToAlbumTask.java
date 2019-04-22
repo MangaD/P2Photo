@@ -76,11 +76,9 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 conn.disconnect();
                 Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
 
-                activityReference.get().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                    }
-                });
+                activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+                );
 
                 return false;
             } else {
@@ -108,11 +106,9 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             conn.disconnect();
             Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }
