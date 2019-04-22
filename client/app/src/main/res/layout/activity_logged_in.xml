@@ -14,13 +14,6 @@
         android:text="Create Album" />
 
     <Button
-        android:id="@+id/button_find_user"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Find Users" />
-
-    <Button
         android:id="@+id/button_add_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Add User To Album" />
+        android:text="Add Users To Album" />
 
     <Button
         android:id="@+id/button_list_user_album"

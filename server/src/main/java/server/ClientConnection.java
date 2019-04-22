@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ClientConnection implements Runnable {
 
@@ -17,6 +18,10 @@ public class ClientConnection implements Runnable {
 	private BufferedReader in;
 	
 	private boolean isLoggedIn;
+	
+	// Right way to do it: https://codeahoy.com/2016/04/13/generating-session-ids/
+	private int sessionID;
+	
 	private String user;
 
 	ClientConnection(Socket s, String name) throws IOException {
@@ -27,6 +32,7 @@ public class ClientConnection implements Runnable {
 				new InputStreamReader(clientSocket.getInputStream()));
 		isLoggedIn = false;
 		this.user = "";
+		this.sessionID = new Random().nextInt();
 	}
 
 	@Override
@@ -55,12 +61,12 @@ public class ClientConnection implements Runnable {
 
 					if (Main.db.login(user, password)) {
 						System.out.println("Login successful.");
-						out.println("true");
+						out.println(Integer.toString(sessionID));
 						isLoggedIn = true;
 						this.user = user;
 					} else {
 						System.out.println("Login insuccessful.");
-						out.println("false");
+						out.println("-1");
 					}
 					
 				} else if (inputLine.equals("signup")) {
@@ -95,6 +101,10 @@ public class ClientConnection implements Runnable {
 						continue;
 					}
 					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
 					String name = read();
 					while (name.isEmpty()) {
 						name = read();
@@ -121,6 +131,10 @@ public class ClientConnection implements Runnable {
 						continue;
 					}
 					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
 					System.out.println("Received get users from '" + user + "'.");
 
 					ArrayList<String> res = Main.db.getUsers();
@@ -134,6 +148,10 @@ public class ClientConnection implements Runnable {
 					
 					if (! isLoggedIn) {
 						out.println("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
 						continue;
 					}
 					
@@ -157,6 +175,22 @@ public class ClientConnection implements Runnable {
 		System.out.println("Thread " + threadName + " exiting.");
 	}
 
+	private boolean verifySessionId() throws IOException {
+		String session = read();
+		try {
+            int res = Integer.parseInt(session);
+            if (res != sessionID) {
+            	out.println("Invalid session ID!");
+				return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+        	out.println("Invalid session ID!");
+            return false;
+        }
+	}
+	
 	private String read() throws IOException {
 		try {
 			return in.readLine().trim();

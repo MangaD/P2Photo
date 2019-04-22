@@ -49,17 +49,7 @@ public class LoggedInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /**
-         * FIND USERS
-         */
-        Button buttonFindUser = findViewById(R.id.button_find_user);
-        buttonFindUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoggedInActivity.this, FindUserActivity.class);
-                startActivity(intent);
-            }
-        });
+
         /**
          * ADD PHOTO TO ALBUM
          */

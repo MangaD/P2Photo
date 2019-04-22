@@ -26,6 +26,8 @@ public class ServerConnection {
     private DataOutputStream out;
     private BufferedReader in;
 
+    int sessionID = -1;
+
     public void connect() throws IOException {
         if (!isConnected()) {
             conn = new Socket(addr, port);
@@ -58,7 +60,17 @@ public class ServerConnection {
         write(password);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
         String result = read();
-        return Boolean.valueOf(result);
+        try {
+            int res = Integer.parseInt(result);
+            if (res < 0) {
+                return false;
+            } else {
+                this.sessionID = res;
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String signup(String user, String password) throws IOException {
@@ -80,6 +92,7 @@ public class ServerConnection {
             return "Not connected to the server!";
         }
         write("createalbum");
+        write(Integer.toString(sessionID));
         write(name);
         Log.d("ServerConnection", "Name: '" + name + "'.");
         String result = read();
@@ -93,11 +106,13 @@ public class ServerConnection {
             return null;
         }
         write("getusers");
+        write(Integer.toString(sessionID));
         Log.d("ServerConnection", "Get users.");
 
         try {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {
+                Log.d("ServerConnection", s);
                 list.add(s);
             }
         } catch (Exception e) { }
@@ -112,6 +127,7 @@ public class ServerConnection {
             return null;
         }
         write("getuseralbums");
+        write(Integer.toString(sessionID));
         Log.d("ServerConnection", "Get user's albums.");
 
         try {

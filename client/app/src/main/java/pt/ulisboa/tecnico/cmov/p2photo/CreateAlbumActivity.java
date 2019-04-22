@@ -16,6 +16,7 @@ import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 
 import android.support.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.metadata.CustomPropertyKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,6 +43,8 @@ public class CreateAlbumActivity extends AppCompatActivity {
     private GlobalClass globalVariable;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
+
+    public String IndexURL = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +128,31 @@ public class CreateAlbumActivity extends AppCompatActivity {
                                 globalVariable.addIndexToIndexList("index"+albumNam, driveFile.getDriveId()); // add to local indexes
                                 showMessage(getString(R.string.file_created) +
                                 driveFile.getDriveId().encodeToString());
+
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            Task<Metadata> queryTask = getDriveResourceClient().getMetadata(driveFile);
+                                    queryTask
+                                    .addOnSuccessListener(this,
+                                            Metadata -> {
+                                                String link2 = queryTask.getResult().getEmbedLink();
+                                                Log.i("LINK", "Success getting URL Embeded " + link2);
+                                                showMessage("Success getting URL " + link2);
+                                                setIndexURL(link2);
+                                                Log.i("LINK", "URL: " + getIndexURL());
+                                            })
+                                    .addOnFailureListener(this, e -> {
+                                        Log.i("LINK", "Error getting URL");
+                                        showMessage("Error getting URL");
+                                        finish();
+                                    });
+
+
+
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create file", e);
@@ -250,6 +279,14 @@ public class CreateAlbumActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void setIndexURL(String iurl){
+        this.IndexURL = iurl;
+    }
+
+    public String getIndexURL(){
+        return this.IndexURL;
     }
 
 }
