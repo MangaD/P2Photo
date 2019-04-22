@@ -16,6 +16,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.AddUserToAlbumActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
 
 
@@ -94,7 +95,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     Object itemAtPosition = adapter.getItemAtPosition(position);
                     String itemString = itemAtPosition.toString();
 
-                    Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity2.class);
+                    Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserActivity.class);
 
                     viewAlbumIntent.putExtra("ViewAlbumName",itemString);
 
