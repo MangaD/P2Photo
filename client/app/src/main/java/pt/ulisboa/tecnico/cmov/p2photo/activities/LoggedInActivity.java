@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,10 @@ import android.widget.Button;
 
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
+
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.LogOutTask;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
 
 public class LoggedInActivity extends AppCompatActivity {
 

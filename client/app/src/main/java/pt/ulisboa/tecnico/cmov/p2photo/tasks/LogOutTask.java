@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -7,6 +7,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
+import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 public class LogOutTask extends AsyncTask<Void, Void, Void> {
 

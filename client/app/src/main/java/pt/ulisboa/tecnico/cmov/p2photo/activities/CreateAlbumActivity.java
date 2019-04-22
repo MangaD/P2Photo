@@ -1,15 +1,10 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.drive.DriveClient;
@@ -19,23 +14,15 @@ import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
-
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.drive.metadata.CustomPropertyKey;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.CreateAlbumTask;
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
 
 public class CreateAlbumActivity extends AppCompatActivity {
 
@@ -57,17 +44,14 @@ public class CreateAlbumActivity extends AppCompatActivity {
         this.mDriveClient = globalVariable.getmDriveClient();
         this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
 
-        Button btn = (Button) findViewById(R.id.buttonCreate);
+        Button btn = findViewById(R.id.buttonCreate);
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                new CreateAlbumTask(CreateAlbumActivity.this).execute();
-            }
-
-        });
+        btn.setOnClickListener((View v) ->
+            new CreateAlbumTask((GlobalClass) getApplicationContext(), CreateAlbumActivity.this).execute()
+        );
     }
 
-    private boolean albumNameExists(String albumN) {
+    public boolean albumNameExists(String albumN) {
         //check if albumName already exists
         globalVariable = (GlobalClass) getApplicationContext();
         GlobalClass.PhotoAlbum photoAlbumum = globalVariable.findPhotoAlbum(albumN);
@@ -77,7 +61,7 @@ public class CreateAlbumActivity extends AppCompatActivity {
         return true;
     }
 
-    private void createFolder(String albumN) {
+    public void createFolder(String albumN) {
         getDriveResourceClient()
                 .getRootFolder()
                 .continueWithTask(task -> {
@@ -175,110 +159,6 @@ public class CreateAlbumActivity extends AppCompatActivity {
 
     protected DriveResourceClient getDriveResourceClient() {
         return this.mDriveResourceClient;
-    }
-
-
-    /**
-     * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
-     * https://www.androidstation.info/networkonmainthreadexception/
-     * <p>
-     * Template meaning:
-     * 1st - argument type of 'doInBackground'
-     * 2nd - argument type of 'onProgressUpdate'
-     * 3rd - argument type of 'onPostExecute'
-     */
-    private static class CreateAlbumTask extends AsyncTask<Void, Void, String> {
-
-        private WeakReference<CreateAlbumActivity> activityReference;
-        private ProgressDialog pd;
-
-        private String albumName;
-
-        private Context ctx;
-
-        private CreateAlbumTask(CreateAlbumActivity activity) {
-
-            activityReference = new WeakReference<>(activity);
-
-            ctx = activity.getApplicationContext();
-
-            // Create Progress dialog
-            pd = new ProgressDialog(activity);
-            pd.setMessage(ctx.getString(R.string.create_album));
-            pd.setTitle("");
-            pd.setIndeterminate(true);
-            pd.setCancelable(false);
-        }
-
-        /**
-         * onPreExecute called before the doInBackgroud start to display progress dialog.
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            // Show Progress dialog
-            pd.show();
-        }
-
-        @Override
-        protected String doInBackground(Void... values) {
-
-            GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-            ServerConnection conn = context.getConnection();
-
-            EditText albumNameEdit = activityReference.get().findViewById(R.id.albumName);
-            albumName = albumNameEdit.getText().toString();
-
-            if (albumName.isEmpty()) {
-                conn.disconnect();
-                String msg = ctx.getString(R.string.album_empty_name);
-                Log.d("CreateAlbumActivity", msg);
-
-                activityReference.get().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                return msg;
-            }
-
-            Log.d("CreateAlbumActivity", "Album name: " + albumName);
-
-            try {
-                return conn.createAlbum(albumName);
-            } catch (IOException e) {
-                conn.disconnect();
-                String msg = ctx.getString(R.string.server_connect_fail);
-                Log.d("CreateAlbumActivity", msg);
-
-                activityReference.get().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                return msg;
-            }
-        }
-
-        /**
-         * onPostExecute displays the results of the doInBackgroud and also we
-         * can hide progress dialog.
-         */
-        @Override
-        protected void onPostExecute(String msg) {
-            pd.dismiss();
-            Log.d("CreateAlbumActivity", msg);
-            Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-            if (msg.equals(ctx.getString(R.string.album_create_success))) {
-                //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
-                if (!activityReference.get().albumNameExists(albumName)) {
-                    activityReference.get().createFolder(albumName);
-                }
-            }
-        }
     }
 
     public void setIndexURL(String iurl){

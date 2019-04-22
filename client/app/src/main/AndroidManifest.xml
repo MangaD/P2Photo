@@ -13,18 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewPhotoActivity" />
-        <activity android:name=".ViewAlbumActivity2" />
-        <activity android:name=".ListUserAlbumActivity2" />
+        <activity android:name=".activities.ViewPhotoActivity" />
+        <activity android:name=".activities.ViewAlbumActivity2" />
+        <activity android:name=".activities.ListUserAlbumActivity2" />
         <activity android:name=".DriveLogin" />
-        <activity android:name=".AddUserToAlbumActivity" />
-        <activity android:name=".AddPhotoActivity" />
-        <activity android:name=".FindUserActivity" />
-        <activity android:name=".CreateAlbumActivity" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".LoggedInActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.AddUserToAlbumActivity" />
+        <activity android:name=".activities.AddPhotoActivity" />
+        <activity android:name=".activities.FindUserActivity" />
+        <activity android:name=".activities.CreateAlbumActivity" />
+        <activity android:name=".activities.SignUpActivity" />
+        <activity android:name=".activities.LoggedInActivity" />
+        <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

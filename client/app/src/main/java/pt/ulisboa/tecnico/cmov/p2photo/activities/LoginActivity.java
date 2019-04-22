@@ -1,10 +1,14 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.LoginTask;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
 
 public class LoginActivity extends AppCompatActivity {
 

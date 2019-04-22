@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,6 +9,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+
+import pt.ulisboa.tecnico.cmov.p2photo.DriveLogin;
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
+import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).

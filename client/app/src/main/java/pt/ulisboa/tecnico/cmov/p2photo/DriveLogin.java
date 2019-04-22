@@ -13,27 +13,20 @@
  */
 package pt.ulisboa.tecnico.cmov.p2photo;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.signin.SignInOptions;
-import com.google.android.gms.tasks.Task;
+
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
 
 /**
  * Android Drive Quickstart activity. This activity takes a photo and saves it in Google Drive. The

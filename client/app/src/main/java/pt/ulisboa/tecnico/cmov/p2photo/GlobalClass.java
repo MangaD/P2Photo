@@ -62,7 +62,7 @@ public class GlobalClass extends Application {
         albumList.add(photoAlbum);
     }
 
-    class PhotoAlbum{
+    public class PhotoAlbum {
         String name;
         DriveId driveid;
         ArrayList<PhotoImage> imagesArr;
@@ -87,7 +87,7 @@ public class GlobalClass extends Application {
         }
     }
 
-    PhotoAlbum findPhotoAlbum(String name) {
+    public PhotoAlbum findPhotoAlbum(String name) {
         for(PhotoAlbum photoalbum : albumList) {
             if(photoalbum.getName().equals(name)) {
                 return photoalbum;
@@ -96,7 +96,7 @@ public class GlobalClass extends Application {
         return null;
     }
 
-    class PhotoImage{
+    public class PhotoImage {
         String name;
         DriveId driveid;
         PhotoAlbum photoAlbum;
@@ -138,7 +138,7 @@ public class GlobalClass extends Application {
         return null;
     }
 
-    class IndexAlbum{
+    public class IndexAlbum {
         String name;
         DriveId driveid;
 
@@ -167,7 +167,7 @@ public class GlobalClass extends Application {
         indexList.add(indexAlbum);
     }
 
-    IndexAlbum findIndexAlbum(String name) {
+    public IndexAlbum findIndexAlbum(String name) {
         for(IndexAlbum indexalbum : indexList) {
             if(indexalbum.getName().equals(name)) {
                 return indexalbum;

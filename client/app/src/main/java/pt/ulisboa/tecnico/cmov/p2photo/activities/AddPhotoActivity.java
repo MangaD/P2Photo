@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -48,6 +48,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
+
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
 
 public class AddPhotoActivity extends AppCompatActivity {
 
