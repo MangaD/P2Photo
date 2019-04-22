@@ -32,7 +32,7 @@ public class ClientConnection implements Runnable {
 				new InputStreamReader(clientSocket.getInputStream()));
 		isLoggedIn = false;
 		this.user = "";
-		this.sessionID = new Random().nextInt();
+		this.sessionID = Math.abs(new Random().nextInt());
 	}
 
 	@Override
@@ -147,6 +147,7 @@ public class ClientConnection implements Runnable {
 				} else if (inputLine.equals("getuseralbums")) {
 					
 					if (! isLoggedIn) {
+						System.out.println("You're not logged in!");
 						out.println("You're not logged in!");
 						continue;
 					}
@@ -160,6 +161,7 @@ public class ClientConnection implements Runnable {
 					ArrayList<String> res = Main.db.getUsersAlbums(user);
 					
 					for (String s : res) {
+						System.out.println(s);
 						out.println(s);
 					}
 					// send empty string for terminating
@@ -177,6 +179,9 @@ public class ClientConnection implements Runnable {
 
 	private boolean verifySessionId() throws IOException {
 		String session = read();
+		while (session.isEmpty()) {
+			session = read();
+		}
 		try {
             int res = Integer.parseInt(session);
             if (res != sessionID) {

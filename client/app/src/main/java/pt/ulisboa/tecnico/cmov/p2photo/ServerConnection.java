@@ -46,7 +46,9 @@ public class ServerConnection {
 
     public void disconnect() {
         try {
-            conn.close();
+            if (conn != null) {
+                conn.close();
+            }
         } catch (IOException e) {}
     }
 
@@ -60,12 +62,14 @@ public class ServerConnection {
         write(password);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
         String result = read();
+        Log.d("ServerConnection", "Session ID: '" + result + "'.");
         try {
             int res = Integer.parseInt(result);
             if (res < 0) {
                 return false;
             } else {
                 this.sessionID = res;
+                Log.d("ServerConnection", "Session ID: '" + this.sessionID + "'.");
                 return true;
             }
         } catch (Exception e) {

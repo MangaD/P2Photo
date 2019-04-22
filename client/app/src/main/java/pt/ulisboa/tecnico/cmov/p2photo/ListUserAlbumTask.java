@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
  * https://www.androidstation.info/networkonmainthreadexception/
@@ -22,9 +21,9 @@ import java.util.ArrayList;
  * 2nd - argument type of 'onProgressUpdate'
  * 3rd - argument type of 'onPostExecute'
  */
-public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
+public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
-    private WeakReference<AddUserToAlbumActivity> activityReference;
+    private WeakReference<ListUserAlbumActivity2> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
 
@@ -32,14 +31,14 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
-    public AddUserToAlbumTask(GlobalClass ctx, AddUserToAlbumActivity activity) {
+    public ListUserAlbumTask(GlobalClass ctx, ListUserAlbumActivity2 activity) {
 
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
-        pd.setMessage(context.getString(R.string.load_user_album));
+        pd.setMessage(ctx.getString(R.string.load_user_album));
         pd.setTitle("");
         pd.setIndeterminate(true);
         pd.setCancelable(false);
@@ -59,6 +58,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
+        GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
         ServerConnection conn = context.getConnection();
 
         //String msg = "Failed to contact the server.";
@@ -67,7 +67,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             ArrayList<String> list = conn.getUserAlbums();
             if (list == null) {
                 conn.disconnect();
-                Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
+                Log.d("ListUserAlbumActivity2", context.getString(R.string.server_contact_fail));
 
                 activityReference.get().runOnUiThread(new Runnable() {
                     public void run() {
@@ -79,7 +79,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             } else {
                 this.albumArrayList = list;
 
-                this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
+                this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
                 this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
                         android.R.layout.simple_list_item_1, this.albumArrayList);
                 this.albumListView.setAdapter(this.albumArrayAdapter);
@@ -99,7 +99,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
+            Log.d("ListUserAlbumActivity2", context.getString(R.string.server_contact_fail));
 
             activityReference.get().runOnUiThread(new Runnable() {
                 public void run() {
@@ -120,16 +120,16 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
         pd.dismiss();
         //String successMsg = "Loaded user's albums list successfully.";
         //String errorMsg = "Failed to load user's albums list.";
-        Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_success));
+        Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_success));
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
-            Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_success));
+            Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_success));
             for (String s : this.albumArrayList) {
-                Log.d("AddUserToAlbumActivity", s);
+                Log.d("ListUserAlbumActivity2", s);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {
-            Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_fail));
+            Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
         }
     }

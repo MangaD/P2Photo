@@ -19,7 +19,7 @@
             android:text="Select the album to which you want to add users" />
 
         <ListView
-            android:id="@+id/listViewAlbums"
+            android:id="@+id/listViewAlbumsAddUser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
 
