@@ -67,13 +67,11 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             ArrayList<String> list = conn.getUserAlbums();
             if (list == null) {
                 conn.disconnect();
-                Log.d("ListUserAlbumActivity2", context.getString(R.string.server_contact_fail));
+                Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
 
-                activityReference.get().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                    }
-                });
+                activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+                );
 
                 return false;
             } else {
@@ -99,13 +97,11 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("ListUserAlbumActivity2", context.getString(R.string.server_contact_fail));
+            Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }
@@ -120,16 +116,16 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         pd.dismiss();
         //String successMsg = "Loaded user's albums list successfully.";
         //String errorMsg = "Failed to load user's albums list.";
-        Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_success));
+        Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_success));
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
-            Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_success));
+            Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_success));
             for (String s : this.albumArrayList) {
-                Log.d("ListUserAlbumActivity2", s);
+                Log.d("ListUserAlbumTask", s);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {
-            Log.d("ListUserAlbumActivity2", context.getString(R.string.load_user_album_fail));
+            Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
         }
     }

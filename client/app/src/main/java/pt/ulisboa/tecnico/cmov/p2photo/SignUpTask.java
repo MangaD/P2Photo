@@ -59,30 +59,26 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         ServerConnection conn = context.getConnection();
 
         if (!ServerConnection.isOnline(context)) {
-            Log.d("SignUpActivity", ctx.getString(R.string.network_disabled));
+            Log.d("SignUpTask", ctx.getString(R.string.network_disabled));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
+            );
 
             return ctx.getString(R.string.network_disabled);
         }
 
         try {
             conn.connect();
-            Log.d("SignUpActivity", "Connected to: " + conn.getAddress());
+            Log.d("SignUpTask", "Connected to: " + conn.getAddress());
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("SignUpActivity", ctx.getString(R.string.server_connect_fail));
-            Log.d("SignUpActivity", e.getMessage());
+            Log.d("SignUpTask", ctx.getString(R.string.server_connect_fail));
+            Log.d("SignUpTask", e.getMessage());
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+            );
 
             return ctx.getString(R.string.server_connect_fail);
         }
@@ -94,32 +90,28 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         if (username.isEmpty() || password.isEmpty()) {
             conn.disconnect();
-            Log.d("SignUpActivity", ctx.getString(R.string.user_pass_empty));
+            Log.d("SignUpTask", ctx.getString(R.string.user_pass_empty));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
+            );
 
             return ctx.getString(R.string.user_pass_empty);
         }
 
-        Log.d("SignUpActivity", "Username: " + username);
-        Log.d("SignUpActivity", "Password: " + password);
+        Log.d("SignUpTask", "Username: " + username);
+        Log.d("SignUpTask", "Password: " + password);
 
         try {
             return conn.signup(username, password);
         } catch (IOException e) {
             conn.disconnect();
 
-            Log.d("SignUpActivity", ctx.getString(R.string.server_contact_fail));
+            Log.d("SignUpTask", ctx.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+            );
 
             return ctx.getString(R.string.server_contact_fail);
         }
@@ -132,7 +124,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String msg) {
         pd.dismiss();
-        Log.d("SignUpActivity", msg);
+        Log.d("SignUpTask", msg);
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         if (msg.equals(ctx.getString(R.string.sign_up_success))) {
             Intent intent = new Intent(activityReference.get(), SignUpActivity.class);
