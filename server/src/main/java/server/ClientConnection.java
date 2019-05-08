@@ -176,7 +176,7 @@ public class ClientConnection implements Runnable {
 					for (String s : res) {
 						write(s);
 					}
-					write("\n");
+					write("");
 				} else if (inputLine.equals("getuseralbums")) {
 					
 					if (! isLoggedIn) {
@@ -197,7 +197,7 @@ public class ClientConnection implements Runnable {
 						System.out.println(s);
 						write(s);
 					}
-					write("\n");
+					write("");
 				}
 			}
 
