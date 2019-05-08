@@ -20,7 +20,7 @@ public class ServerConnection {
      * https://stackoverflow.com/questions/18341652/connect-failed-econnrefused
      */
     public static String addr = "10.0.2.2"; //null for loopback address
-    public static int port = 4444;
+    public static int port = 12345;
     public static Socket conn;
     private DataOutputStream out;
     private BufferedReader in;

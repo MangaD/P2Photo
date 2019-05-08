@@ -20,14 +20,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initializeButtons() {
         /*
-        * button to confirm the creation of a user
-        * */
+         * button to confirm the creation of a user
+         * */
         Button buttonSignIn = findViewById(R.id.button_create_account);
-        buttonSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new SignUpTask((GlobalClass) getApplicationContext(), SignUpActivity.this).execute();
-            }
+        buttonSignIn.setOnClickListener((View view) -> {
+            new SignUpTask((GlobalClass) getApplicationContext(), SignUpActivity.this).execute();
         });
     }
 }

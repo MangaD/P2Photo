@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class Main {
 
-	public static int port = 4444;
+	public static int port = 12345;
 	public static Database db = null;
 	public static String db_name = "p2photo.db";
 
