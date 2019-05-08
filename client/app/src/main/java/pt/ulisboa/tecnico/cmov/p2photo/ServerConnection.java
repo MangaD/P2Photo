@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +23,7 @@ public class ServerConnection {
     public static int port = 12345;
     public static Socket conn;
     private DataOutputStream out;
-    private BufferedReader in;
+    private DataInputStream in;
 
     int sessionID = -1;
 
@@ -31,7 +31,7 @@ public class ServerConnection {
         if (!isConnected()) {
             conn = new Socket(addr, port);
             out = new DataOutputStream(conn.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            in = new DataInputStream(conn.getInputStream());
         }
     }
 
@@ -158,7 +158,7 @@ public class ServerConnection {
     }
 
     private String read() throws IOException {
-        return in.readLine().trim();
+        return in.readUTF().trim();
     }
 
     private void write(String message) throws IOException {
