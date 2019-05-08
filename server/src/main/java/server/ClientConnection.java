@@ -1,9 +1,8 @@
 package server;
 
+import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public class ClientConnection implements Runnable {
 	private Thread t;
 	private String threadName;
 	private Socket clientSocket;
-	private PrintWriter out;
+	private DataOutputStream out;
 	private DataInputStream in;
 	
 	private boolean isLoggedIn;
@@ -27,7 +26,7 @@ public class ClientConnection implements Runnable {
 	ClientConnection(Socket s, String name) throws IOException {
 		threadName = name;
 		clientSocket = s;
-		out = new PrintWriter(clientSocket.getOutputStream(), true);
+		out = new DataOutputStream(clientSocket.getOutputStream());
 		in = new DataInputStream(clientSocket.getInputStream());
 		isLoggedIn = false;
 		this.user = "";
@@ -60,12 +59,12 @@ public class ClientConnection implements Runnable {
 
 					if (Main.db.login(user, password)) {
 						System.out.println("Login successful.");
-						out.println(Integer.toString(sessionID));
+						write(Integer.toString(sessionID));
 						isLoggedIn = true;
 						this.user = user;
 					} else {
 						System.out.println("Login insuccessful.");
-						out.println("-1");
+						write("-1");
 					}
 					
 				} else if (inputLine.equals("signup")) {
@@ -83,20 +82,20 @@ public class ClientConnection implements Runnable {
 
 					try {
 						Main.db.signUp(user, password);
-						out.println("Sign up successful.");
+						write("Sign up successful.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
 						if (e.getErrorCode() == 19) {
-							out.println("User with that name already exists.");
+							write("User with that name already exists.");
 						} else {
-							out.println("Sign up unsuccessful. Error code: " + e.getErrorCode());
+							write("Sign up unsuccessful. Error code: " + e.getErrorCode());
 						}
 					}
 					
 				} else if (inputLine.equals("createalbum")) {
 					
 					if (! isLoggedIn) {
-						out.println("You're not logged in!");
+						write("You're not logged in!");
 						continue;
 					}
 					
@@ -113,20 +112,20 @@ public class ClientConnection implements Runnable {
 
 					try {
 						Main.db.createAlbum(user, name);
-						out.println("Album created successfully.");
+						write("Album created successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
 						if (e.getErrorCode() == 19) {
-							out.println("Album with that name already exists.");
+							write("Album with that name already exists.");
 						} else {
-							out.println("Album creation failed. Error code: " + e.getErrorCode());
+							write("Album creation failed. Error code: " + e.getErrorCode());
 						}
 					}
 					
 				} else if (inputLine.equals("setalbumindex")) {
 					
 					if (! isLoggedIn) {
-						out.println("You're not logged in!");
+						write("You're not logged in!");
 						continue;
 					}
 					
@@ -149,20 +148,20 @@ public class ClientConnection implements Runnable {
 
 					try {
 						Main.db.setAlbumIndex(name, user, index);
-						out.println("Album created successfully.");
+						write("Album created successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
 						if (e.getErrorCode() == 19) {
-							out.println("Album with that name already exists.");
+							write("Album with that name already exists.");
 						} else {
-							out.println("Album creation failed. Error code: " + e.getErrorCode());
+							write("Album creation failed. Error code: " + e.getErrorCode());
 						}
 					}
 					
 				} else if (inputLine.equals("getusers")) {
 					
 					if (! isLoggedIn) {
-						out.println("You're not logged in!");
+						write("You're not logged in!");
 						continue;
 					}
 					
@@ -175,15 +174,13 @@ public class ClientConnection implements Runnable {
 					ArrayList<String> res = Main.db.getUsers();
 					
 					for (String s : res) {
-						out.println(s);
+						write(s);
 					}
-					// send empty string for terminating
-					out.println();
 				} else if (inputLine.equals("getuseralbums")) {
 					
 					if (! isLoggedIn) {
 						System.out.println("You're not logged in!");
-						out.println("You're not logged in!");
+						write("You're not logged in!");
 						continue;
 					}
 					
@@ -197,10 +194,8 @@ public class ClientConnection implements Runnable {
 					
 					for (String s : res) {
 						System.out.println(s);
-						out.println(s);
+						write(s);
 					}
-					// send empty string for terminating
-					out.println();
 				}
 			}
 
@@ -218,17 +213,17 @@ public class ClientConnection implements Runnable {
 			session = read();
 		}
 		try {
-            int res = Integer.parseInt(session);
-            if (res != sessionID) {
-            	out.println("Invalid session ID!");
+			int res = Integer.parseInt(session);
+			if (res != sessionID) {
+				write("Invalid session ID!");
 				return false;
-            } else {
-                return true;
-            }
-        } catch (Exception e) {
-        	out.println("Invalid session ID!");
-            return false;
-        }
+			} else {
+				return true;
+			}
+		} catch (Exception e) {
+			write("Invalid session ID!");
+			return false;
+		}
 	}
 	
 	private String read() throws IOException {
@@ -237,6 +232,10 @@ public class ClientConnection implements Runnable {
 		} catch (NullPointerException e) {
 			return null;
 		}
+	}
+
+	private void write(String message) throws IOException {
+		out.writeUTF(message + "\n");
 	}
 	
 	public void start() {
