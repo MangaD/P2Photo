@@ -1,6 +1,6 @@
 package server;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,7 +15,7 @@ public class ClientConnection implements Runnable {
 	private String threadName;
 	private Socket clientSocket;
 	private PrintWriter out;
-	private BufferedReader in;
+	private DataInputStream in;
 	
 	private boolean isLoggedIn;
 	
@@ -28,8 +28,7 @@ public class ClientConnection implements Runnable {
 		threadName = name;
 		clientSocket = s;
 		out = new PrintWriter(clientSocket.getOutputStream(), true);
-		in = new BufferedReader(
-				new InputStreamReader(clientSocket.getInputStream()));
+		in = new DataInputStream(clientSocket.getInputStream());
 		isLoggedIn = false;
 		this.user = "";
 		this.sessionID = Math.abs(new Random().nextInt());
@@ -234,7 +233,7 @@ public class ClientConnection implements Runnable {
 	
 	private String read() throws IOException {
 		try {
-			return in.readLine().trim();
+			return in.readUTF().trim();
 		} catch (NullPointerException e) {
 			return null;
 		}
