@@ -82,21 +82,28 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 return false;
             } else {
                 this.albumArrayList = list;
+                Log.d("ListUserAlbumTask", "List size: " + list.size());
+                for(String s : list) {
+                    Log.d("ListUserAlbumTask", s);
+                }
 
-                this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
-                this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
-                        android.R.layout.simple_list_item_1, this.albumArrayList);
-                this.albumListView.setAdapter(this.albumArrayAdapter);
+                this.activityReference.get().runOnUiThread(() -> {
+                    this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
+                    this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, this.albumArrayList);
+                    this.albumListView.setAdapter(this.albumArrayAdapter);
 
-                this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
-                    Object itemAtPosition = adapter.getItemAtPosition(position);
-                    String itemString = itemAtPosition.toString();
 
-                    Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity2.class);
+                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                        Object itemAtPosition = adapter.getItemAtPosition(position);
+                        String itemString = itemAtPosition.toString();
 
-                    viewAlbumIntent.putExtra("ViewAlbumName",itemString);
+                        Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity2.class);
 
-                    activityReference.get().startActivity(viewAlbumIntent);
+                        viewAlbumIntent.putExtra("ViewAlbumName",itemString);
+
+                        activityReference.get().startActivity(viewAlbumIntent);
+                    });
                 });
 
                 return true;
