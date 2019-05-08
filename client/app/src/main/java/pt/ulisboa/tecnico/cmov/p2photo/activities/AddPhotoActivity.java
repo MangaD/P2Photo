@@ -36,6 +36,7 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.api.services.drive.model.Permission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -132,42 +133,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         return createImageInAlbum(dfId.asDriveFolder(), driveContents, image);
     }
 
-    /*private Task<Void> createFileIntentSender(DriveContents driveContents, Bitmap image) {
-        Log.i(TAG, "New contents created.");
-        // Get an output stream for the contents.
-        OutputStream outputStream = driveContents.getOutputStream();
-        // Write the bitmap data from it.
-        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
-        try {
-            outputStream.write(bitmapStream.toByteArray());
-        } catch (IOException e) {
-            Log.w(TAG, "Unable to write file contents.", e);
-        }
-
-        // Create the initial metadata - MIME type and title.
-        // Note that the user will be able to change the title later.
-        MetadataChangeSet metadataChangeSet =
-                new MetadataChangeSet.Builder()
-                        .setMimeType("image/jpeg")
-                        .setTitle("Android Photo.png")
-                        .build();
-        // Set up options to configure and display the create file activity.
-        CreateFileActivityOptions createFileActivityOptions =
-                new CreateFileActivityOptions.Builder()
-                        .setInitialMetadata(metadataChangeSet)
-                        .setInitialDriveContents(driveContents)
-                        .build();
-
-        return mDriveClient
-                .newCreateFileActivityIntentSender(createFileActivityOptions)
-                .continueWith(
-                        task -> {
-                            startIntentSenderForResult(task.getResult(), REQUEST_CODE_CREATOR, null, 0, 0, 0);
-                            return null;
-                        });
-    }*/
-
     private Task<DriveFile> createImageInAlbum(final DriveFolder parent, DriveContents driveContents, Bitmap image) {
         // [START drive_android_create_file]
         final Task<DriveFolder> rootFolderTask = mDriveResourceClient.getRootFolder();
@@ -224,7 +189,6 @@ public class AddPhotoActivity extends AppCompatActivity {
                                         showMessage("Error getting URL");
                                         finish();
                                     });
-
 
                             showMessage("Image created " +
                                     driveFile.getDriveId().encodeToString());

@@ -4,6 +4,10 @@
     <!-- This permission is for Internet connection established (using sockets). -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- This permission is to check weather Internet connection is available or not -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Permissions required by GoogleAuthUtil -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".GlobalClass"
