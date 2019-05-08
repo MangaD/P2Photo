@@ -150,6 +150,7 @@ public class ServerConnection {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {
                 list.add(s);
+                Log.d("ServerConnection", s);
             }
         } catch (Exception e) { }
 

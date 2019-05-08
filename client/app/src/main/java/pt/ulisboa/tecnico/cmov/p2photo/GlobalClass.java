@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.DriveClient;
@@ -88,6 +89,7 @@ public class GlobalClass extends Application {
     public PhotoAlbum findPhotoAlbum(String name) {
         for(PhotoAlbum photoalbum : albumList) {
             if(photoalbum.getName().equals(name)) {
+                Log.d("GlobalClass", photoalbum.getName() + " " + name);
                 return photoalbum;
             }
         }

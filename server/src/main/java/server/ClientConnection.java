@@ -176,6 +176,7 @@ public class ClientConnection implements Runnable {
 					for (String s : res) {
 						write(s);
 					}
+					// send empty string for terminating
 					write("");
 				} else if (inputLine.equals("getuseralbums")) {
 					
@@ -197,6 +198,7 @@ public class ClientConnection implements Runnable {
 						System.out.println(s);
 						write(s);
 					}
+					// send empty string for terminating
 					write("");
 				}
 			}
