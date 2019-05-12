@@ -11,13 +11,15 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.AddUserToAlbumActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
 
 
 /**
@@ -36,8 +38,8 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     GlobalClass context;
 
     private ListView albumListView;
-    private ArrayList<String> albumArrayList;
-    private ArrayAdapter<String> albumArrayAdapter;
+    private ArrayList<Map.Entry<Integer, String>> albumArrayList;
+    private ArrayAdapter<Map.Entry<Integer, String>> albumArrayAdapter;
 
     public AddUserToAlbumTask(GlobalClass ctx, AddUserToAlbumActivity activity) {
 
@@ -71,7 +73,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
         //String msg = "Failed to contact the server.";
 
         try {
-            ArrayList<String> list = conn.getUserAlbums();
+            HashMap<Integer, String> list = conn.getUserAlbums();
             if (list == null) {
                 conn.disconnect();
                 Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
@@ -82,7 +84,8 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 return false;
             } else {
-                this.albumArrayList = list;
+                Set<Map.Entry<Integer, String>> listEntrySet = list.entrySet();
+                this.albumArrayList = new ArrayList<>(listEntrySet);
 
                 this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
                 this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
@@ -127,8 +130,10 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_success));
-            for (String s : this.albumArrayList) {
-                Log.d("AddUserToAlbumActivity", s);
+            for (Map.Entry<Integer, String> entry : this.albumArrayList) {
+                Integer key = entry.getKey();
+                String value = entry.getValue();
+                Log.d("AddUserToAlbumActivity", "Key: " + key + "\nValue: " + value);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {

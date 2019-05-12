@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Database {
 
@@ -150,9 +151,11 @@ public class Database {
 		}
 	}
 	
-	public ArrayList<String> getUsersAlbums(String username) {
-		String sql = "SELECT name FROM albums WHERE owner_id IN (SELECT uid FROM users WHERE username = ?)";
-		ArrayList<String> result = new ArrayList<>();
+	public HashMap<Integer, String> getUsersAlbums(String username) {
+		String sql = "SELECT aid, name FROM albums WHERE uid IN " +
+				" (SELECT uid FROM album_slices WHERE uid IN " +
+				" (SELECT uid FROM users WHERE username = ?) )";
+		HashMap<Integer, String> result = new HashMap<>();
 		
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
@@ -161,7 +164,26 @@ public class Database {
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
-				result.add(rs.getString("name").trim());
+				result.put(rs.getInt("aid"), rs.getString("name").trim());
+			}
+			return result;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	public ArrayList<String> getAlbumIndexes(int aid) {
+		String sql = "SELECT url FROM album_slices WHERE aid = ?;";
+		ArrayList<String> result = new ArrayList<>();
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, aid);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getString("url").trim());
 			}
 			return result;
 		} catch (SQLException e) {

@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ServerConnection {
 
@@ -136,8 +137,8 @@ public class ServerConnection {
         return list;
     }
 
-    public ArrayList<String> getUserAlbums() throws IOException {
-        ArrayList<String> list = new ArrayList<>();
+    public HashMap<Integer, String> getUserAlbums() throws IOException {
+        HashMap<Integer, String> list = new HashMap<>();
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
@@ -149,7 +150,7 @@ public class ServerConnection {
         try {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {
-                list.add(s);
+                list.put(Integer.valueOf(s), read());
                 Log.d("ServerConnection", s);
             }
         } catch (Exception e) { }

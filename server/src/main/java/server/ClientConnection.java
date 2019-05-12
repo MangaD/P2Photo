@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class ClientConnection implements Runnable {
@@ -192,11 +194,14 @@ public class ClientConnection implements Runnable {
 					
 					System.out.println("Received get user's albums from '" + user + "'.");
 
-					ArrayList<String> res = Main.db.getUsersAlbums(user);
+					HashMap<Integer, String> res = Main.db.getUsersAlbums(user);
 					
-					for (String s : res) {
-						System.out.println(s);
-						write(s);
+					for (Map.Entry<Integer, String> entry : res.entrySet()) {
+					    Integer key = entry.getKey();
+					    String value = entry.getValue();
+					    System.out.println("Key: " + key + "\nValue: " + value);
+						write(Integer.toString(key));
+						write(value);
 					}
 					// send empty string for terminating
 					write("");

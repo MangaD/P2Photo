@@ -11,6 +11,9 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -34,8 +37,8 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
     GlobalClass context;
 
     private ListView albumListView;
-    private ArrayList<String> albumArrayList;
-    private ArrayAdapter<String> albumArrayAdapter;
+    private ArrayList<Map.Entry<Integer, String>> albumArrayList;
+    private ArrayAdapter<Map.Entry<Integer, String>> albumArrayAdapter;
 
     public ListUserAlbumTask(GlobalClass ctx, ListUserAlbumActivity2 activity) {
 
@@ -70,7 +73,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         //String msg = "Failed to contact the server.";
 
         try {
-            ArrayList<String> list = conn.getUserAlbums();
+            HashMap<Integer, String> list = conn.getUserAlbums();
             if (list == null) {
                 conn.disconnect();
                 Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
@@ -81,10 +84,14 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 return false;
             } else {
-                this.albumArrayList = list;
+                Set<Map.Entry<Integer, String>> listEntrySet = list.entrySet();
+                this.albumArrayList = new ArrayList<>(listEntrySet);
+
                 Log.d("ListUserAlbumTask", "List size: " + list.size());
-                for(String s : list) {
-                    Log.d("ListUserAlbumTask", s);
+                for (Map.Entry<Integer, String> entry : this.albumArrayList) {
+                    Integer key = entry.getKey();
+                    String value = entry.getValue();
+                    Log.d("ListUserAlbumTask", "Key: " + key + "\nValue: " + value);
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
@@ -133,8 +140,10 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_success));
-            for (String s : this.albumArrayList) {
-                Log.d("ListUserAlbumTask", s);
+            for (Map.Entry<Integer, String> entry : this.albumArrayList) {
+                Integer key = entry.getKey();
+                String value = entry.getValue();
+                Log.d("ListUserAlbumTask", "Key: " + key + "\nValue: " + value);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {
