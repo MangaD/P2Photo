@@ -122,7 +122,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     private Task<DriveFile> createFileIntentSender(DriveContents driveContents, Bitmap image) {
 
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-        //DriveId diId = globalVariable.findIndexAlbum("index"+itemString).getDriveid();
+        //DriveId diId = globalVariable.findIndexAlbum("index"+itemString).getDriveID();
         //appendContents(diId.asDriveFile());
 
         Log.i(TAG, "ALBUM NAME: " + itemString);

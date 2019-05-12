@@ -87,6 +87,7 @@ public class GlobalClass extends Application {
     }
 
     public PhotoAlbum findPhotoAlbum(String name) {
+        Log.d("GlobalClass", Integer.toString(albumList.size()));
         for(PhotoAlbum photoalbum : albumList) {
             if(photoalbum.getName().equals(name)) {
                 Log.d("GlobalClass", photoalbum.getName() + " " + name);
@@ -109,7 +110,7 @@ public class GlobalClass extends Application {
             this.photoAlbum = pa;
             this.indexAlbum = ia;
         }
-        public DriveId getDriveid() {
+        public DriveId getDriveID() {
             return driveid;
         }
         public String getName() {
