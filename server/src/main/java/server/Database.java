@@ -152,8 +152,8 @@ public class Database {
 	}
 	
 	public HashMap<Integer, String> getUsersAlbums(String username) {
-		String sql = "SELECT aid, name FROM albums WHERE uid IN " +
-				" (SELECT uid FROM album_slices WHERE uid IN " +
+		String sql = "SELECT aid, name FROM albums WHERE aid IN " +
+				" (SELECT aid FROM album_slices WHERE uid IN " +
 				" (SELECT uid FROM users WHERE username = ?) )";
 		HashMap<Integer, String> result = new HashMap<>();
 		
