@@ -37,8 +37,8 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
     GlobalClass context;
 
     private ListView albumListView;
-    private ArrayList<Map.Entry<Integer, String>> albumArrayList;
-    private ArrayAdapter<Map.Entry<Integer, String>> albumArrayAdapter;
+    private ArrayList<String> albumArrayList;
+    private ArrayAdapter<String> albumArrayAdapter;
 
     public ListUserAlbumTask(GlobalClass ctx, ListUserAlbumActivity2 activity) {
 
@@ -84,14 +84,11 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 return false;
             } else {
-                Set<Map.Entry<Integer, String>> listEntrySet = list.entrySet();
-                this.albumArrayList = new ArrayList<>(listEntrySet);
+                this.albumArrayList = new ArrayList<>(list.values());
 
                 Log.d("ListUserAlbumTask", "List size: " + list.size());
-                for (Map.Entry<Integer, String> entry : this.albumArrayList) {
-                    Integer key = entry.getKey();
-                    String value = entry.getValue();
-                    Log.d("ListUserAlbumTask", "Key: " + key + "\nValue: " + value);
+                for (String entry : this.albumArrayList) {
+                    Log.d("ListUserAlbumTask", entry);
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
@@ -140,10 +137,8 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_success));
-            for (Map.Entry<Integer, String> entry : this.albumArrayList) {
-                Integer key = entry.getKey();
-                String value = entry.getValue();
-                Log.d("ListUserAlbumTask", "Key: " + key + "\nValue: " + value);
+            for (String entry : this.albumArrayList) {
+                Log.d("ListUserAlbumTask", entry);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {

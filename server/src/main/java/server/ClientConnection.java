@@ -145,7 +145,7 @@ public class ClientConnection implements Runnable {
 						index = read();
 					}
 
-					System.out.println("Received create album from '" + user + "' with name '" +
+					System.out.println("Received set album index from '" + user + "' with name '" +
 							name + "' and index '" + index + "'.");
 
 					try {

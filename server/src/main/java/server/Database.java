@@ -127,7 +127,7 @@ public class Database {
 		PreparedStatement pstmt  = conn.prepareStatement(sql);
 		pstmt.setString(1, album_name);
 		pstmt.setString(2, user_name);
-		pstmt.setString(2, index);
+		pstmt.setString(3, index);
 		
 		pstmt.executeUpdate();
 	}
