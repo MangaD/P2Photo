@@ -20,11 +20,18 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.drive.DriveScopes;
+
+import java.util.Collections;
 
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
 
@@ -38,7 +45,8 @@ public class DriveLogin extends AppCompatActivity {
     private static final int REQUEST_CODE_SIGN_IN = 0;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
-    //private GoogleSignInAccount account;
+    private GoogleSignInAccount account;
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +80,11 @@ public class DriveLogin extends AppCompatActivity {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_FILE)
+                        .requestEmail()
+                        .requestProfile()
                         .build();
-        return GoogleSignIn.getClient(this, signInOptions);
+        googleSignInClient = GoogleSignIn.getClient(this, signInOptions);
+        return googleSignInClient;
     }
 
     @Override
@@ -86,11 +97,16 @@ public class DriveLogin extends AppCompatActivity {
                 // Called after user is signed in.
                 if (resultCode == RESULT_OK) {
                     Log.i(TAG, "Signed in successfully.");
+
+                    account = GoogleSignIn.getLastSignedInAccount(this);
+
+
+
                     // Use the last signed in account here since it already have a Drive scope.
-                    mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
+                    mDriveClient = Drive.getDriveClient(this, account);
                     // Build a drive resource client.
                     mDriveResourceClient =
-                            Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
+                            Drive.getDriveResourceClient(this, account);
 
                     setDriveVars();
 
@@ -106,6 +122,7 @@ public class DriveLogin extends AppCompatActivity {
         // Set mDriveClient and mDriveResourceCliente in global/application context
         globalVariable.setmDriveClient(mDriveClient);
         globalVariable.setmDriveResourceClient(mDriveResourceClient);
-        //globalVariable.setAccount(account);
+        globalVariable.setAccount(account);
+        globalVariable.setGoogleSignInClient(googleSignInClient);
     }
 }

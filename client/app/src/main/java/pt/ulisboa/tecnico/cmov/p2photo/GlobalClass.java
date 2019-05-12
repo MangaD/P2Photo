@@ -4,9 +4,13 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
+import com.google.api.services.drive.Drive;
+
 
 import java.util.ArrayList;
 
@@ -17,6 +21,26 @@ public class GlobalClass extends Application {
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
     private GoogleSignInAccount account;
+
+    public GoogleSignInClient getGoogleSignInClient() {
+        return googleSignInClient;
+    }
+
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
+        this.googleSignInClient = googleSignInClient;
+    }
+
+    private GoogleSignInClient googleSignInClient;
+
+    public Drive getService() {
+        return service;
+    }
+
+    public void setService(Drive service) {
+        this.service = service;
+    }
+
+    private Drive service;
 
     private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
     private ArrayList<IndexAlbum> indexList = new ArrayList<>();

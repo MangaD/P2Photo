@@ -13,12 +13,17 @@ import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.Task;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
@@ -43,6 +48,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
     private GlobalClass context;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
+    private Drive service;
     private String IndexURL = null;
 
     private Semaphore indexSemaphore = new Semaphore(0);
@@ -56,6 +62,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         // Get mDriveCliet and mDriveResourceCLient from global/application context
         this.mDriveClient = context.getmDriveClient();
         this.mDriveResourceClient = context.getmDriveResourceClient();
+        this.service = context.getService();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -180,6 +187,44 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                             insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
                             Log.d("CreateAlbumTask", context.getString(R.string.album_created) +
                                     driveFolder.getDriveId().encodeToString());
+
+
+                            new Thread(new Runnable() {
+                                public void run() {
+
+                            Permission newPermission = new Permission();
+                            newPermission.setType("anyone");
+                            newPermission.setRole("reader");
+                            try {
+                                Thread.sleep(3000);
+                                // Print the names and IDs for up to 10 files.
+                                FileList result = null;
+                                result = service.files().list()
+                                        .setPageSize(100)
+                                        .setFields("nextPageToken, files(id, name)")
+                                        .execute();
+                                List<File> files = result.getFiles();
+                                if (files == null || files.isEmpty()) {
+                                    Log.i("LINK", "No files found.");
+                                } else {
+                                    Log.i("LINK", "Files:");
+                                    for (File file : files) {
+                                        Log.i("LINK", "%s " + file.getName() + " (%s) " + file.getId() + "\n");
+                                        service.permissions().create(file.getId(), newPermission).execute();
+                                    }
+                                }
+
+                                /*String id = service.files().get("root").setFields("id").execute().getId();
+                                Log.i("LNK", "ID of RootFolder: " + id);
+                                service.permissions().create(id, newPermission).execute();*/
+
+                            }catch (Exception e){
+                                Log.i("LINK", "Failed to add permition: " + e);
+                            }
+                                }
+                            }).start();
+
+
 
                             activityReference.get().runOnUiThread(() ->
                                     Toast.makeText(context, context.getString(R.string.album_created) +
