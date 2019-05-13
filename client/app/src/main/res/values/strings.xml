@@ -27,4 +27,6 @@
     <string name="sign_up">Signing up…</string>
     <string name="sign_up_success">Sign up successful!</string>
     <string name="load_album_photos">Loading album photos...</string>
+    <string name="load_album_photos_success">Loaded album photos successfully.</string>
+    <string name="load_album_photos_fail">Failed to load album photos.</string>
 </resources>

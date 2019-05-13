@@ -70,7 +70,9 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        mResultsAdapter.clear();
+        if(mResultsAdapter != null) {
+            mResultsAdapter.clear();
+        }
     }
 
     /**

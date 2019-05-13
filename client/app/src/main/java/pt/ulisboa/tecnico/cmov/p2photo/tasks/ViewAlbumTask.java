@@ -130,19 +130,15 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean success) {
         pd.dismiss();
-        //String successMsg = "Loaded user's albums list successfully.";
-        //String errorMsg = "Failed to load user's albums list.";
-        Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_success));
-        Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
-            Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_success));
+            Log.d("ViewAlbumTask", context.getString(R.string.load_album_photos_success));
             for (String entry : this.indexURLs) {
                 Log.d("ViewAlbumTask", entry);
             }
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
+            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_success), Toast.LENGTH_LONG).show();
         } else {
             Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_fail));
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
+            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_fail), Toast.LENGTH_LONG).show();
         }
     }
 }

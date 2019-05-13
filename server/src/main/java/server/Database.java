@@ -183,7 +183,6 @@ public class Database {
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
-				System.out.println(rs.getString("url").trim());
 				result.add(rs.getString("url").trim());
 			}
 			return result;
