@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -137,7 +136,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_success));
-            for (String entry : this.albumArrayList) {
+            for (String entry : this.indexURLs) {
                 Log.d("ViewAlbumTask", entry);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
