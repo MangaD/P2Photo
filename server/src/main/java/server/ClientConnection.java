@@ -224,7 +224,7 @@ public class ClientConnection implements Runnable {
 					
 					System.out.println("Received get album indexes from '" + user + "' with album name '" + name + "'.");
 
-					ArrayList<String> res = Main.db.getAlbumIndexes(user);
+					ArrayList<String> res = Main.db.getAlbumIndexes(name);
 					
 					for (String entry : res) {
 					    System.out.println("Index: " + entry);
