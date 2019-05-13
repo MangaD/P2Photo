@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -31,11 +32,19 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     private ProgressDialog pd;
     private Context ctx;
 
-    public FindUserTask(FindUserActivity activity) {
+    String albumName;
+
+    private ListView userListView;
+    private ArrayList<String> userArrayList;
+    private ArrayAdapter<String> userArrayAdapter;
+
+    public FindUserTask(FindUserActivity activity, String albumName) {
 
         activityReference = new WeakReference<>(activity);
 
         ctx = activity.getApplicationContext();
+
+        this.albumName = albumName;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -68,28 +77,27 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
                 conn.disconnect();
                 Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
 
-                activityReference.get().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
-                    }
-                });
+                activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+                );
 
                 return false;
             } else {
-                activityReference.get().setUserArrayList(list);
+                this.userArrayList = list;
 
-                activityReference.get().setUserListView(activityReference.get().findViewById(R.id.listUsers));
-                activityReference.get().setUserArrayAdapter(new ArrayAdapter<>(activityReference.get(),
-                        android.R.layout.simple_list_item_1, activityReference.get().getUserArrayList()));
-                activityReference.get().getUserListView().setAdapter(activityReference.get().getUserArrayAdapter());
+                this.activityReference.get().runOnUiThread(() -> {
+                    this.userListView = activityReference.get().findViewById(R.id.listUsers);
+                    this.userArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, this.userArrayList);
+                    this.userListView.setAdapter(this.userArrayAdapter);
 
-                activityReference.get().getUserListView().setOnItemClickListener((adapter, view, position, arg) -> {
-                    Object itemAtPosition = adapter.getItemAtPosition(position);
-                    String itemString = itemAtPosition.toString();
-
-                    //TODO send information to the server
-
-
+                    this.userListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                        Object itemAtPosition = adapter.getItemAtPosition(position);
+                        String itemString = itemAtPosition.toString();
+                        try {
+                            conn.setAlbumIndex(albumName, "");
+                        } catch (IOException e) {}
+                    });
                 });
 
                 return true;
@@ -106,6 +114,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
             return false;
         }
+
     }
 
     /**
@@ -121,7 +130,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_success));
-            for (String s : activityReference.get().getUserArrayList()) {
+            for (String s : this.userArrayList) {
                 Log.d("FindUserActivity", s);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();

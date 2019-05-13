@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewPhotoActivity;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -37,7 +39,6 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     String albumName;
 
     private ArrayList<String> indexURLs;
-    private ArrayList<String> photosURLs;
 
     private ListView albumListView;
     private ArrayList<String> albumArrayList;
@@ -48,7 +49,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
         this.albumName = albumName;
-        this.photosURLs = new ArrayList<>();
+        this.albumArrayList = new ArrayList<>();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -87,6 +88,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 this.indexURLs = list;
 
                 Log.d("ViewAlbumTask", "List size: " + list.size());
+
                 for (String entry : this.indexURLs) {
                     Log.d("ViewAlbumTask", entry);
                     URL index = new URL(entry);
@@ -96,11 +98,28 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     String inputLine;
                     while ((inputLine = in.readLine()) != null) {
                         Log.d("ViewAlbumTask", inputLine);
-                        this.photosURLs.add(inputLine);
+                        this.albumArrayList.add(inputLine);
                     }
                     in.close();
                 }
 
+                this.activityReference.get().runOnUiThread(() -> {
+                    this.albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
+                    this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, this.albumArrayList);
+                    this.albumListView.setAdapter(this.albumArrayAdapter);
+
+                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                        Object itemAtPosition = adapter.getItemAtPosition(position);
+                        String itemString = itemAtPosition.toString();
+
+                        Intent viewPhotoIntent = new Intent(activityReference.get(), ViewPhotoActivity.class);
+
+                        viewPhotoIntent.putExtra("ViewPhotoName",itemString);
+
+                        activityReference.get().startActivity(viewPhotoIntent);
+                    });
+                });
 
 
 

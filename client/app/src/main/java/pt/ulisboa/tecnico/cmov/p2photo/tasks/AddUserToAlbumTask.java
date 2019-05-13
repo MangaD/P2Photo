@@ -84,20 +84,22 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             } else {
                 this.albumArrayList = new ArrayList<>(list.values());
 
-                this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
-                this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
-                        android.R.layout.simple_list_item_1, this.albumArrayList);
-                this.albumListView.setAdapter(this.albumArrayAdapter);
+                this.activityReference.get().runOnUiThread(() -> {
+                    this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
+                    this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, this.albumArrayList);
+                    this.albumListView.setAdapter(this.albumArrayAdapter);
 
-                this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
-                    Object itemAtPosition = adapter.getItemAtPosition(position);
-                    String itemString = itemAtPosition.toString();
+                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                        Object itemAtPosition = adapter.getItemAtPosition(position);
+                        String itemString = itemAtPosition.toString();
 
-                    Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserActivity.class);
+                        Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserActivity.class);
 
-                    viewAlbumIntent.putExtra("ViewAlbumName",itemString);
+                        viewAlbumIntent.putExtra("ViewAlbumName", itemString);
 
-                    activityReference.get().startActivity(viewAlbumIntent);
+                        activityReference.get().startActivity(viewAlbumIntent);
+                    });
                 });
 
                 return true;

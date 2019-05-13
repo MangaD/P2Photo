@@ -22,10 +22,6 @@ public class ViewPhotoActivity extends AppCompatActivity  {
 
     ImageView testImageView;
 
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
-
-    private static final String TAG = "view_photo";
     private String photo_url;
 
     @Override
@@ -35,7 +31,7 @@ public class ViewPhotoActivity extends AppCompatActivity  {
 
         testImageView = this.findViewById(R.id.testImageView);
 
-        photo_url = "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg"; //example URL to be CHANGED
+        photo_url = getIntent().getStringExtra("ViewPhotoName");
 
         new ObtainPhotoTask(ViewPhotoActivity.this).execute();
 

@@ -197,9 +197,9 @@ public class ClientConnection implements Runnable {
 					HashMap<Integer, String> res = Main.db.getUsersAlbums(user);
 					
 					for (Map.Entry<Integer, String> entry : res.entrySet()) {
-					    Integer key = entry.getKey();
-					    String value = entry.getValue();
-					    System.out.println("Key: " + key + "\nValue: " + value);
+						Integer key = entry.getKey();
+						String value = entry.getValue();
+						System.out.println("Key: " + key + "\nValue: " + value);
 						write(Integer.toString(key));
 						write(value);
 					}
@@ -227,7 +227,7 @@ public class ClientConnection implements Runnable {
 					ArrayList<String> res = Main.db.getAlbumIndexes(name);
 					
 					for (String entry : res) {
-					    System.out.println("Index: " + entry);
+						System.out.println("Index: " + entry);
 						write(entry);
 					}
 					// send empty string for terminating
@@ -235,10 +235,7 @@ public class ClientConnection implements Runnable {
 				}
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		} catch (IOException e) {}
 
 		System.out.println("Thread " + threadName + " exiting.");
 	}
