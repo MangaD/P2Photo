@@ -7,8 +7,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
@@ -34,6 +37,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     String albumName;
 
     private ArrayList<String> indexURLs;
+    private ArrayList<String> photosURLs;
 
     private ListView albumListView;
     private ArrayList<String> albumArrayList;
@@ -44,6 +48,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
         this.albumName = albumName;
+        this.photosURLs = new ArrayList<>();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -76,11 +81,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
             if (list == null) {
                 conn.disconnect();
                 Log.d("ViewAlbumTask", context.getString(R.string.server_contact_fail));
-
-                activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-                );
-
+                showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
                 this.indexURLs = list;
@@ -88,7 +89,22 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 Log.d("ViewAlbumTask", "List size: " + list.size());
                 for (String entry : this.indexURLs) {
                     Log.d("ViewAlbumTask", entry);
-                }/*
+                    URL index = new URL(entry);
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(index.openStream()));
+
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        Log.d("ViewAlbumTask", inputLine);
+                        this.photosURLs.add(inputLine);
+                    }
+                    in.close();
+                }
+
+
+
+
+                /*
 
                 this.activityReference.get().runOnUiThread(() -> {
                     this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
@@ -114,11 +130,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         } catch (IOException e) {
             conn.disconnect();
             Log.d("ViewAlbumTask", context.getString(R.string.server_contact_fail));
-
-            activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-            );
-
+            showMessage(context.getString(R.string.server_contact_fail));
             return false;
         }
     }
@@ -140,5 +152,14 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
             Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_fail), Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Shows a toast message.
+     */
+    protected void showMessage(String message) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        );
     }
 }
