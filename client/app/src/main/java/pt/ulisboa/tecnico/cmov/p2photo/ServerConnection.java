@@ -158,6 +158,29 @@ public class ServerConnection {
         return list;
     }
 
+    public ArrayList<String> getAlbumIndexes(String name) throws IOException {
+        ArrayList<String> list = new ArrayList<>();
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getalbumindexes");
+        write(Integer.toString(sessionID));
+
+        write(name);
+        Log.d("ServerConnection", "Get album indexes.");
+
+        try {
+            String s;
+            while ((s = read()) != null && !s.isEmpty()) {
+                list.add(s);
+                Log.d("ServerConnection", s);
+            }
+        } catch (Exception e) { }
+
+        return list;
+    }
+
     private String read() throws IOException {
         return in.readUTF().trim();
     }

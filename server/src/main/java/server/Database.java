@@ -173,12 +173,12 @@ public class Database {
 		}
 	}
 	
-	public ArrayList<String> getAlbumIndexes(int aid) {
-		String sql = "SELECT url FROM album_slices WHERE aid = ?;";
+	public ArrayList<String> getAlbumIndexes(String name) {
+		String sql = "SELECT url FROM album_slices WHERE aid IN (SELECT aid FROM albums WHERE name = ?);";
 		ArrayList<String> result = new ArrayList<>();
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
-			pstmt.setInt(1, aid);
+			pstmt.setString(1, name);
 			
 			ResultSet rs  = pstmt.executeQuery();
 

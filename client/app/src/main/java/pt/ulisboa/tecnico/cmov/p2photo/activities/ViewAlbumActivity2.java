@@ -3,60 +3,26 @@ package pt.ulisboa.tecnico.cmov.p2photo.activities;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-
-import android.app.Activity;
-import android.content.Intent;
-import android.content.IntentSender;
-import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.OpenFileActivityOptions;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.ListView;
 
-import android.content.IntentSender;
-
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.OpenFileActivityOptions;
-import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.drive.widget.DataBufferAdapter;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ResultsAdapter;
+
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.ViewAlbumTask;
 
 public class ViewAlbumActivity2 extends AppCompatActivity {
 
@@ -73,9 +39,12 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_album2);
+
         albumName = getIntent().getStringExtra("ViewAlbumName");
 
+        new ViewAlbumTask((GlobalClass) this.getApplicationContext(), ViewAlbumActivity2.this, albumName).execute();
 
+/*
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
@@ -90,6 +59,7 @@ public class ViewAlbumActivity2 extends AppCompatActivity {
         DriveId driveId = photoAlbum.getDriveid();
 
         listFilesInFolder(driveId.asDriveFolder());
+        */
     }
 
 

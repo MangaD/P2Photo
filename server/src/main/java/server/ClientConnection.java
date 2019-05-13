@@ -205,6 +205,33 @@ public class ClientConnection implements Runnable {
 					}
 					// send empty string for terminating
 					write("");
+				} else if (inputLine.equals("getalbumindexes")) {
+					
+					if (! isLoggedIn) {
+						System.out.println("You're not logged in!");
+						write("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
+					String name = read();
+					while (name.isEmpty()) {
+						name = read();
+					}
+					
+					System.out.println("Received get album indexes from '" + user + "' with album name '" + name + "'.");
+
+					ArrayList<String> res = Main.db.getAlbumIndexes(user);
+					
+					for (String entry : res) {
+					    System.out.println("Index: " + entry);
+						write(entry);
+					}
+					// send empty string for terminating
+					write("");
 				}
 			}
 
