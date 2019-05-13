@@ -294,7 +294,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                                             .addOnSuccessListener(this,
                                                     Metadata -> {
                                                         //String link2 = queryTsk.getResult().getEmbedLink();
-                                                        String link2 = queryTsk.getResult().getAlternateLink();
+                                                        String link2 = queryTsk.getResult().getWebContentLink();
                                                         Log.i("LINK", "Success getting URL Embeded " + link2);
                                                         showMessage("Success getting URL " + link2);
                                                         appendContents(indexFile, link2);

@@ -247,7 +247,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                     DriveContents contents = task.getResult();
                     OutputStream outputStream = contents.getOutputStream();
                     try (Writer writer = new OutputStreamWriter(outputStream)) {
-                        writer.write("Inserir URLS\n");
+                        //writer.write("Inserir URLS\n");
                     }
 
                     MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
@@ -272,7 +272,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                     driveFile.getDriveId().encodeToString());
 
                             try {
-                                Thread.sleep(5000);
+                                Thread.sleep(6000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -281,7 +281,8 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
 
                             queryTask.addOnSuccessListener(activityReference.get(),
                                     Metadata -> {
-                                        String link2 = queryTask.getResult().getEmbedLink();
+                                        //String link2 = queryTask.getResult().getEmbedLink();
+                                        String link2 = queryTask.getResult().getWebContentLink();
                                         Log.i("CreateAlbumTask", "Success getting URL Embeded " + link2);
 
                                         activityReference.get().runOnUiThread(() ->
