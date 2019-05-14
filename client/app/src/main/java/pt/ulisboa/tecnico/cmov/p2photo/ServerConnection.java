@@ -116,6 +116,22 @@ public class ServerConnection {
         return result;
     }
 
+    public String givePermission(String userName, String albumName, String index) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return "Not connected to the server!";
+        }
+        write("givepermission");
+        write(Integer.toString(sessionID));
+        write(userName);
+        write(albumName);
+        write(index);
+        Log.d("ServerConnection", "User name: '" + userName +
+                "' Album name: '" + albumName + "' Index: '" + index + "'.");
+        String result = read();
+        return result;
+    }
+
     public ArrayList<String> getUsers() throws IOException {
         ArrayList<String> list = new ArrayList<>();
         if (!isConnected()) {

@@ -30,7 +30,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
     private WeakReference<FindUserActivity> activityReference;
     private ProgressDialog pd;
-    private Context ctx;
+    private GlobalClass ctx;
 
     String albumName;
 
@@ -42,7 +42,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
         activityReference = new WeakReference<>(activity);
 
-        ctx = activity.getApplicationContext();
+        ctx = (GlobalClass) activity.getApplicationContext();
 
         this.albumName = albumName;
 
@@ -68,8 +68,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
-        GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = ctx.getConnection();
 
         try {
             ArrayList<String> list = conn.getUsers();
@@ -78,7 +77,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
                 Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
 
                 activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+                    Toast.makeText(ctx, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
                 );
 
                 return false;
@@ -93,9 +92,9 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
                     this.userListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
-                        String itemString = itemAtPosition.toString();
+                        String userName = itemAtPosition.toString();
                         try {
-                            conn.setAlbumIndex(albumName, "");
+                            conn.givePermission(userName, albumName, "");
                         } catch (IOException e) {}
                     });
                 });
@@ -106,11 +105,9 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
             conn.disconnect();
             Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(ctx, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }

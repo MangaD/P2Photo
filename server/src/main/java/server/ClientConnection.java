@@ -232,6 +232,47 @@ public class ClientConnection implements Runnable {
 					}
 					// send empty string for terminating
 					write("");
+				} else if (inputLine.equals("givepermission")) {
+					
+					if (! isLoggedIn) {
+						write("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
+					String userName = read();
+					while (userName.isEmpty()) {
+						userName = read();
+					}
+					
+					String albumName = read();
+					while (albumName.isEmpty()) {
+						albumName = read();
+					}
+					
+					String index = read();
+					while (index.isEmpty()) {
+						index = read();
+					}
+
+					System.out.println("Received give permission from '" + user + "' to user name '" +
+							userName + "', for album '" + albumName + "' with index '" + index + "'.");
+
+					try {
+						Main.db.setAlbumIndex(albumName, userName, index);
+						write("Permission given successfully.");
+					} catch (SQLException e) {
+						// https://www.sqlite.org/rescode.html#constraint
+						if (e.getErrorCode() == 19) {
+							write("Permission already exists.");
+						} else {
+							write("Granting permission failed. Error code: " + e.getErrorCode());
+						}
+					}
+					
 				}
 			}
 
