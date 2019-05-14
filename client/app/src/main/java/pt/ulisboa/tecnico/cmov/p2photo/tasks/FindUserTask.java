@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.GivePermissionActivity;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -93,9 +95,11 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
                     this.userListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String userName = itemAtPosition.toString();
-                        try {
-                            conn.givePermission(userName, albumName, "");
-                        } catch (IOException e) {}
+
+                        Intent givePermissionIntent = new Intent(activityReference.get(), GivePermissionActivity.class);
+                        givePermissionIntent.putExtra("GivePermissionUserName", userName);
+                        givePermissionIntent.putExtra("GivePermissionAlbumName", albumName);
+                        activityReference.get().startActivity(givePermissionIntent);
                     });
                 });
 

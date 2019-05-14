@@ -28,6 +28,7 @@
         <activity android:name=".activities.SignUpActivity" />
         <activity android:name=".activities.LoggedInActivity" />
         <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.GivePermissionActivity" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

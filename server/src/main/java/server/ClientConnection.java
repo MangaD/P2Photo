@@ -247,16 +247,19 @@ public class ClientConnection implements Runnable {
 					while (userName.isEmpty()) {
 						userName = read();
 					}
+					System.out.println(userName);
 					
 					String albumName = read();
 					while (albumName.isEmpty()) {
 						albumName = read();
 					}
+					System.out.println(albumName);
 					
 					String index = read();
 					while (index.isEmpty()) {
 						index = read();
 					}
+					System.out.println(index);
 
 					System.out.println("Received give permission from '" + user + "' to user name '" +
 							userName + "', for album '" + albumName + "' with index '" + index + "'.");
