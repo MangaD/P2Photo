@@ -48,7 +48,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
-        pd.setMessage(ctx.getString(R.string.load_user_list));
+        pd.setMessage("Giving permission to album '" + albumName + "' to user '" + userName + "'");
         pd.setTitle("");
         pd.setIndeterminate(true);
         pd.setCancelable(false);
