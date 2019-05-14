@@ -17,6 +17,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.GivePermissionActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -95,5 +96,8 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
         Log.d("GivePermissionActivity", msg);
         Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+
+        Intent mainIntent = new Intent(activityReference.get(), LoggedInActivity.class);
+        activityReference.get().startActivity(mainIntent);
     }
 }
