@@ -2,7 +2,9 @@ package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 
@@ -35,28 +37,29 @@ public class DriveLoginActivity extends AppCompatActivity {
         setContentView(R.layout.drive_login);
 
         com.google.android.gms.common.SignInButton clickButton = findViewById(R.id.sign_in_button);
-        clickButton.setOnClickListener( new View.OnClickListener() {
-
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.sign_in_button:
-                        signIn();
-                        //Intent intent = new Intent(DriveLoginActivity.this, DriveActions.class);
-                        //startActivity(intent);
-                        break;
-                }
+        clickButton.setOnClickListener((View v) -> {
+            switch (v.getId()) {
+                case R.id.sign_in_button:
+                    signIn();
+                    //Intent intent = new Intent(DriveLoginActivity.this, DriveActions.class);
+                    //startActivity(intent);
+                    break;
             }
         });
     }
 
-    /** Start sign in activity. */
+    /**
+     * Start sign in activity.
+     */
     private void signIn() {
-        Log.i(DriveLoginActivity, "Start sign in");
+        Log.i("DriveLoginActivity", "Start sign in");
         GoogleSignInClient GoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(GoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
 
-    /** Build a Google SignIn client. */
+    /**
+     * Build a Google SignIn client.
+     */
     private GoogleSignInClient buildGoogleSignInClient() {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -74,13 +77,12 @@ public class DriveLoginActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case REQUEST_CODE_SIGN_IN:
-                Log.i(DriveLoginActivity, "Sign in request code");
+                Log.i("DriveLoginActivity", "Sign in request code");
                 // Called after user is signed in.
                 if (resultCode == RESULT_OK) {
-                    Log.i(DriveLoginActivity, "Signed in successfully.");
+                    Log.i("DriveLoginActivity", "Signed in successfully.");
 
                     account = GoogleSignIn.getLastSignedInAccount(this);
-
 
 
                     // Use the last signed in account here since it already have a Drive scope.
@@ -97,13 +99,13 @@ public class DriveLoginActivity extends AppCompatActivity {
         }
     }
 
-    void setDriveVars(){
+    void setDriveVars() {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Set mDriveClient and mDriveResourceCliente in global/application context
-        globalVariable.setmDriveClient(mDriveClient);
-        globalVariable.setmDriveResourceClient(mDriveResourceClient);
-        globalVariable.setAccount(account);
+        globalVariable.setDriveClient(mDriveClient);
+        globalVariable.setDriveResourceClient(mDriveResourceClient);
+        globalVariable.setGoogleAccount(account);
         globalVariable.setGoogleSignInClient(googleSignInClient);
     }
 }

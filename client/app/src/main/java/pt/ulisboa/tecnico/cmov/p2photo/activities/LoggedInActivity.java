@@ -37,8 +37,8 @@ public class LoggedInActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = globalVariable.getmDriveClient();
-        this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
+        this.mDriveClient = globalVariable.getDriveClient();
+        this.mDriveResourceClient = globalVariable.getDriveResourceClient();
         this.googleSignInClient = globalVariable.getGoogleSignInClient();
 
         initializeButtons();
@@ -47,9 +47,9 @@ public class LoggedInActivity extends AppCompatActivity {
         GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(
                         globalVariable, Collections.singleton(DriveScopes.DRIVE_FILE));
-        credential.setSelectedAccount(globalVariable.getAccount().getAccount());
+        credential.setSelectedAccount(globalVariable.getGoogleAccount().getAccount());
 
-        Log.i("LINK", "EMail: " + globalVariable.getAccount().getEmail());
+        Log.i("LINK", "EMail: " + globalVariable.getGoogleAccount().getEmail());
 
 
         this.service = new Drive.Builder(AndroidHttp.newCompatibleTransport(),
@@ -126,8 +126,8 @@ public class LoggedInActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Set mDriveClient and mDriveResourceCliente in global/application context
-        globalVariable.setmDriveClient(mDriveClient);
-        globalVariable.setmDriveResourceClient(mDriveResourceClient);
+        globalVariable.setDriveClient(mDriveClient);
+        globalVariable.setDriveResourceClient(mDriveResourceClient);
         globalVariable.setService(service);
     }
 

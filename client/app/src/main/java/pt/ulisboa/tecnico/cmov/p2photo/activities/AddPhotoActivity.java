@@ -153,8 +153,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = globalVariable.getmDriveClient();
-        this.mDriveResourceClient = globalVariable.getmDriveResourceClient();
+        this.mDriveClient = globalVariable.getDriveClient();
+        this.mDriveResourceClient = globalVariable.getDriveResourceClient();
 
 
         new AddPhotoTask((GlobalClass) getApplicationContext(), AddPhotoActivity.this).execute();

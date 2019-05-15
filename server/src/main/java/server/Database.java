@@ -183,7 +183,10 @@ public class Database {
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
-				result.add(rs.getString("url").trim());
+				String url = rs.getString("url").trim();
+				if (!url.isEmpty()) {
+					result.add(url);
+				}
 			}
 			return result;
 		} catch (SQLException e) {

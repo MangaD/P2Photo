@@ -166,7 +166,6 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
             for (String entry : this.indexURLs) {
                 Log.d("ViewAlbumTask", entry);
             }
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_success), Toast.LENGTH_LONG).show();
         } else {
             Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_fail), Toast.LENGTH_LONG).show();

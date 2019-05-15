@@ -60,8 +60,8 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         this.context = ctx;
 
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = context.getmDriveClient();
-        this.mDriveResourceClient = context.getmDriveResourceClient();
+        this.mDriveClient = context.getDriveClient();
+        this.mDriveResourceClient = context.getDriveResourceClient();
         this.service = context.getService();
 
         // Create Progress dialog

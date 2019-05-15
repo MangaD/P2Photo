@@ -19,72 +19,19 @@ public class GlobalClass extends Application {
     private ServerConnection serverConn;
     public String storageMode;
 
+    private DriveClient driveClient;
+    private DriveResourceClient driveResourceClient;
+    private GoogleSignInAccount googleAccount;
+    private GoogleSignInClient googleSignInClient;
+    private Drive service;
 
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
-    private GoogleSignInAccount account;
+    private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
+    private ArrayList<IndexAlbum> indexList = new ArrayList<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
         serverConn = new ServerConnection();
-    }
-
-    public ServerConnection getConnection() {
-        return serverConn;
-    }
-
-    public GoogleSignInClient getGoogleSignInClient() {
-        return googleSignInClient;
-    }
-
-    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
-        this.googleSignInClient = googleSignInClient;
-    }
-
-    private GoogleSignInClient googleSignInClient;
-
-    public Drive getService() {
-        return service;
-    }
-
-    public void setService(Drive service) {
-        this.service = service;
-    }
-
-    private Drive service;
-
-    private ArrayList<PhotoAlbum> albumList = new ArrayList<>();
-    private ArrayList<IndexAlbum> indexList = new ArrayList<>();
-    private ArrayList<PhotoImage> photosList = new ArrayList<>();
-
-
-    public DriveClient getmDriveClient() {
-        return mDriveClient;
-    }
-
-    public void setmDriveClient(DriveClient mDriveClient) {
-        this.mDriveClient = mDriveClient;
-    }
-
-    public DriveResourceClient getmDriveResourceClient() {
-        return mDriveResourceClient;
-    }
-
-    public void setmDriveResourceClient(DriveResourceClient mDriveResourceClient) {
-        this.mDriveResourceClient = mDriveResourceClient;
-    }
-
-    public GoogleSignInAccount getAccount() {
-        return this.account;
-    }
-
-    public void setAccount(GoogleSignInAccount acc) {
-        this.account = acc;
-    }
-
-    public ArrayList<PhotoAlbum> getAlbumList() {
-        return albumList;
     }
 
     public void addAlbumToAlbumList(String albumName, DriveId driveId) {
@@ -103,16 +50,8 @@ public class GlobalClass extends Application {
             this.imagesArr = new ArrayList<>();
         }
 
-        public DriveId getDriveid() {
-            return driveid;
-        }
-
         public String getName() {
             return name;
-        }
-
-        public ArrayList<PhotoImage> getImagesArr() {
-            return imagesArr;
         }
 
         @Override
@@ -137,7 +76,6 @@ public class GlobalClass extends Application {
         DriveId driveid;
         PhotoAlbum photoAlbum;
         IndexAlbum indexAlbum;
-        String url;
 
         PhotoImage(String name, DriveId driveid, PhotoAlbum pa, IndexAlbum ia) {
             this.name = name;
@@ -146,40 +84,14 @@ public class GlobalClass extends Application {
             this.indexAlbum = ia;
         }
 
-        public DriveId getDriveID() {
-            return driveid;
-        }
-
         public String getName() {
             return name;
-        }
-
-        public String getURL() {
-            return url;
         }
 
         @Override
         public String toString() {
             return getName();
         }
-    }
-
-    public void addPhotoToPhotosList(String name, DriveId driveId, PhotoAlbum pa, IndexAlbum ia) {
-        PhotoImage pi = new PhotoImage(name, driveId, pa, ia);
-        photosList.add(pi);
-    }
-
-    public ArrayList<PhotoImage> getPhotosList() {
-        return this.photosList;
-    }
-
-    public PhotoImage findPhotoImage(String name) {
-        for (PhotoImage photoImage : photosList) {
-            if (photoImage.getName().equals(name)) {
-                return photoImage;
-            }
-        }
-        return null;
     }
 
     public class IndexAlbum {
@@ -189,10 +101,6 @@ public class GlobalClass extends Application {
         IndexAlbum(String name, DriveId driveid) {
             this.name = name;
             this.driveid = driveid;
-        }
-
-        public DriveId getDriveid() {
-            return this.driveid;
         }
 
         public String getName() {
@@ -205,21 +113,55 @@ public class GlobalClass extends Application {
         }
     }
 
-    public ArrayList<IndexAlbum> getIndexList() {
-        return indexList;
-    }
-
     public void addIndexToIndexList(String indexName, DriveId driveId) {
         IndexAlbum indexAlbum = new IndexAlbum(indexName, driveId);
         indexList.add(indexAlbum);
     }
 
-    public IndexAlbum findIndexAlbum(String name) {
-        for (IndexAlbum indexalbum : indexList) {
-            if (indexalbum.getName().equals(name)) {
-                return indexalbum;
-            }
-        }
-        return null;
+    /*
+     * Getters and Setters
+     */
+    public ServerConnection getConnection() {
+        return serverConn;
+    }
+
+    public GoogleSignInClient getGoogleSignInClient() {
+        return googleSignInClient;
+    }
+
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
+        this.googleSignInClient = googleSignInClient;
+    }
+
+    public Drive getService() {
+        return service;
+    }
+
+    public void setService(Drive service) {
+        this.service = service;
+    }
+
+    public DriveClient getDriveClient() {
+        return driveClient;
+    }
+
+    public void setDriveClient(DriveClient driveClient) {
+        this.driveClient = driveClient;
+    }
+
+    public DriveResourceClient getDriveResourceClient() {
+        return driveResourceClient;
+    }
+
+    public void setDriveResourceClient(DriveResourceClient driveResourceClient) {
+        this.driveResourceClient = driveResourceClient;
+    }
+
+    public GoogleSignInAccount getGoogleAccount() {
+        return this.googleAccount;
+    }
+
+    public void setGoogleAccount(GoogleSignInAccount acc) {
+        this.googleAccount = acc;
     }
 }
