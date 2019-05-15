@@ -46,7 +46,9 @@ The server is a web server which is in charge of maintaining the user list, mana
 ### Advanced Features
 
 In addition to the baseline features, students must also implement two advanced features (each worth 3 points) in order to get the full 20 points as described below:
+
 **A) Security:** Design and implementation of a security mechanism to encrypt the catalog files and prevent a malicious application provider from retrieving users' catalogs and photos from their private stores.
+
 **B) Availability:** Design and implementation of a replication protocol for increasing photo availability in the presence of disconnections. A simple solution would be for each device to maintain a reserved space for caching, and use it for keeping replicas of photos published by other users. However, solutions that involve the partial or total replication of the albums can be considered.
 
 ### Testing mechanisms
