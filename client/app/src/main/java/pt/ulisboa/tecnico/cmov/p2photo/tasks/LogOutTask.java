@@ -50,8 +50,8 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         pd.dismiss();
-        Log.d("LoggedInActivity", context.getString(R.string.log_out));
-        Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.log_out), Toast.LENGTH_LONG).show();
+        Log.d("LoggedInActivity", context.getString(R.string.logged_out));
+        Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.logged_out), Toast.LENGTH_LONG).show();
         Intent intent = new Intent(activityReference.get(), LoginActivity.class);
         activityReference.get().startActivity(intent);
     }

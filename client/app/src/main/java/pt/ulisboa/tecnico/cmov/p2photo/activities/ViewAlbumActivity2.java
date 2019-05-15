@@ -1,6 +1,6 @@
 package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="storage_array">
+        <item>Google Drive</item>
+        <item>Wi-fi Direct</item>
+    </string-array>
+
+    <string-array name="storage_values">
+        <item>drive</item>
+        <item>wifi</item>
+    </string-array>
+</resources>

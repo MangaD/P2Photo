@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.SignUpActivity;
 
 /**
@@ -41,7 +42,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
-        pd.setMessage(ctx.getString(R.string.sign_up));
+        pd.setMessage(ctx.getString(R.string.signing_up));
         pd.setTitle("");
         pd.setIndeterminate(true);
         pd.setCancelable(false);
@@ -132,7 +133,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         Log.d("SignUpTask", msg);
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         if (msg.equals(ctx.getString(R.string.sign_up_success))) {
-            Intent intent = new Intent(activityReference.get(), SignUpActivity.class);
+            Intent intent = new Intent(activityReference.get(), LoginActivity.class);
             activityReference.get().startActivity(intent);
         }
     }

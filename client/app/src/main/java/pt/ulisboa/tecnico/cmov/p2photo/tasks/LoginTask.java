@@ -37,7 +37,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         this.context = ctx;
         // Create Progress dialog
         pd = new ProgressDialog(activity);
-        pd.setMessage(ctx.getString(R.string.login));
+        pd.setMessage(ctx.getString(R.string.loggin_in));
         pd.setTitle("");
         pd.setIndeterminate(true);
         pd.setCancelable(false);
@@ -79,11 +79,9 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
             Log.d("LoginTask", context.getString(R.string.server_connect_fail));
             Log.d("LoginTask", e.getMessage());
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, context.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, context.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }
@@ -98,11 +96,9 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
             //String msg = "Username and password cannot be empty!";
             Log.d("LoginTask", context.getString(R.string.user_pass_empty));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, context.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, context.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }
@@ -111,17 +107,22 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         Log.d("LoginTask", "Password: " + password);
 
         try {
-            return conn.login(username, password);
+            boolean success = conn.login(username, password);
+            if(!success) {
+                Log.d("LoginTask", context.getString(R.string.login_invalid));
+                activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.login_invalid), Toast.LENGTH_LONG).show()
+                );
+            }
+            return success;
         } catch (IOException e) {
             conn.disconnect();
 
             Log.d("LoginTask", context.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show();
-                }
-            });
+            activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+            );
 
             return false;
         }
@@ -137,10 +138,6 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         if (result) {
             Intent intent = new Intent(activityReference.get(), DriveLogin.class);
             activityReference.get().startActivity(intent);
-        } else {
-
-            Log.d("LoginTask", context.getString(R.string.login_invalid));
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.login_invalid), Toast.LENGTH_LONG).show();
         }
     }
 }

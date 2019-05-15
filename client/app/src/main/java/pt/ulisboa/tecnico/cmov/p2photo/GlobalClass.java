@@ -17,10 +17,22 @@ import java.util.ArrayList;
 public class GlobalClass extends Application {
 
     private ServerConnection serverConn;
+    public String storageMode;
+
 
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
     private GoogleSignInAccount account;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        serverConn = new ServerConnection();
+    }
+
+    public ServerConnection getConnection() {
+        return serverConn;
+    }
 
     public GoogleSignInClient getGoogleSignInClient() {
         return googleSignInClient;
@@ -46,15 +58,6 @@ public class GlobalClass extends Application {
     private ArrayList<IndexAlbum> indexList = new ArrayList<>();
     private ArrayList<PhotoImage> photosList = new ArrayList<>();
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        serverConn = new ServerConnection();
-    }
-
-    public ServerConnection getConnection() {
-        return serverConn;
-    }
 
     public DriveClient getmDriveClient() {
         return mDriveClient;
@@ -72,16 +75,20 @@ public class GlobalClass extends Application {
         this.mDriveResourceClient = mDriveResourceClient;
     }
 
-    public GoogleSignInAccount getAccount(){ return this.account;}
+    public GoogleSignInAccount getAccount() {
+        return this.account;
+    }
 
-    public void setAccount (GoogleSignInAccount acc){
+    public void setAccount(GoogleSignInAccount acc) {
         this.account = acc;
     }
 
-    public ArrayList<PhotoAlbum> getAlbumList() {return albumList; }
+    public ArrayList<PhotoAlbum> getAlbumList() {
+        return albumList;
+    }
 
-    public void addAlbumToAlbumList(String albumName,DriveId driveId){
-        PhotoAlbum photoAlbum = new PhotoAlbum(albumName,driveId);
+    public void addAlbumToAlbumList(String albumName, DriveId driveId) {
+        PhotoAlbum photoAlbum = new PhotoAlbum(albumName, driveId);
         albumList.add(photoAlbum);
     }
 
@@ -90,30 +97,34 @@ public class GlobalClass extends Application {
         DriveId driveid;
         ArrayList<PhotoImage> imagesArr;
 
-        PhotoAlbum(String name,DriveId driveid){
-            this.name=name;
-            this.driveid=driveid;
+        PhotoAlbum(String name, DriveId driveid) {
+            this.name = name;
+            this.driveid = driveid;
             this.imagesArr = new ArrayList<>();
         }
 
         public DriveId getDriveid() {
             return driveid;
         }
+
         public String getName() {
             return name;
         }
-        public ArrayList<PhotoImage> getImagesArr(){ return imagesArr;}
+
+        public ArrayList<PhotoImage> getImagesArr() {
+            return imagesArr;
+        }
 
         @Override
-        public String toString(){
+        public String toString() {
             return getName();
         }
     }
 
     public PhotoAlbum findPhotoAlbum(String name) {
         Log.d("GlobalClass", Integer.toString(albumList.size()));
-        for(PhotoAlbum photoalbum : albumList) {
-            if(photoalbum.getName().equals(name)) {
+        for (PhotoAlbum photoalbum : albumList) {
+            if (photoalbum.getName().equals(name)) {
                 Log.d("GlobalClass", photoalbum.getName() + " " + name);
                 return photoalbum;
             }
@@ -128,35 +139,43 @@ public class GlobalClass extends Application {
         IndexAlbum indexAlbum;
         String url;
 
-        PhotoImage(String name,DriveId driveid, PhotoAlbum pa, IndexAlbum ia){
-            this.name=name;
-            this.driveid=driveid;
+        PhotoImage(String name, DriveId driveid, PhotoAlbum pa, IndexAlbum ia) {
+            this.name = name;
+            this.driveid = driveid;
             this.photoAlbum = pa;
             this.indexAlbum = ia;
         }
+
         public DriveId getDriveID() {
             return driveid;
         }
+
         public String getName() {
             return name;
         }
-        public String getURL(){ return url; }
+
+        public String getURL() {
+            return url;
+        }
+
         @Override
-        public String toString(){
+        public String toString() {
             return getName();
         }
     }
 
-    public void addPhotoToPhotosList(String name, DriveId driveId, PhotoAlbum pa, IndexAlbum ia){
+    public void addPhotoToPhotosList(String name, DriveId driveId, PhotoAlbum pa, IndexAlbum ia) {
         PhotoImage pi = new PhotoImage(name, driveId, pa, ia);
         photosList.add(pi);
     }
 
-    public ArrayList<PhotoImage> getPhotosList(){ return this.photosList;}
+    public ArrayList<PhotoImage> getPhotosList() {
+        return this.photosList;
+    }
 
     public PhotoImage findPhotoImage(String name) {
-        for(PhotoImage photoImage : photosList) {
-            if(photoImage.getName().equals(name)) {
+        for (PhotoImage photoImage : photosList) {
+            if (photoImage.getName().equals(name)) {
                 return photoImage;
             }
         }
@@ -167,9 +186,9 @@ public class GlobalClass extends Application {
         String name;
         DriveId driveid;
 
-        IndexAlbum(String name,DriveId driveid){
-            this.name=name;
-            this.driveid=driveid;
+        IndexAlbum(String name, DriveId driveid) {
+            this.name = name;
+            this.driveid = driveid;
         }
 
         public DriveId getDriveid() {
@@ -179,22 +198,25 @@ public class GlobalClass extends Application {
         public String getName() {
             return this.name;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return this.getName();
         }
     }
 
-    public ArrayList<IndexAlbum> getIndexList() {return indexList; }
+    public ArrayList<IndexAlbum> getIndexList() {
+        return indexList;
+    }
 
-    public void addIndexToIndexList(String indexName,DriveId driveId){
-        IndexAlbum indexAlbum = new IndexAlbum(indexName,driveId);
+    public void addIndexToIndexList(String indexName, DriveId driveId) {
+        IndexAlbum indexAlbum = new IndexAlbum(indexName, driveId);
         indexList.add(indexAlbum);
     }
 
     public IndexAlbum findIndexAlbum(String name) {
-        for(IndexAlbum indexalbum : indexList) {
-            if(indexalbum.getName().equals(name)) {
+        for (IndexAlbum indexalbum : indexList) {
+            if (indexalbum.getName().equals(name)) {
                 return indexalbum;
             }
         }

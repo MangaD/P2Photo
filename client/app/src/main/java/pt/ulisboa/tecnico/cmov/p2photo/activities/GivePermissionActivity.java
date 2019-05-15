@@ -1,10 +1,9 @@
 package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import pt.ulisboa.tecnico.cmov.p2photo.R;
-import pt.ulisboa.tecnico.cmov.p2photo.tasks.FindUserTask;
 import pt.ulisboa.tecnico.cmov.p2photo.tasks.GivePermissionTask;
 
 public class GivePermissionActivity extends AppCompatActivity {

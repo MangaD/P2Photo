@@ -1,5 +1,48 @@
 <resources>
     <string name="app_name">P2Photo</string>
+
+    <!-- Menu -->
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preferences -->
+    <string name="connection_header">Connection</string>
+    <string name="server_address">Server IP address</string>
+    <string name="default_ip">10.0.2.2</string>
+    <string name="server_port">Server port</string>
+    <string name="default_port">12345</string>
+    <string name="storage_header">Storage</string>
+    <string name="storage_default">drive</string>
+    <string name="invalid_address">Invalid server address.</string>
+    <string name="invalid_port">Port must be a number between 1024 and 65535.</string>
+    <string name="invalid_mode">Must select a storage mode.</string>
+
+    <!-- Connection -->
+    <string name="network_disabled">Network is disabled.</string>
+    <string name="server_contact_fail">Failed to contact the server.</string>
+    <string name="server_connect_fail">Failed to connect to the server.</string>
+
+    <!-- Login / Sign up -->
+    <string name="login">Log in</string>
+    <string name="signup">Sign up</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="loggin_in">Logging in…</string>
+    <string name="user_pass_empty">Username and password cannot be empty!</string>
+    <string name="login_invalid">Login invalid.</string>
+    <string name="createaccount">Create account</string>
+    <string name="logged_out">Logged out.</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="signing_up">Signing up…</string>
+    <string name="sign_up_success">Sign up successful.</string>
+
+    <!-- Menu -->
+    <string name="createalbum_opt">Create album</string>
+    <string name="addphototoalbum_opt">Add photo to album</string>
+    <string name="adduserstoalbum_opt">Add users to album</string>
+    <string name="listusersalbums_opt">List user\'s albums</string>
+    <string name="logout_opt">Log out</string>
+
+
     <string name="download_success">Successfully retrieved file!</string>
     <string name="download_failed_stream">Failed decoding file from stream!</string>
     <string name="download_failed">Failed decoding file!</string>
@@ -10,22 +53,12 @@
     <string name="album_create_success">Album created successfully.</string>
     <string name="create_album">Creating album…</string>
     <string name="album_empty_name">"Album name cannot be empty!"</string>
-    <string name="server_contact_fail">Failed to contact the server.</string>
-    <string name="server_connect_fail">Failed to connect to the server.</string>
     <string name="load_user_list">Loading user list…</string>
     <string name="load_user_list_success">Loaded user list successfully.</string>
     <string name="load_user_list_fail">Failed to load user list.</string>
     <string name="load_user_album">Loading user\'s albums…</string>
     <string name="load_user_album_success">Loaded user\'s albums list successfully.</string>
     <string name="load_user_album_fail">Failed to load user\'s albums list.</string>
-    <string name="login">Logging in…</string>
-    <string name="network_disabled">Network is disabled.</string>
-    <string name="user_pass_empty">Username and password cannot be empty!</string>
-    <string name="login_invalid">Login invalid.</string>
-    <string name="log_out">Logged out.</string>
-    <string name="logging_out">Logging out…</string>
-    <string name="sign_up">Signing up…</string>
-    <string name="sign_up_success">Sign up successful!</string>
     <string name="load_album_photos">Loading album photos...</string>
     <string name="load_album_photos_success">Loaded album photos successfully.</string>
     <string name="load_album_photos_fail">Failed to load album photos.</string>
