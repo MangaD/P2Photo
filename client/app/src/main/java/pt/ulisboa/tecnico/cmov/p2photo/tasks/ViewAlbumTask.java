@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewPhotoActivity;
 
 /**
@@ -34,7 +34,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
     public static final String TAG = "ViewAlbumTask";
 
-    private WeakReference<ViewAlbumActivity2> activityReference;
+    private WeakReference<ViewAlbumActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
 
@@ -46,7 +46,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
-    public ViewAlbumTask(GlobalClass ctx, ViewAlbumActivity2 activity, String albumName) {
+    public ViewAlbumTask(GlobalClass ctx, ViewAlbumActivity activity, String albumName) {
 
         activityReference = new WeakReference<>(activity);
         this.context = ctx;

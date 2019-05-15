@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.MainMenuActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 /**
@@ -162,7 +162,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         pd.dismiss();
         if (result) {
-            Intent intent = new Intent(activityReference.get(), LoggedInActivity.class);
+            Intent intent = new Intent(activityReference.get(), MainMenuActivity.class);
             activityReference.get().startActivity(intent);
         }
     }

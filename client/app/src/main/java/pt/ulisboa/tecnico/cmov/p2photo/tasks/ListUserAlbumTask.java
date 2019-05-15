@@ -16,8 +16,8 @@ import java.util.HashMap;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.ListUserAlbumActivity2;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ListUserAlbumActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -32,7 +32,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
     public static final String TAG = "ListUserAlbumTask";
 
-    private WeakReference<ListUserAlbumActivity2> activityReference;
+    private WeakReference<ListUserAlbumActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
 
@@ -40,7 +40,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
-    public ListUserAlbumTask(GlobalClass ctx, ListUserAlbumActivity2 activity) {
+    public ListUserAlbumTask(GlobalClass ctx, ListUserAlbumActivity activity) {
 
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
@@ -102,7 +102,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String itemString = itemAtPosition.toString();
 
-                        Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity2.class);
+                        Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity.class);
 
                         viewAlbumIntent.putExtra("ViewAlbumName",itemString);
 

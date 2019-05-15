@@ -10,7 +10,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.tasks.LogOutTask;
 
-public class LoggedInActivity extends AppCompatActivity {
+public class MainMenuActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class LoggedInActivity extends AppCompatActivity {
          */
         Button buttonCreateAlbum = findViewById(R.id.button_create_album);
         buttonCreateAlbum.setOnClickListener((View view) -> {
-            Intent intent = new Intent(LoggedInActivity.this, CreateAlbumActivity.class);
+            Intent intent = new Intent(MainMenuActivity.this, CreateAlbumActivity.class);
             startActivity(intent);
         });
 
@@ -35,7 +35,7 @@ public class LoggedInActivity extends AppCompatActivity {
          */
         Button buttonAddPhoto = findViewById(R.id.button_add_photo);
         buttonAddPhoto.setOnClickListener((View view) -> {
-            Intent intent = new Intent(LoggedInActivity.this, AddPhotoActivity.class);
+            Intent intent = new Intent(MainMenuActivity.this, AddPhotoActivity.class);
             startActivity(intent);
         });
         /**
@@ -43,7 +43,7 @@ public class LoggedInActivity extends AppCompatActivity {
          */
         Button buttonAddUserToAlbum = findViewById(R.id.button_add_user_to_album);
         buttonAddUserToAlbum.setOnClickListener((View view) -> {
-            Intent intent = new Intent(LoggedInActivity.this, AddUserToAlbumActivity.class);
+            Intent intent = new Intent(MainMenuActivity.this, AddUserToAlbumActivity.class);
             startActivity(intent);
         });
         /**
@@ -51,7 +51,7 @@ public class LoggedInActivity extends AppCompatActivity {
          */
         Button buttonListAlbums = findViewById(R.id.button_list_user_album);
         buttonListAlbums.setOnClickListener((View view) -> {
-            Intent intent = new Intent(LoggedInActivity.this, ListUserAlbumActivity2.class);
+            Intent intent = new Intent(MainMenuActivity.this, ListUserAlbumActivity.class);
             startActivity(intent);
         });
 
@@ -60,7 +60,7 @@ public class LoggedInActivity extends AppCompatActivity {
          */
         Button buttonLogOut = findViewById(R.id.button_log_out);
         buttonLogOut.setOnClickListener((View view) ->
-            new LogOutTask((GlobalClass) getApplicationContext(), LoggedInActivity.this).execute()
+            new LogOutTask((GlobalClass) getApplicationContext(), MainMenuActivity.this).execute()
         );
 
         /*
@@ -68,7 +68,7 @@ public class LoggedInActivity extends AppCompatActivity {
          *
         Button buttonPhotoTest = findViewById(R.id.button_photo_test);
         buttonPhotoTest.setOnClickListener((View view) -> {
-            Intent intent = new Intent(LoggedInActivity.this, ViewPhotoActivity.class);
+            Intent intent = new Intent(MainMenuActivity.this, ViewPhotoActivity.class);
             startActivity(intent);
         });*/
 

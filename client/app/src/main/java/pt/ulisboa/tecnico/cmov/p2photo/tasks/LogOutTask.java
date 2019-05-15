@@ -11,18 +11,18 @@ import java.lang.ref.WeakReference;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.MainMenuActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 public class LogOutTask extends AsyncTask<Void, Void, Void> {
 
     public static final String TAG = "LogOutTask";
 
-    private WeakReference<LoggedInActivity> activityReference;
+    private WeakReference<MainMenuActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
 
-    public LogOutTask(GlobalClass ctx, LoggedInActivity activity) {
+    public LogOutTask(GlobalClass ctx, MainMenuActivity activity) {
 
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
