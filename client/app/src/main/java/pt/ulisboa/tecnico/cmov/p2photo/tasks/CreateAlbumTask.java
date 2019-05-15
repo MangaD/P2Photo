@@ -6,14 +6,11 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.tasks.Task;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
@@ -43,13 +40,14 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.CreateAlbumActivity;
  */
 public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
 
+    public static final String TAG = "CreateAlbumTask";
+
     private WeakReference<CreateAlbumActivity> activityReference;
-    private ProgressDialog pd;
-    private String albumName;
     private GlobalClass context;
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
-    private Drive service;
+    private DriveConnection dc;
+    private ProgressDialog pd;
+
+    private String albumName;
     private String IndexURL = null;
 
     private Semaphore indexSemaphore = new Semaphore(0);
@@ -59,11 +57,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         activityReference = new WeakReference<>(activity);
 
         this.context = ctx;
-
-        // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = context.getDriveConnection().getDriveClient();
-        this.mDriveResourceClient = context.getDriveConnection().getDriveResourceClient();
-        this.service = context.getDriveConnection().getService();
+        this.dc = context.getDriveConnection();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -95,7 +89,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         if (albumName.isEmpty()) {
             conn.disconnect();
             String msg = context.getString(R.string.album_empty_name);
-            Log.d("CreateAlbumTask", msg);
+            Log.d(TAG, msg);
 
             activityReference.get().runOnUiThread(() ->
                     Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
@@ -104,7 +98,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
             return msg;
         }
 
-        Log.d("CreateAlbumTask", "Album name: " + albumName);
+        Log.d(TAG, "Album name: " + albumName);
 
         try {
             // Add album to server
@@ -115,7 +109,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                 //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
 
                 boolean exists = this.albumNameExists(albumName);
-                Log.d("CreateAlbumTask", Boolean.toString(exists));
+                Log.d(TAG, Boolean.toString(exists));
                 if (!exists) {
                     this.createFolder(albumName);
                 }
@@ -128,7 +122,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
             }
 
             String indexURL = getIndexURL();
-            Log.d("CreateAlbumTask", "indexURL: " + indexURL);
+            Log.d(TAG, "indexURL: " + indexURL);
 
             // Add index of album to server
             msg = conn.setAlbumIndex(albumName, indexURL);
@@ -137,10 +131,10 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         } catch (IOException e) {
             conn.disconnect();
             String msg = context.getString(R.string.server_connect_fail);
-            Log.d("CreateAlbumTask", msg);
+            Log.d(TAG, msg);
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
             );
 
             return msg;
@@ -154,7 +148,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String msg) {
         pd.dismiss();
-        Log.d("CreateAlbumTask", msg);
+        Log.d(TAG, msg);
         Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
         activityReference.get().finish();
     }
@@ -171,7 +165,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
     }
 
     private void createFolder(String albumN) {
-        getDriveResourceClient()
+        dc.getDriveResourceClient()
                 .getRootFolder()
                 .continueWithTask(task -> {
                     DriveFolder parentFolder = task.getResult();
@@ -180,51 +174,48 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                             .setMimeType(DriveFolder.MIME_TYPE)
                             .setStarred(true)
                             .build();
-                    return getDriveResourceClient().createFolder(parentFolder, changeSet);
+                    return dc.getDriveResourceClient().createFolder(parentFolder, changeSet);
                 })
                 .addOnSuccessListener(activityReference.get(),
                         driveFolder -> {
                             context.getDriveConnection().addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
                             insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
-                            Log.d("CreateAlbumTask", context.getString(R.string.album_created) +
+                            Log.d(TAG, context.getString(R.string.album_created) +
                                     driveFolder.getDriveId().encodeToString());
 
 
-                            new Thread(new Runnable() {
-                                public void run() {
+                            new Thread(() -> {
 
-                            Permission newPermission = new Permission();
-                            newPermission.setType("anyone");
-                            newPermission.setRole("reader");
-                            try {
-                                Thread.sleep(3000);
-                                // Print the names and IDs for up to 10 files.
-                                FileList result = null;
-                                result = service.files().list()
-                                        .setPageSize(100)
-                                        .setFields("nextPageToken, files(id, name)")
-                                        .execute();
-                                List<File> files = result.getFiles();
-                                if (files == null || files.isEmpty()) {
-                                    Log.i("LINK", "No files found.");
-                                } else {
-                                    Log.i("LINK", "Files:");
-                                    for (File file : files) {
-                                        Log.i("LINK", "%s " + file.getName() + " (%s) " + file.getId() + "\n");
-                                        service.permissions().create(file.getId(), newPermission).execute();
+                                Permission newPermission = new Permission();
+                                newPermission.setType("anyone");
+                                newPermission.setRole("reader");
+                                try {
+                                    Thread.sleep(3000);
+                                    // Print the names and IDs for up to 10 files.
+                                    FileList result = null;
+                                    result = dc.getService().files().list()
+                                            .setPageSize(100)
+                                            .setFields("nextPageToken, files(id, name)")
+                                            .execute();
+                                    List<File> files = result.getFiles();
+                                    if (files == null || files.isEmpty()) {
+                                        Log.i("LINK", "No files found.");
+                                    } else {
+                                        Log.i("LINK", "Files:");
+                                        for (File file : files) {
+                                            Log.i("LINK", "%s " + file.getName() + " (%s) " + file.getId() + "\n");
+                                            dc.getService().permissions().create(file.getId(), newPermission).execute();
+                                        }
                                     }
-                                }
 
                                 /*String id = service.files().get("root").setFields("id").execute().getId();
                                 Log.i("LNK", "ID of RootFolder: " + id);
                                 service.permissions().create(id, newPermission).execute();*/
 
-                            }catch (Exception e){
-                                Log.i("LINK", "Failed to add permition: " + e);
-                            }
+                                } catch (Exception e) {
+                                    Log.i("LINK", "Failed to add permition: " + e);
                                 }
                             }).start();
-
 
 
                             activityReference.get().runOnUiThread(() ->
@@ -233,7 +224,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                             );
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
-                    Log.e("CreateAlbumTask", "Unable to create file", e);
+                    Log.e(TAG, "Unable to create file", e);
                     activityReference.get().runOnUiThread(() ->
                             Toast.makeText(context, context.getString(R.string.file_create_error), Toast.LENGTH_LONG).show()
                     );
@@ -242,7 +233,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
     }
 
     private void insertIndexFileInAlbum(String albumName, DriveFolder parent) {
-        getDriveResourceClient()
+        dc.getDriveResourceClient()
                 .createContents()
                 .continueWithTask(task -> {
                     DriveContents contents = task.getResult();
@@ -258,7 +249,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                             .build();
 
 
-                    return getDriveResourceClient().createFile(parent, changeSet, contents);
+                    return dc.getDriveResourceClient().createFile(parent, changeSet, contents);
                 })
                 .addOnSuccessListener(activityReference.get(),
                         driveFile -> {
@@ -269,7 +260,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                             driveFile.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
                             );
 
-                            Log.d("CreateAlbumTask", context.getString(R.string.file_created) +
+                            Log.d(TAG, context.getString(R.string.file_created) +
                                     driveFile.getDriveId().encodeToString());
 
                             try {
@@ -278,13 +269,13 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                 e.printStackTrace();
                             }
 
-                            Task<Metadata> queryTask = getDriveResourceClient().getMetadata(driveFile);
+                            Task<Metadata> queryTask = dc.getDriveResourceClient().getMetadata(driveFile);
 
                             queryTask.addOnSuccessListener(activityReference.get(),
                                     Metadata -> {
                                         //String link2 = queryTask.getResult().getEmbedLink();
                                         String link2 = queryTask.getResult().getWebContentLink();
-                                        Log.i("CreateAlbumTask", "Success getting URL Embeded " + link2);
+                                        Log.i(TAG, "Success getting URL Embeded " + link2);
 
                                         activityReference.get().runOnUiThread(() ->
                                                 Toast.makeText(context, "Success getting URL " + link2,
@@ -292,12 +283,12 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                         );
 
                                         setIndexURL(link2);
-                                        Log.i("CreateAlbumTask", "URL: " + getIndexURL());
+                                        Log.i(TAG, "URL: " + getIndexURL());
 
                                         indexSemaphore.release();
                                     })
                                     .addOnFailureListener(activityReference.get(), e -> {
-                                        Log.i("CreateAlbumTask", "Error getting URL");
+                                        Log.i(TAG, "Error getting URL");
 
                                         activityReference.get().runOnUiThread(() ->
                                                 Toast.makeText(context, "Error getting URL",
@@ -309,7 +300,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
 
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
-                    Log.e("CreateAlbumTask", "Unable to create file", e);
+                    Log.e(TAG, "Unable to create file", e);
 
                     activityReference.get().runOnUiThread(() ->
                             Toast.makeText(context, context.getString(R.string.file_create_error),
@@ -322,16 +313,8 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
 
     }
 
-    private DriveClient getDriveClient() {
-        return this.mDriveClient;
-    }
-
-    private DriveResourceClient getDriveResourceClient() {
-        return this.mDriveResourceClient;
-    }
-
-    private void setIndexURL(String iurl) {
-        this.IndexURL = iurl;
+    private void setIndexURL(String url) {
+        this.IndexURL = url;
     }
 
     private String getIndexURL() {

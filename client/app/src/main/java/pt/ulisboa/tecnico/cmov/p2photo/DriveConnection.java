@@ -14,6 +14,9 @@ import java.util.ArrayList;
 public class DriveConnection {
 
     public static final int REQUEST_CODE_SIGN_IN = 0;
+    public static final int REQUEST_CODE_CAPTURE_IMAGE = 1;
+    public static final int REQUEST_CODE_CREATOR = 2;
+    public static final int REQUEST_CODE_FIND_IMAGE = 4;
 
     private GlobalClass context;
 

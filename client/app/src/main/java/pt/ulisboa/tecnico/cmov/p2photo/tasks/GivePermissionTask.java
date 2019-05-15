@@ -26,6 +26,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
  */
 public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
+    public static final String TAG = "GivePermissionTask";
+
     private WeakReference<GivePermissionActivity> activityReference;
     private ProgressDialog pd;
     private GlobalClass ctx;
@@ -72,7 +74,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
         } catch (IOException e) {
             conn.disconnect();
             String msg = ctx.getString(R.string.server_connect_fail);
-            Log.d("GivePermissionActivity", msg);
+            Log.d(TAG, msg);
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
@@ -90,7 +92,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String msg) {
         pd.dismiss();
 
-        Log.d("GivePermissionActivity", msg);
+        Log.d(TAG, msg);
         Toast.makeText(activityReference.get().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
 
         Intent mainIntent = new Intent(activityReference.get(), LoggedInActivity.class);

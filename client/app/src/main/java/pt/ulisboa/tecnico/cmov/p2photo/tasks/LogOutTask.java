@@ -16,6 +16,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 public class LogOutTask extends AsyncTask<Void, Void, Void> {
 
+    public static final String TAG = "LogOutTask";
+
     private WeakReference<LoggedInActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
@@ -43,14 +45,14 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
         ServerConnection conn = context.getServerConnection();
 
         conn.disconnect();
-        Log.d("LoggedInActivity", "Disconnected");
+        Log.d(TAG, "Disconnected");
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
         pd.dismiss();
-        Log.d("LoggedInActivity", context.getString(R.string.logged_out));
+        Log.d(TAG, context.getString(R.string.logged_out));
         Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.logged_out), Toast.LENGTH_LONG).show();
         Intent intent = new Intent(activityReference.get(), LoginActivity.class);
         activityReference.get().startActivity(intent);

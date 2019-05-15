@@ -30,6 +30,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity2;
  */
 public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
+    public static final String TAG = "ListUserAlbumTask";
+
     private WeakReference<ListUserAlbumActivity2> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
@@ -74,7 +76,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             HashMap<Integer, String> list = conn.getUserAlbums();
             if (list == null) {
                 conn.disconnect();
-                Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
+                Log.d(TAG, context.getString(R.string.server_contact_fail));
 
                 activityReference.get().runOnUiThread(() ->
                     Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
@@ -84,9 +86,9 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             } else {
                 this.albumArrayList = new ArrayList<>(list.values());
 
-                Log.d("ListUserAlbumTask", "List size: " + list.size());
+                Log.d(TAG, "List size: " + list.size());
                 for (String entry : this.albumArrayList) {
-                    Log.d("ListUserAlbumTask", entry);
+                    Log.d(TAG, entry);
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
@@ -112,7 +114,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
+            Log.d(TAG, context.getString(R.string.server_contact_fail));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
@@ -130,12 +132,12 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean success) {
         pd.dismiss();
         if (success) {
-            Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_success));
+            Log.d(TAG, context.getString(R.string.load_user_album_success));
             for (String entry : this.albumArrayList) {
-                Log.d("ListUserAlbumTask", entry);
+                Log.d(TAG, entry);
             }
         } else {
-            Log.d("ListUserAlbumTask", context.getString(R.string.load_user_album_fail));
+            Log.d(TAG, context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
         }
     }

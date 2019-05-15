@@ -17,7 +17,12 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.drive.DriveScopes;
 
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
@@ -175,6 +180,21 @@ public class LoginActivity extends AppCompatActivity {
                     dc.setDriveClient(Drive.getDriveClient(context, dc.getGoogleAccount()));
                     // Build a drive resource client.
                     dc.setDriveResourceClient(Drive.getDriveResourceClient(context, dc.getGoogleAccount()));
+
+                    // Use the authenticated account to sign in to the Drive service.
+                    GoogleAccountCredential credential =
+                            GoogleAccountCredential.usingOAuth2(
+                                    context, Collections.singleton(DriveScopes.DRIVE_FILE));
+                    credential.setSelectedAccount(dc.getGoogleAccount().getAccount());
+
+                    Log.i("LINK", "EMail: " + dc.getGoogleAccount().getEmail());
+
+                    dc.setService(new com.google.api.services.drive.Drive.Builder(AndroidHttp.newCompatibleTransport(),
+                            JacksonFactory.getDefaultInstance(), credential)
+                            .setApplicationName("Drive API Migration")
+                            .build());
+
+                    Log.i("LINK", "SERVICE: " + dc.getService().files());
 
                     isSignedInToDrive = true;
                 }

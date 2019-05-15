@@ -27,6 +27,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
  */
 public class LoginTask extends AsyncTask<Void, Void, Boolean> {
 
+    public static final String TAG = "LoginTask";
+
     private WeakReference<LoginActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
@@ -67,7 +69,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
             try {
                 activityReference.get().driveSemaphore.acquire();
             } catch (InterruptedException e) {
-                Log.d("LoginTask", "Error with thread synchronization.");
+                Log.d(TAG, "Error with thread synchronization.");
                 return false;
             }
             if (!activityReference.get().getIsSignedInToDrive()) {
@@ -84,7 +86,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         ServerConnection conn = context.getServerConnection();
 
         if (!ServerConnection.isOnline(context)) {
-            Log.d("LoginTask", context.getString(R.string.network_disabled));
+            Log.d(TAG, context.getString(R.string.network_disabled));
 
             // https://stackoverflow.com/questions/34026903/how-runnable-is-created-from-java8-lambda
             activityReference.get().runOnUiThread(() ->
@@ -96,12 +98,12 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
 
         try {
             conn.connect();
-            Log.d("LoginTask", "Connected to: " + conn.getAddress());
+            Log.d(TAG, "Connected to: " + conn.getAddress());
         } catch (IOException e) {
             conn.disconnect();
 
-            Log.d("LoginTask", context.getString(R.string.server_connect_fail));
-            Log.d("LoginTask", e.getMessage());
+            Log.d(TAG, context.getString(R.string.server_connect_fail));
+            Log.d(TAG, e.getMessage());
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, context.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
@@ -118,7 +120,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         if (username.isEmpty() || password.isEmpty()) {
             conn.disconnect();
             //String msg = "Username and password cannot be empty!";
-            Log.d("LoginTask", context.getString(R.string.user_pass_empty));
+            Log.d(TAG, context.getString(R.string.user_pass_empty));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, context.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
@@ -127,13 +129,13 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
 
-        Log.d("LoginTask", "Username: " + username);
-        Log.d("LoginTask", "Password: " + password);
+        Log.d(TAG, "Username: " + username);
+        Log.d(TAG, "Password: " + password);
 
         try {
             boolean success = conn.login(username, password);
             if(!success) {
-                Log.d("LoginTask", context.getString(R.string.login_invalid));
+                Log.d(TAG, context.getString(R.string.login_invalid));
                 activityReference.get().runOnUiThread(() ->
                     Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.login_invalid), Toast.LENGTH_LONG).show()
                 );
@@ -142,7 +144,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         } catch (IOException e) {
             conn.disconnect();
 
-            Log.d("LoginTask", context.getString(R.string.server_contact_fail));
+            Log.d(TAG, context.getString(R.string.server_contact_fail));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()

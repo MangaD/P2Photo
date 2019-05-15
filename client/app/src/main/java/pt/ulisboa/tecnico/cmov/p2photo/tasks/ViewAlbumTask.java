@@ -32,6 +32,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewPhotoActivity;
  */
 public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
+    public static final String TAG = "ViewAlbumTask";
+
     private WeakReference<ViewAlbumActivity2> activityReference;
     private ProgressDialog pd;
     GlobalClass context;
@@ -77,27 +79,27 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         ServerConnection conn = context.getServerConnection();
 
         try {
-            Log.d("ViewAlbumTask", "Getting indexes for album: " + this.albumName);
+            Log.d(TAG, "Getting indexes for album: " + this.albumName);
             ArrayList<String> list = conn.getAlbumIndexes(this.albumName);
             if (list == null) {
                 conn.disconnect();
-                Log.d("ViewAlbumTask", context.getString(R.string.server_contact_fail));
+                Log.d(TAG, context.getString(R.string.server_contact_fail));
                 showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
                 this.indexURLs = list;
 
-                Log.d("ViewAlbumTask", "List size: " + list.size());
+                Log.d(TAG, "List size: " + list.size());
 
                 for (String entry : this.indexURLs) {
-                    Log.d("ViewAlbumTask", entry);
+                    Log.d(TAG, entry);
                     URL index = new URL(entry);
                     BufferedReader in = new BufferedReader(
                             new InputStreamReader(index.openStream()));
 
                     String inputLine;
                     while ((inputLine = in.readLine()) != null) {
-                        Log.d("ViewAlbumTask", inputLine);
+                        Log.d(TAG, inputLine);
                         this.albumArrayList.add(inputLine);
                     }
                     in.close();
@@ -121,34 +123,11 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     });
                 });
 
-
-
-                /*
-
-                this.activityReference.get().runOnUiThread(() -> {
-                    this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
-                    this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
-                            android.R.layout.simple_list_item_1, this.albumArrayList);
-                    this.albumListView.setAdapter(this.albumArrayAdapter);
-
-
-                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
-                        Object itemAtPosition = adapter.getItemAtPosition(position);
-                        String itemString = itemAtPosition.toString();
-
-                        Intent viewAlbumIntent = new Intent(activityReference.get(), ViewAlbumActivity2.class);
-
-                        viewAlbumIntent.putExtra("ViewAlbumName",itemString);
-
-                        activityReference.get().startActivity(viewAlbumIntent);
-                    });
-                });*/
-
                 return true;
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("ViewAlbumTask", context.getString(R.string.server_contact_fail));
+            Log.d(TAG, context.getString(R.string.server_contact_fail));
             showMessage(context.getString(R.string.server_contact_fail));
             return false;
         }
@@ -162,12 +141,12 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean success) {
         pd.dismiss();
         if (success) {
-            Log.d("ViewAlbumTask", context.getString(R.string.load_album_photos_success));
+            Log.d(TAG, context.getString(R.string.load_album_photos_success));
             for (String entry : this.indexURLs) {
-                Log.d("ViewAlbumTask", entry);
+                Log.d(TAG, entry);
             }
         } else {
-            Log.d("ViewAlbumTask", context.getString(R.string.load_user_album_fail));
+            Log.d(TAG, context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_album_photos_fail), Toast.LENGTH_LONG).show();
         }
     }

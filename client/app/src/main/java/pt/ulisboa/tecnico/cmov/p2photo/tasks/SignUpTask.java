@@ -28,6 +28,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.SignUpActivity;
  */
 public class SignUpTask extends AsyncTask<Void, Void, String> {
 
+    public static final String TAG = "SignUpTask";
+    
     private GlobalClass context;
     private WeakReference<SignUpActivity> activityReference;
     private ProgressDialog pd;
@@ -65,7 +67,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         ServerConnection conn = context.getServerConnection();
 
         if (!ServerConnection.isOnline(context)) {
-            Log.d("SignUpTask", ctx.getString(R.string.network_disabled));
+            Log.d(TAG, ctx.getString(R.string.network_disabled));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
@@ -76,11 +78,11 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         try {
             conn.connect();
-            Log.d("SignUpTask", "Connected to: " + conn.getAddress());
+            Log.d(TAG, "Connected to: " + conn.getAddress());
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("SignUpTask", ctx.getString(R.string.server_connect_fail));
-            Log.d("SignUpTask", e.getMessage());
+            Log.d(TAG, ctx.getString(R.string.server_connect_fail));
+            Log.d(TAG, e.getMessage());
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
@@ -96,7 +98,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         if (username.isEmpty() || password.isEmpty()) {
             conn.disconnect();
-            Log.d("SignUpTask", ctx.getString(R.string.user_pass_empty));
+            Log.d(TAG, ctx.getString(R.string.user_pass_empty));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
@@ -105,15 +107,15 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
             return ctx.getString(R.string.user_pass_empty);
         }
 
-        Log.d("SignUpTask", "Username: " + username);
-        Log.d("SignUpTask", "Password: " + password);
+        Log.d(TAG, "Username: " + username);
+        Log.d(TAG, "Password: " + password);
 
         try {
             return conn.signup(username, password);
         } catch (IOException e) {
             conn.disconnect();
 
-            Log.d("SignUpTask", ctx.getString(R.string.server_contact_fail));
+            Log.d(TAG, ctx.getString(R.string.server_contact_fail));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
@@ -130,7 +132,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String msg) {
         pd.dismiss();
-        Log.d("SignUpTask", msg);
+        Log.d(TAG, msg);
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
         if (msg.equals(ctx.getString(R.string.sign_up_success))) {
             Intent intent = new Intent(activityReference.get(), LoginActivity.class);

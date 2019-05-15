@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,11 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.drive.CreateFileActivityOptions;
-import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
@@ -44,93 +41,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 
+import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
-import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.AddPhotoTask;
 
 public class AddPhotoActivity extends AppCompatActivity {
 
-    public class AddPhotoTask extends AsyncTask<Void, Void, String> {
+    public static final String TAG = "AddPhotoActivity";
 
-        private WeakReference<AddPhotoActivity> activityReference;
-        private ArrayList<String> albumArrayList;
-        public AddPhotoTask(GlobalClass ctx, AddPhotoActivity activity) {
+    private GlobalClass context;
+    private DriveConnection driveConn;
 
-            activityReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        protected String doInBackground(Void... values) {
-
-            GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-            ServerConnection conn = context.getServerConnection();
-
-            //String msg = "Failed to contact the server.";
-
-            try {
-                HashMap<Integer, String> hashMap = conn.getUserAlbums();
-                ArrayList<String> list = new ArrayList<>(hashMap.values());
-                //list = convertMapToArrayList(hashMap);
-
-                if (list == null) {
-                    conn.disconnect();
-                    Log.d("ListUserAlbumTask", context.getString(R.string.server_contact_fail));
-
-                    activityReference.get().runOnUiThread(() ->
-                            Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-                    );
-                } else {
-                    this.albumArrayList = list;
-                    Log.i("ListUserAlbumTask", "List size: " + list.size());
-                    for (String s : list) {
-                        Log.i("ListUserAlbumTask", s);
-                    }
-                }
-            }catch (Exception e){
-                Log.i("ListUserAlbumTask", "Failed to show albuns: " + e);
-            }
-            return "n";
-        }
-
-        public ArrayList<String> convertMapToArrayList(HashMap<Integer, String> mp) {
-            ArrayList<String> lst = new ArrayList<>();
-            Iterator it = mp.entrySet().iterator();
-            while (it.hasNext()) {
-                HashMap.Entry pair = (HashMap.Entry)it.next();
-                Log.i("HASH", "Key: " + pair.getKey() + " = Value: " + pair.getValue());
-                lst.add(pair.getValue().toString());
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-            return lst;
-        }
-
-        /**
-         * onPostExecute displays the results of the doInBackgroud and also we
-         * can hide progress dialog.
-         */
-        @Override
-        protected void onPostExecute(String msg) {
-
-            initButtons();
-
-            createDialogOpts(albumArrayList);
-        }
-    }
-
-    private static final String TAG = "add_photo";
-
-    private static final int REQUEST_CODE_CAPTURE_IMAGE = 1;
-    private static final int REQUEST_CODE_CREATOR = 2;
-    private static final int REQUEST_CODE_FIND_IMAGE = 4;
-
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
     private Bitmap mBitmapToSave;
 
     private ListView albumListView;
@@ -142,7 +67,6 @@ public class AddPhotoActivity extends AppCompatActivity {
     Button btnFindPicture;
     private String imageTitle = "";
 
-
     AlertDialog.Builder alertDialogBuilder;
 
     @Override
@@ -150,14 +74,10 @@ public class AddPhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_photo);
 
-        // Obtain reference to application context
-        GlobalClass globalVariable = (GlobalClass) getApplicationContext();
-        // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = globalVariable.getDriveConnection().getDriveClient();
-        this.mDriveResourceClient = globalVariable.getDriveConnection().getDriveResourceClient();
+        this.context = (GlobalClass) getApplicationContext();
+        this.driveConn = context.getDriveConnection();
 
-
-        new AddPhotoTask((GlobalClass) getApplicationContext(), AddPhotoActivity.this).execute();
+        new AddPhotoTask((GlobalClass) getApplicationContext(), this).execute();
     }
 
     /**
@@ -168,7 +88,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         Log.i(TAG, "Creating new contents.");
         final Bitmap image = mBitmapToSave;
 
-        mDriveResourceClient
+        driveConn.getDriveResourceClient()
                 .createContents()
                 .continueWithTask(
                         task ->
@@ -199,7 +119,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .build();
 
         Task<MetadataBuffer> queryTask =
-                mDriveResourceClient
+                driveConn.getDriveResourceClient()
                         .query(query)
                         .addOnSuccessListener(this,
                                 metadataBuffer -> {
@@ -217,8 +137,8 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     private Task<DriveFile> createImageInAlbum(final DriveFolder parent, DriveContents driveContents, Bitmap image) {
         // [START drive_android_create_file]
-        final Task<DriveFolder> rootFolderTask = mDriveResourceClient.getRootFolder();
-        final Task<DriveContents> createContentsTask = mDriveResourceClient.createContents();
+        final Task<DriveFolder> rootFolderTask = driveConn.getDriveResourceClient().getRootFolder();
+        final Task<DriveContents> createContentsTask = driveConn.getDriveResourceClient().createContents();
         Tasks.whenAll(rootFolderTask, createContentsTask)
                 .continueWithTask(task -> {
                     //DriveFolder parent = rootFolderTask.getResult();
@@ -243,7 +163,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                             .setMimeType("image/jpeg")
                             .build();
 
-                    return mDriveResourceClient.createFile(parent, changeSet, contents);
+                    return driveConn.getDriveResourceClient().createFile(parent, changeSet, contents);
                 })
                 .addOnSuccessListener(this,
                         driveFile -> {
@@ -274,7 +194,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .build();
 
         Task<MetadataBuffer> queryTask =
-                mDriveResourceClient
+                driveConn.getDriveResourceClient()
                         .query(query)
                         .addOnSuccessListener(this,
                                 metadataBuffer -> {
@@ -282,7 +202,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                                     DriveFile indexFile = metadataBuffer.get(0).getDriveId().asDriveFile();
 
-                                    Task<Metadata> queryTsk = mDriveResourceClient.getMetadata(img);
+                                    Task<Metadata> queryTsk = driveConn.getDriveResourceClient().getMetadata(img);
                                     queryTsk
                                             .addOnSuccessListener(this,
                                                     Metadata -> {
@@ -310,7 +230,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         // [START drive_android_open_for_append]
         Task<DriveContents> openTask =
-                mDriveResourceClient.openFile(file, DriveFile.MODE_READ_WRITE);
+                driveConn.getDriveResourceClient().openFile(file, DriveFile.MODE_READ_WRITE);
         // [END drive_android_open_for_append]
         // [START drive_android_append_contents]
         openTask.continueWithTask(task -> {
@@ -334,7 +254,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     .setLastViewedByMeDate(new Date())
                     .build();
             Task<Void> commitTask =
-                    mDriveResourceClient.commitContents(driveContents, changeSet);
+                    driveConn.getDriveResourceClient().commitContents(driveContents, changeSet);
             // [END drive_android_commit_contents_with_metadata]
             return commitTask;
         })
@@ -356,7 +276,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case REQUEST_CODE_FIND_IMAGE:
+            case DriveConnection.REQUEST_CODE_FIND_IMAGE:
                 Log.i(TAG, "find image request code");
                 // Called after a photo has been taken.
                 if (resultCode == Activity.RESULT_OK) {
@@ -386,7 +306,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 }
                 break;
-            case REQUEST_CODE_CAPTURE_IMAGE:
+            case DriveConnection.REQUEST_CODE_CAPTURE_IMAGE:
                 Log.i(TAG, "capture image request code");
                 // Called after a photo has been taken.
                 if (resultCode == Activity.RESULT_OK) {
@@ -409,7 +329,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 }
                 break;
-            case REQUEST_CODE_CREATOR:
+            case DriveConnection.REQUEST_CODE_CREATOR:
                 Log.i(TAG, "creator request code");
                 // Called after a file is saved to Drive.
                 if (resultCode == RESULT_OK) {
@@ -423,31 +343,25 @@ public class AddPhotoActivity extends AppCompatActivity {
         }
     }
 
-    void initButtons() {
+    public void initButtons() {
         /*
          * opens the activity responsible for CREATING ALBUMS
          */
         btnFindPicture = findViewById(R.id.find_picture);
-        btnFindPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnFindPicture.setOnClickListener((View view) ->
                 //Start getContent
                 startActivityForResult(
-                        new Intent(Intent.ACTION_GET_CONTENT).setType("image/*"), REQUEST_CODE_FIND_IMAGE);
-            }
-        });
+                        new Intent(Intent.ACTION_GET_CONTENT).setType("image/*"), DriveConnection.REQUEST_CODE_FIND_IMAGE)
+        );
         /*
          * add photo to album
          * */
         btnTakePicture = findViewById(R.id.take_picture);
-        btnTakePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnTakePicture.setOnClickListener((View view) ->
                 // Start camera.
                 startActivityForResult(
-                        new Intent(MediaStore.ACTION_IMAGE_CAPTURE), REQUEST_CODE_CAPTURE_IMAGE);
-            }
-        });
+                        new Intent(MediaStore.ACTION_IMAGE_CAPTURE), DriveConnection.REQUEST_CODE_CAPTURE_IMAGE)
+        );
     }
 
     /**
@@ -457,7 +371,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    void createDialogOpts(ArrayList<String> albumArrayList) {
+    public void createDialogOpts(ArrayList<String> albumArrayList) {
         alertDialogBuilder = new AlertDialog.Builder(this);
 
         LinearLayout layout = new LinearLayout(this);

@@ -31,6 +31,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
  */
 public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
+    public static final String TAG = "AddUserToAlbumTask";
+    
     private WeakReference<AddUserToAlbumActivity> activityReference;
     private ProgressDialog pd;
     GlobalClass context;

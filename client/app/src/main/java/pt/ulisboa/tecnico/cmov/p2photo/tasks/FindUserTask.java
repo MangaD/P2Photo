@@ -29,6 +29,8 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.GivePermissionActivity;
  */
 public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
+    public static final String TAG = "FindUserTask";
+
     private WeakReference<FindUserActivity> activityReference;
     private ProgressDialog pd;
     private GlobalClass ctx;
@@ -75,7 +77,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
             ArrayList<String> list = conn.getUsers();
             if (list == null) {
                 conn.disconnect();
-                Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
+                Log.d(TAG, ctx.getString(R.string.server_connect_fail));
 
                 activityReference.get().runOnUiThread(() ->
                     Toast.makeText(ctx, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
@@ -106,7 +108,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("FindUserActivity", ctx.getString(R.string.server_connect_fail));
+            Log.d(TAG, ctx.getString(R.string.server_connect_fail));
 
             activityReference.get().runOnUiThread(() ->
                 Toast.makeText(ctx, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
@@ -126,16 +128,16 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
         pd.dismiss();
 
 
-        Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_success));
+        Log.d(TAG, ctx.getString(R.string.load_user_list_success));
         Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
         if (success) {
-            Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_success));
+            Log.d(TAG, ctx.getString(R.string.load_user_list_success));
             for (String s : this.userArrayList) {
-                Log.d("FindUserActivity", s);
+                Log.d(TAG, s);
             }
             Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
         } else {
-            Log.d("FindUserActivity", ctx.getString(R.string.load_user_list_fail));
+            Log.d(TAG, ctx.getString(R.string.load_user_list_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_fail), Toast.LENGTH_LONG).show();
         }
     }
