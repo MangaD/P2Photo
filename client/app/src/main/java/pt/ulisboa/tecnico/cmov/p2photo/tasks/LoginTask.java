@@ -10,7 +10,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import pt.ulisboa.tecnico.cmov.p2photo.DriveLogin;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.DriveLoginActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
@@ -136,7 +136,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         pd.dismiss();
         if (result) {
-            Intent intent = new Intent(activityReference.get(), DriveLogin.class);
+            Intent intent = new Intent(activityReference.get(), DriveLoginActivity.class);
             activityReference.get().startActivity(intent);
         }
     }

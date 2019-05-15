@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.p2photo;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,15 +14,15 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveResourceClient;
 
-import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
+import pt.ulisboa.tecnico.cmov.p2photo.R;
 
 /**
  * Android Drive Quickstart activity. This activity takes a photo and saves it in Google Drive. The
  * user is prompted with a pre-made dialog which allows them to choose the file location.
  */
-public class DriveLogin extends AppCompatActivity {
+public class DriveLoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "drive_login";
     private static final int REQUEST_CODE_SIGN_IN = 0;
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
@@ -34,14 +34,14 @@ public class DriveLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drive_login);
 
-        com.google.android.gms.common.SignInButton clickButton = (com.google.android.gms.common.SignInButton) findViewById(R.id.sign_in_button);
+        com.google.android.gms.common.SignInButton clickButton = findViewById(R.id.sign_in_button);
         clickButton.setOnClickListener( new View.OnClickListener() {
 
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.sign_in_button:
                         signIn();
-                        //Intent intent = new Intent(DriveLogin.this, DriveActions.class);
+                        //Intent intent = new Intent(DriveLoginActivity.this, DriveActions.class);
                         //startActivity(intent);
                         break;
                 }
@@ -51,7 +51,7 @@ public class DriveLogin extends AppCompatActivity {
 
     /** Start sign in activity. */
     private void signIn() {
-        Log.i(TAG, "Start sign in");
+        Log.i(DriveLoginActivity, "Start sign in");
         GoogleSignInClient GoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(GoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
@@ -74,10 +74,10 @@ public class DriveLogin extends AppCompatActivity {
 
         switch (requestCode) {
             case REQUEST_CODE_SIGN_IN:
-                Log.i(TAG, "Sign in request code");
+                Log.i(DriveLoginActivity, "Sign in request code");
                 // Called after user is signed in.
                 if (resultCode == RESULT_OK) {
-                    Log.i(TAG, "Signed in successfully.");
+                    Log.i(DriveLoginActivity, "Signed in successfully.");
 
                     account = GoogleSignIn.getLastSignedInAccount(this);
 
@@ -91,7 +91,7 @@ public class DriveLogin extends AppCompatActivity {
 
                     setDriveVars();
 
-                    Intent intent = new Intent(DriveLogin.this, LoggedInActivity.class);
+                    Intent intent = new Intent(DriveLoginActivity.this, LoggedInActivity.class);
                     startActivity(intent);
                 }
         }
