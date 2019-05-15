@@ -24,7 +24,6 @@
         <activity android:name=".activities.ViewPhotoActivity" />
         <activity android:name=".activities.ViewAlbumActivity2" />
         <activity android:name=".activities.ListUserAlbumActivity2" />
-        <activity android:name=".activities.DriveLoginActivity" />
         <activity android:name=".activities.AddUserToAlbumActivity" />
         <activity android:name=".activities.AddPhotoActivity" />
         <activity android:name=".activities.FindUserActivity" />

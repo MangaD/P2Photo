@@ -40,7 +40,7 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... values) {
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         conn.disconnect();
         Log.d("LoggedInActivity", "Disconnected");

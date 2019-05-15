@@ -74,7 +74,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... values) {
 
         GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         try {
             Log.d("ViewAlbumTask", "Getting indexes for album: " + this.albumName);

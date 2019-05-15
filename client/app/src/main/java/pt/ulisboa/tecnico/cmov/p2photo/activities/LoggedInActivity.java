@@ -37,9 +37,9 @@ public class LoggedInActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = globalVariable.getDriveClient();
-        this.mDriveResourceClient = globalVariable.getDriveResourceClient();
-        this.googleSignInClient = globalVariable.getGoogleSignInClient();
+        this.mDriveClient = globalVariable.getDriveConnection().getDriveClient();
+        this.mDriveResourceClient = globalVariable.getDriveConnection().getDriveResourceClient();
+        this.googleSignInClient = globalVariable.getDriveConnection().getGoogleSignInClient();
 
         initializeButtons();
 
@@ -47,9 +47,9 @@ public class LoggedInActivity extends AppCompatActivity {
         GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(
                         globalVariable, Collections.singleton(DriveScopes.DRIVE_FILE));
-        credential.setSelectedAccount(globalVariable.getGoogleAccount().getAccount());
+        credential.setSelectedAccount(globalVariable.getDriveConnection().getGoogleAccount().getAccount());
 
-        Log.i("LINK", "EMail: " + globalVariable.getGoogleAccount().getEmail());
+        Log.i("LINK", "EMail: " + globalVariable.getDriveConnection().getGoogleAccount().getEmail());
 
 
         this.service = new Drive.Builder(AndroidHttp.newCompatibleTransport(),
@@ -126,9 +126,9 @@ public class LoggedInActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Set mDriveClient and mDriveResourceCliente in global/application context
-        globalVariable.setDriveClient(mDriveClient);
-        globalVariable.setDriveResourceClient(mDriveResourceClient);
-        globalVariable.setService(service);
+        globalVariable.getDriveConnection().setDriveClient(mDriveClient);
+        globalVariable.getDriveConnection().setDriveResourceClient(mDriveResourceClient);
+        globalVariable.getDriveConnection().setService(service);
     }
 
 }

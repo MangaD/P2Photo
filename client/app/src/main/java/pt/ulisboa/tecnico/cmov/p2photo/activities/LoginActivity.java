@@ -14,6 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.drive.Drive;
+
+import java.util.concurrent.Semaphore;
+
+import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.tasks.LoginTask;
@@ -22,7 +29,10 @@ import pt.ulisboa.tecnico.cmov.p2photo.R;
 public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences sp;
+    private DriveConnection dc;
     private GlobalClass context;
+    private boolean isSignedInToDrive = false;
+    public Semaphore driveSemaphore = new Semaphore(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         context = (GlobalClass) getApplicationContext();
 
         sp = PreferenceManager.getDefaultSharedPreferences(this);
+        dc = context.getDriveConnection();
 
         initializeButtons();
     }
@@ -71,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean setServerAddress() {
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
         String address = sp.getString("address", getString(R.string.default_ip));
         conn.addr = address;
 
@@ -106,11 +117,13 @@ public class LoginActivity extends AppCompatActivity {
             Log.d("LoginActivity", getString(R.string.invalid_mode));
             return false;
         }
-        context.storageMode = mode;
+        context.setStorageMode(mode);
         return true;
     }
 
     /**
+     * Menu
+     *
      * https://stackoverflow.com/questions/47488899/how-to-show-the-settingsactivity-when-pressing-on-settings-button
      */
     @Override
@@ -120,7 +133,6 @@ public class LoginActivity extends AppCompatActivity {
         MenuItem menuItem = menu.findItem(R.id.settings);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
@@ -128,5 +140,49 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Start sign in activity.
+     */
+    public void signInGoogleDrive() {
+        Log.i("DriveConnection", "Start sign in");
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestScopes(Drive.SCOPE_FILE)
+                        .requestEmail()
+                        .requestProfile()
+                        .build();
+        dc.setGoogleSignInClient(GoogleSignIn.getClient(this, signInOptions));
+        this.startActivityForResult(dc.getGoogleSignInClient().getSignInIntent(), DriveConnection.REQUEST_CODE_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case DriveConnection.REQUEST_CODE_SIGN_IN:
+                Log.i("DriveConnection", "Sign in request code");
+                // Called after user is signed in.
+                if (resultCode == RESULT_OK) {
+                    Log.i("DriveConnection", "Signed in successfully.");
+
+                    dc.setGoogleAccount(GoogleSignIn.getLastSignedInAccount(context));
+
+
+                    // Use the last signed in account here since it already have a Drive scope.
+                    dc.setDriveClient(Drive.getDriveClient(context, dc.getGoogleAccount()));
+                    // Build a drive resource client.
+                    dc.setDriveResourceClient(Drive.getDriveResourceClient(context, dc.getGoogleAccount()));
+
+                    isSignedInToDrive = true;
+                }
+        }
+        driveSemaphore.release();
+    }
+
+    public boolean getIsSignedInToDrive() {
+        return isSignedInToDrive;
     }
 }

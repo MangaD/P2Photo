@@ -62,7 +62,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... values) {
 
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         if (!ServerConnection.isOnline(context)) {
             Log.d("SignUpTask", ctx.getString(R.string.network_disabled));

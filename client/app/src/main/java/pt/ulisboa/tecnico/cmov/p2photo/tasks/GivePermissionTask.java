@@ -4,18 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.GivePermissionActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
 
@@ -68,7 +64,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... values) {
 
-        ServerConnection conn = ctx.getConnection();
+        ServerConnection conn = ctx.getServerConnection();
 
         try {
             String msg = conn.givePermission(userName, albumName, "");

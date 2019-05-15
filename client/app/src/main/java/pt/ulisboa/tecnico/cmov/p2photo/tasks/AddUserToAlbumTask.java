@@ -66,7 +66,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         //String msg = "Failed to contact the server.";
 

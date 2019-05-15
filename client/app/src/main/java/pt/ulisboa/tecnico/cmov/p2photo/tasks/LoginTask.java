@@ -10,10 +10,10 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import pt.ulisboa.tecnico.cmov.p2photo.activities.DriveLoginActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.LoggedInActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 
 /**
@@ -57,7 +57,31 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
-        ServerConnection conn = context.getConnection();
+        /*
+         * Login to drive
+         */
+        if (context.getStorageMode().equals(context.getString(R.string.storage_default))) {
+            activityReference.get().runOnUiThread(() ->
+                    activityReference.get().signInGoogleDrive()
+            );
+            try {
+                activityReference.get().driveSemaphore.acquire();
+            } catch (InterruptedException e) {
+                Log.d("LoginTask", "Error with thread synchronization.");
+                return false;
+            }
+            if (!activityReference.get().getIsSignedInToDrive()) {
+                activityReference.get().runOnUiThread(() ->
+                        Toast.makeText(context, context.getString(R.string.failed_drive_login), Toast.LENGTH_LONG).show()
+                );
+                return false;
+            }
+        }
+
+        /*
+         * Login to server
+         */
+        ServerConnection conn = context.getServerConnection();
 
         if (!ServerConnection.isOnline(context)) {
             Log.d("LoginTask", context.getString(R.string.network_disabled));
@@ -136,7 +160,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         pd.dismiss();
         if (result) {
-            Intent intent = new Intent(activityReference.get(), DriveLoginActivity.class);
+            Intent intent = new Intent(activityReference.get(), LoggedInActivity.class);
             activityReference.get().startActivity(intent);
         }
     }

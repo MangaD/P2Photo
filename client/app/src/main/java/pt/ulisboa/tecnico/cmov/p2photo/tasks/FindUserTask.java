@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -70,7 +69,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
-        ServerConnection conn = ctx.getConnection();
+        ServerConnection conn = ctx.getServerConnection();
 
         try {
             ArrayList<String> list = conn.getUsers();

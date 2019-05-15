@@ -69,7 +69,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         protected String doInBackground(Void... values) {
 
             GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-            ServerConnection conn = context.getConnection();
+            ServerConnection conn = context.getServerConnection();
 
             //String msg = "Failed to contact the server.";
 
@@ -153,8 +153,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         // Obtain reference to application context
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = globalVariable.getDriveClient();
-        this.mDriveResourceClient = globalVariable.getDriveResourceClient();
+        this.mDriveClient = globalVariable.getDriveConnection().getDriveClient();
+        this.mDriveResourceClient = globalVariable.getDriveConnection().getDriveResourceClient();
 
 
         new AddPhotoTask((GlobalClass) getApplicationContext(), AddPhotoActivity.this).execute();

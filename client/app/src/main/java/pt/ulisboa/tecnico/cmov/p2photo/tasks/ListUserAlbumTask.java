@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -68,7 +66,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... values) {
 
         GlobalClass context = (GlobalClass) activityReference.get().getApplicationContext();
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         //String msg = "Failed to contact the server.";
 

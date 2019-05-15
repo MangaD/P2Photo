@@ -26,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
@@ -60,9 +61,9 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         this.context = ctx;
 
         // Get mDriveCliet and mDriveResourceCLient from global/application context
-        this.mDriveClient = context.getDriveClient();
-        this.mDriveResourceClient = context.getDriveResourceClient();
-        this.service = context.getService();
+        this.mDriveClient = context.getDriveConnection().getDriveClient();
+        this.mDriveResourceClient = context.getDriveConnection().getDriveResourceClient();
+        this.service = context.getDriveConnection().getService();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -86,7 +87,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... values) {
 
-        ServerConnection conn = context.getConnection();
+        ServerConnection conn = context.getServerConnection();
 
         EditText albumNameEdit = activityReference.get().findViewById(R.id.albumName);
         albumName = albumNameEdit.getText().toString();
@@ -162,7 +163,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
      * Check if albumName already exists.
      */
     private boolean albumNameExists(String albumN) {
-        GlobalClass.PhotoAlbum photoAlbum = context.findPhotoAlbum(albumN);
+        DriveConnection.PhotoAlbum photoAlbum = context.getDriveConnection().findPhotoAlbum(albumN);
         if (photoAlbum == null) {
             return false;
         }
@@ -183,7 +184,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                 })
                 .addOnSuccessListener(activityReference.get(),
                         driveFolder -> {
-                            context.addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
+                            context.getDriveConnection().addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
                             insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
                             Log.d("CreateAlbumTask", context.getString(R.string.album_created) +
                                     driveFolder.getDriveId().encodeToString());
@@ -261,7 +262,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                 })
                 .addOnSuccessListener(activityReference.get(),
                         driveFile -> {
-                            context.addIndexToIndexList("index" + albumName, driveFile.getDriveId()); // add to local indexes
+                            context.getDriveConnection().addIndexToIndexList("index" + albumName, driveFile.getDriveId()); // add to local indexes
 
                             activityReference.get().runOnUiThread(() ->
                                     Toast.makeText(context, context.getString(R.string.file_created) +
