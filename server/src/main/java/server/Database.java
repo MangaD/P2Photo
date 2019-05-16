@@ -248,9 +248,7 @@ public class Database {
 				String[] pair = new String[2];
 				pair[0] = url;
 				pair[1] = key;
-				if (!url.isEmpty()) {
-					result.put(uid, pair);
-				}
+				result.put(uid, pair);
 			}
 			return result;
 		} catch (SQLException e) {

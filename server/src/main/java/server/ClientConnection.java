@@ -311,6 +311,7 @@ public class ClientConnection implements Runnable {
 						System.out.println("Key: " + key);
 						if(u == uid) {
 							write(key);
+							break;
 						}
 					}
 					
