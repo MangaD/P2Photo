@@ -120,7 +120,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                     return "Error with thread synchronization.";
                 }
             } else {
-                return "Album with that name already exists.";
+                return "Album with that name already exists in your drive.";
             }
 
             // Add album to server
@@ -240,10 +240,10 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                             }).start();
 
 
-                            activityReference.get().runOnUiThread(() ->
+                            /*activityReference.get().runOnUiThread(() ->
                                     Toast.makeText(context, context.getString(R.string.album_created) +
                                             driveFolder.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
-                            );
+                            );*/
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
                     Log.e(TAG, "Unable to create file", e);
@@ -277,10 +277,10 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                         driveFile -> {
                             context.getDriveConnection().addIndexToIndexList("index" + albumName, driveFile.getDriveId()); // add to local indexes
 
-                            activityReference.get().runOnUiThread(() ->
+                            /*activityReference.get().runOnUiThread(() ->
                                     Toast.makeText(context, context.getString(R.string.file_created) +
                                             driveFile.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
-                            );
+                            );*/
 
                             Log.d(TAG, context.getString(R.string.file_created) +
                                     driveFile.getDriveId().encodeToString());
@@ -299,10 +299,10 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                         String link2 = queryTask.getResult().getWebContentLink();
                                         Log.i(TAG, "Success getting URL Embeded " + link2);
 
-                                        activityReference.get().runOnUiThread(() ->
+                                        /*activityReference.get().runOnUiThread(() ->
                                                 Toast.makeText(context, "Success getting URL " + link2,
                                                         Toast.LENGTH_LONG).show()
-                                        );
+                                        );*/
 
                                         setIndexURL(link2);
                                         Log.i(TAG, "URL: " + getIndexURL());

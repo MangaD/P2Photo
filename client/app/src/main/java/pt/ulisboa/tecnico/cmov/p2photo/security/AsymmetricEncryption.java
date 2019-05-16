@@ -19,7 +19,7 @@ public class AsymmetricEncryption {
     private Cipher cipher;
 
     public AsymmetricEncryption() throws NoSuchAlgorithmException, NoSuchPaddingException {
-        this.cipher = Cipher.getInstance("ECIESwithAES-CBC");
+        this.cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
     }
 
     /**
@@ -31,12 +31,12 @@ public class AsymmetricEncryption {
          * is Elliptical Curves (EC), but could be RSA, ElGammal... EC is the key with
          * smaller size, more efficient with equivalent security.
          */
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         // SHA1PRNG is the standard to generate secure randoms
         SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 
-        // Use 224 key size
-        keyGen.initialize(224, random);
+        // Use 2048 key size
+        keyGen.initialize(2048, random);
         KeyPair keys = keyGen.generateKeyPair();
         //Key pub = kp.getPublic();
         //Key pvt = kp.getPrivate();
@@ -50,7 +50,7 @@ public class AsymmetricEncryption {
     public static PublicKey publicKeyFromByteArray(byte[] data)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(data);
-        KeyFactory kf = KeyFactory.getInstance("EC");
+        KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(keySpec);
     }
 
@@ -61,7 +61,7 @@ public class AsymmetricEncryption {
     public static PrivateKey privateKeyFromByteArray(byte[] data)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(data);
-        KeyFactory kf = KeyFactory.getInstance("EC");
+        KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate(ks);
     }
 
