@@ -173,10 +173,10 @@ public class Database {
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
-				int aid = rs.getInt("A.aid");
+				int aid = rs.getInt("aid");
 				String[] pair = new String[2];
-				pair[0] = rs.getString("A.name").trim();
-				pair[1] = rs.getString("A_S.key").trim();
+				pair[0] = rs.getString("name").trim();
+				pair[1] = rs.getString("key").trim();
 				result.put(aid, pair);
 			}
 			return result;

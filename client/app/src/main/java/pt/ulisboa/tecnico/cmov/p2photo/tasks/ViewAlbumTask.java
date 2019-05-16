@@ -87,10 +87,13 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
+                String encKeyBase64 = list.get(0);
+                list.remove(0);
                 this.indexURLs = list;
 
                 Log.d(TAG, "List size: " + list.size());
 
+                // TODO decrypt urls in index
                 for (String entry : this.indexURLs) {
                     Log.d(TAG, entry);
                     URL index = new URL(entry);
@@ -117,7 +120,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                         Intent viewPhotoIntent = new Intent(activityReference.get(), ViewPhotoActivity.class);
 
-                        viewPhotoIntent.putExtra("ViewPhotoName",itemString);
+                        viewPhotoIntent.putExtra("ViewPhotoName", itemString);
 
                         activityReference.get().startActivity(viewPhotoIntent);
                     });
