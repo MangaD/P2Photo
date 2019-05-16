@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -13,7 +14,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.tasks.ViewAlbumTask;
 
 public class ViewAlbumActivity extends AppCompatActivity {
 
-    private String albumName;
+    public ListView albumListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,7 @@ public class ViewAlbumActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        albumName = getIntent().getStringExtra("ViewAlbumName");
+        String albumName = getIntent().getStringExtra("ViewAlbumName");
 
         new ViewAlbumTask((GlobalClass) this.getApplicationContext(), ViewAlbumActivity.this, albumName).execute();
     }

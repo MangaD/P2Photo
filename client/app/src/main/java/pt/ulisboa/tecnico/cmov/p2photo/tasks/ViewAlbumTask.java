@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -36,13 +35,12 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
     private WeakReference<ViewAlbumActivity> activityReference;
     private ProgressDialog pd;
-    GlobalClass context;
+    private GlobalClass context;
 
-    String albumName;
+    private String albumName;
 
     private ArrayList<String> indexURLs;
 
-    private ListView albumListView;
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
@@ -108,12 +106,12 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
-                    this.albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
+                    activityReference.get().albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
                     this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
                             android.R.layout.simple_list_item_1, this.albumArrayList);
-                    this.albumListView.setAdapter(this.albumArrayAdapter);
+                    activityReference.get().albumListView.setAdapter(this.albumArrayAdapter);
 
-                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                    activityReference.get().albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String itemString = itemAtPosition.toString();
 
@@ -156,7 +154,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
     /**
      * Shows a toast message.
      */
-    protected void showMessage(String message) {
+    private void showMessage(String message) {
         activityReference.get().runOnUiThread(() ->
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         );

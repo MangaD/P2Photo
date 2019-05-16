@@ -49,6 +49,8 @@
     <!-- Add photo to album -->
     <string name="find_picture">Find picture</string>
     <string name="take_picture">Take picture</string>
+    <string name="choose_album">Choose Album and Insert Photo Title</string>
+    <string name="insert_photo_title">"Insert Photo Title"</string>
 
     <!-- Add user to album -->
     <string name="select_album">Select album</string>

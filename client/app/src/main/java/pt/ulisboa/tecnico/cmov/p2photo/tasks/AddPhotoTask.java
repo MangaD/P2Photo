@@ -89,21 +89,20 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
 
         ServerConnection conn = context.getServerConnection();
         try {
-            /**
+            /*
              * Get user's allowed albums
              */
             HashMap<Integer, String> hashMap = conn.getUsersAllowedAlbums();
-            ArrayList<String> list = new ArrayList<>(hashMap.values());
 
-            if (list == null) {
+            if (hashMap == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));
 
                 showMessage(context.getString(R.string.server_contact_fail));
             } else {
-                this.albumArrayList = list;
-                Log.i(TAG, "List size: " + list.size());
-                for (String s : list) {
+                this.albumArrayList = new ArrayList<>(hashMap.values());
+                Log.i(TAG, "List size: " + albumArrayList.size());
+                for (String s : albumArrayList) {
                     Log.i(TAG, s);
                 }
             }
@@ -130,7 +129,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
         );
     }
 
-    public void createDialogOpts(ArrayList<String> albumArrayList) {
+    private void createDialogOpts(ArrayList<String> albumArrayList) {
         activityReference.get().alertDialogBuilder = new AlertDialog.Builder(activityReference.get());
 
         LinearLayout layout = new LinearLayout(activityReference.get());
@@ -142,7 +141,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
         layout.setPadding(2, 2, 2, 2);
 
         TextView tv = new TextView(activityReference.get());
-        tv.setText("Choose Album and Insert Photo Title");
+        tv.setText(context.getString(R.string.choose_album));
         tv.setPadding(40, 40, 40, 40);
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(20);
@@ -150,7 +149,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
         EditText et = new EditText(activityReference.get());
         this.imageTitle = et.getText().toString();
         TextView tv1 = new TextView(activityReference.get());
-        tv1.setText("Insert Photo Title");
+        tv1.setText(context.getString(R.string.insert_photo_title));
 
 
         LinearLayout.LayoutParams tv1Params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -168,8 +167,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
 
         albumArrayAdapter = new ArrayAdapter<>(activityReference.get(), android.R.layout.simple_list_item_1, albumArrayList);
         activityReference.get().alertDialogBuilder.setAdapter(albumArrayAdapter, (DialogInterface dialog, int which) -> {
-            String albumName = albumArrayAdapter.getItem(which);
-            this.albumName = albumName;
+            this.albumName = albumArrayAdapter.getItem(which);
             imageTitle = et.getText().toString();
 
             try {
@@ -212,7 +210,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
         return null;
     }
 
-    public void getAlbumByName(String albumName, DriveContents driveContents, Bitmap image) {
+    private void getAlbumByName(String albumName, DriveContents driveContents, Bitmap image) {
         Query query = new Query.Builder()
                 .addFilter(Filters.eq(SearchableField.TITLE, albumName))
                 .build();
@@ -233,7 +231,6 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
                 .addOnFailureListener(activityReference.get(), e -> {
                             Log.i(TAG, "Error retrieving files", e);
                             showMessage("Query album failed");
-                            return;
                         }
                 );
     }
@@ -340,11 +337,9 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
 
                             showMessage("Image created " +
                                     driveFile.getDriveId().encodeToString());
-                            return;
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
                     Log.e(TAG, "Unable to create file", e);
-                    return;
                 });
         // [END drive_android_create_file]
         return null;

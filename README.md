@@ -25,3 +25,5 @@ See [Assignment.md](documentation/Assignment.md)
 ### Problems
 
 - Password should be stored as hash + salt (and possibly pepper)
+- When viewing an album, if we go back and forth the connection to the server will be lost
+

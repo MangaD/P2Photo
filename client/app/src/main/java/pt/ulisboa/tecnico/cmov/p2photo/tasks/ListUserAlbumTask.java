@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -34,9 +33,8 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
     private WeakReference<ListUserAlbumActivity> activityReference;
     private ProgressDialog pd;
-    GlobalClass context;
+    private GlobalClass context;
 
-    private ListView albumListView;
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
@@ -77,11 +75,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             if (list == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));
-
-                activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-                );
-
+                showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
                 this.albumArrayList = new ArrayList<>(list.values());
@@ -92,13 +86,13 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
-                    this.albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
+                    this.activityReference.get().albumListView = activityReference.get().findViewById(R.id.listViewAlbums);
                     this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
                             android.R.layout.simple_list_item_1, this.albumArrayList);
-                    this.albumListView.setAdapter(this.albumArrayAdapter);
+                    this.activityReference.get().albumListView.setAdapter(this.albumArrayAdapter);
 
 
-                    this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+                    this.activityReference.get().albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String itemString = itemAtPosition.toString();
 
@@ -115,11 +109,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         } catch (IOException e) {
             conn.disconnect();
             Log.d(TAG, context.getString(R.string.server_contact_fail));
-
-            activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-            );
-
+            showMessage(context.getString(R.string.server_contact_fail));
             return false;
         }
     }
@@ -140,5 +130,11 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
             Log.d(TAG, context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showMessage(String msg) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        );
     }
 }
