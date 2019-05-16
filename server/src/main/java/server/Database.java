@@ -245,6 +245,7 @@ public class Database {
 				int uid = rs.getInt("uid");
 				String url = rs.getString("url").trim();
 				String key = rs.getString("key").trim();
+				System.out.println("Uid: " + uid + "\nUrl: " + url + "\nKey: " + key);
 				String[] pair = new String[2];
 				pair[0] = url;
 				pair[1] = key;
