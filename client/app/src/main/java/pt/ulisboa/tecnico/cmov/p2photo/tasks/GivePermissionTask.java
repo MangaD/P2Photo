@@ -92,7 +92,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
             userEncKey = Utility.bytesToBase64(ae.encrypt(userPubKey, decryptedKey));
         } catch(Exception e) {
             String msg = "Problem with decrypting / encrypting album key.";
-            Log.d(TAG, msg + "\n" + e.getStackTrace());
+            Log.d(TAG, msg + "\n" + e.getMessage() + "\n" + e.toString());
             activityReference.get().runOnUiThread(() ->
                     Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
             );

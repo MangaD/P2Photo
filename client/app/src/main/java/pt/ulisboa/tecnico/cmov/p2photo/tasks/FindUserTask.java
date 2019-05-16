@@ -136,15 +136,12 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean success) {
         pd.dismiss();
 
-
         Log.d(TAG, ctx.getString(R.string.load_user_list_success));
-        Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d(TAG, ctx.getString(R.string.load_user_list_success));
             for (String s : this.userArrayList) {
                 Log.d(TAG, s);
             }
-            Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_success), Toast.LENGTH_LONG).show();
         } else {
             Log.d(TAG, ctx.getString(R.string.load_user_list_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_fail), Toast.LENGTH_LONG).show();

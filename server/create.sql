@@ -28,5 +28,6 @@ CREATE TABLE IF NOT EXISTS `album_slices` (
 	`url` TEXT UNIQUE NOT NULL,
 	`key` TEXT NOT NULL,
 	FOREIGN KEY(`aid`) REFERENCES `albums`(`aid`),
-	FOREIGN KEY(`uid`) REFERENCES `users`(`uid`)
+	FOREIGN KEY(`uid`) REFERENCES `users`(`uid`),
+	PRIMARY KEY(`aid`, `uid`)
 );

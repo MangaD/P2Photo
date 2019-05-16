@@ -139,6 +139,8 @@ public class Database {
 		pstmt.executeUpdate();
 	}
 	
+	//TODO getUsersWithoutAccess
+	
 	public HashMap<String, String> getUsers() {
 		String sql = "SELECT username, pub_key FROM users";
 		HashMap<String, String> result = new HashMap<>();

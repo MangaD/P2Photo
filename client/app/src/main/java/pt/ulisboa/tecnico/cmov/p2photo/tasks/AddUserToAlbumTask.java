@@ -145,13 +145,11 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
         //String successMsg = "Loaded user's albums list successfully.";
         //String errorMsg = "Failed to load user's albums list.";
         Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_success));
-        Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         if (success) {
             Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_success));
             for (String entry : this.albumArrayList) {
                 Log.d("AddUserToAlbumActivity", entry);
             }
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_success), Toast.LENGTH_LONG).show();
         } else {
             Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();

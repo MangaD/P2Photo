@@ -19,7 +19,7 @@ public class AsymmetricEncryption {
     private Cipher cipher;
 
     public AsymmetricEncryption() throws NoSuchAlgorithmException, NoSuchPaddingException {
-        this.cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        this.cipher = Cipher.getInstance("RSA");
     }
 
     /**
@@ -70,7 +70,6 @@ public class AsymmetricEncryption {
      */
     public byte[] encrypt(PublicKey publicKey, byte[] inputData)
             throws Exception {
-
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] encryptedBytes = cipher.doFinal(inputData);
         return encryptedBytes;
