@@ -41,7 +41,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
 
         ServerConnection conn = context.getServerConnection();
         try {
-            HashMap<Integer, String> hashMap = conn.getUserAlbums();
+            HashMap<Integer, String> hashMap = conn.getUsersAllowedAlbums();
             ArrayList<String> list = new ArrayList<>(hashMap.values());
 
             if (list == null) {

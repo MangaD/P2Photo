@@ -20,14 +20,21 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.ref.WeakReference;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.CreateAlbumActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.SymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -124,8 +131,19 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
             String indexURL = getIndexURL();
             Log.d(TAG, "indexURL: " + indexURL);
 
+            String encKeyBase64;
+            try {
+                SecretKey key = SymmetricEncryption.generateAESKey();
+                byte[] keyBytes = SymmetricEncryption.secretKeyToByteArray(key);
+                AsymmetricEncryption ae = new AsymmetricEncryption();
+                byte[] encKey = ae.encrypt(context.getPubKey(), keyBytes);
+                encKeyBase64 = Utility.bytesToBase64(encKey);
+            } catch (Exception e) {
+                return "Error generating symmetric key.\n" + e.getStackTrace();
+            }
+
             // Add index of album to server
-            msg = conn.setAlbumIndex(albumName, indexURL);
+            msg = conn.setAlbumIndex(albumName, indexURL, encKeyBase64);
 
             return msg;
         } catch (IOException e) {

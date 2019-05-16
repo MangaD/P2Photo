@@ -4,7 +4,9 @@
 CREATE TABLE IF NOT EXISTS `users` (
 	`uid` INTEGER PRIMARY KEY,
 	`username` TEXT UNIQUE NOT NULL,
-	`password` TEXT NOT NULL
+	`password` TEXT NOT NULL,
+	`pub_key` TEXT NOT NULL,
+	`enc_priv_key` TEXT NOT NULL
 );
 
 ---
@@ -24,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `album_slices` (
 	`aid` INTEGER,
 	`uid` INTEGER,
 	`url` TEXT UNIQUE NOT NULL,
+	`key` TEXT NOT NULL,
 	FOREIGN KEY(`aid`) REFERENCES `albums`(`aid`),
 	FOREIGN KEY(`uid`) REFERENCES `users`(`uid`)
 );

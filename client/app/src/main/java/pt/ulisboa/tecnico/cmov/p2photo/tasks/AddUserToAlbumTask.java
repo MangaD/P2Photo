@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -40,6 +41,8 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     private ListView albumListView;
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
+
+    private HashMap<Integer, String[]> albumsMap;
 
     public AddUserToAlbumTask(GlobalClass ctx, AddUserToAlbumActivity activity) {
 
@@ -73,8 +76,8 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
         //String msg = "Failed to contact the server.";
 
         try {
-            HashMap<Integer, String> list = conn.getUserAlbums();
-            if (list == null) {
+            albumsMap = conn.getUsersOwnedAlbums();
+            if (albumsMap == null) {
                 conn.disconnect();
                 Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
 
@@ -84,7 +87,11 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 return false;
             } else {
-                this.albumArrayList = new ArrayList<>(list.values());
+                this.albumArrayList = new ArrayList<>();
+                for (Map.Entry<Integer, String[]> entry : albumsMap.entrySet()) {
+                    String name = entry.getValue()[0];
+                    albumArrayList.add(name);
+                }
 
                 this.activityReference.get().runOnUiThread(() -> {
                     this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
@@ -94,13 +101,23 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                     this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
-                        String itemString = itemAtPosition.toString();
+                        String albumName = itemAtPosition.toString();
+                        String encryptedKeyBase64 = "";
 
-                        Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserActivity.class);
+                        for (Map.Entry<Integer, String[]> entry : albumsMap.entrySet()) {
+                            String name = entry.getValue()[0];
+                            if (albumName.equals(name)) {
+                                encryptedKeyBase64 = entry.getValue()[1];
+                                break;
+                            }
+                        }
 
-                        viewAlbumIntent.putExtra("ViewAlbumName", itemString);
+                        Intent findUserIntent = new Intent(activityReference.get(), FindUserActivity.class);
 
-                        activityReference.get().startActivity(viewAlbumIntent);
+                        findUserIntent.putExtra("FindActivityAlbumName", albumName);
+                        findUserIntent.putExtra("FindActivityEncKey", encryptedKeyBase64);
+
+                        activityReference.get().startActivity(findUserIntent);
                     });
                 });
 

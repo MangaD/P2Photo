@@ -14,9 +14,10 @@ public class FindUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_user);
 
-        String albumName = getIntent().getStringExtra("ViewAlbumName");
+        String albumName = getIntent().getStringExtra("FindActivityAlbumName");
+        String encryptedKeyBase64 = getIntent().getStringExtra("FindActivityEncKey");
 
-        new FindUserTask(FindUserActivity.this, albumName).execute();
+        new FindUserTask(FindUserActivity.this, albumName, encryptedKeyBase64).execute();
     }
 
 }

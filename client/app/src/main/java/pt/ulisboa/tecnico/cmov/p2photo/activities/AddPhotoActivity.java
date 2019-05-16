@@ -565,13 +565,15 @@ public class AddPhotoActivity extends AppCompatActivity {
                                         );
 
                                         setIndexURL(link2);
-                                        Log.i(TAG, "URL: " + getIndexURL());
-                                        // Add index of album to server
-                                        try {
-                                            context.getServerConnection().setAlbumIndex(albumName, getIndexURL());
+
+                                        String indexURL = getIndexURL();
+                                        Log.i(TAG, "URL: " + indexURL);
+                                        // TODO Add index of album to server
+                                        /*try {
+                                            context.getServerConnection().setAlbumIndex(albumName, indexURL);
                                         } catch (IOException e) {
                                             Log.i(TAG, "Failed to add URL Index: " + e);
-                                        }
+                                        }*/
 
                                         //indexSemaphore.release();
                                     })

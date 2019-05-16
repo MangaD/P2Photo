@@ -8,12 +8,21 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.NoSuchPaddingException;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.GivePermissionActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.MainMenuActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
+
+import static pt.ulisboa.tecnico.cmov.p2photo.security.Utility.base64ToBytes;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -34,8 +43,11 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
     String userName;
     String albumName;
+    String userPubKeyBase64;
+    String encryptedKeyBase64;
 
-    public GivePermissionTask(GivePermissionActivity activity, String userName, String albumName) {
+    public GivePermissionTask(GivePermissionActivity activity, String userName, String albumName,
+                              String userPubKeyBase64, String encryptedKeyBase64) {
 
         activityReference = new WeakReference<>(activity);
 
@@ -43,6 +55,8 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
         this.userName = userName;
         this.albumName = albumName;
+        this.userPubKeyBase64 = userPubKeyBase64;
+        this.encryptedKeyBase64 = encryptedKeyBase64;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -68,8 +82,25 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
 
         ServerConnection conn = ctx.getServerConnection();
 
+        String userEncKey;
         try {
-            String msg = conn.givePermission(userName, albumName, "");
+            byte[] userPubKeyBytes = Utility.base64ToBytes(userPubKeyBase64);
+            PublicKey userPubKey = AsymmetricEncryption.publicKeyFromByteArray(userPubKeyBytes);
+            byte[] encryptedKey = Utility.base64ToBytes(encryptedKeyBase64);
+            AsymmetricEncryption ae = new AsymmetricEncryption();
+            byte[] decryptedKey = ae.decrypt(ctx.getPrivKey(), encryptedKey);
+            userEncKey = Utility.bytesToBase64(ae.encrypt(userPubKey, decryptedKey));
+        } catch(Exception e) {
+            String msg = "Problem with decrypting / encrypting album key.";
+            Log.d(TAG, msg + "\n" + e.getStackTrace());
+            activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+            );
+            return msg;
+        }
+
+        try {
+            String msg = conn.givePermission(userName, albumName, "", userEncKey);
             return msg;
         } catch (IOException e) {
             conn.disconnect();
@@ -77,7 +108,7 @@ public class GivePermissionTask extends AsyncTask<Void, Void, String> {
             Log.d(TAG, msg);
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+                    Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
             );
             return msg;
         }

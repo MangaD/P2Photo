@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -59,14 +58,18 @@ public class ClientConnection implements Runnable {
 
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
 
-					if (Main.db.login(user, password)) {
+					String[] pair = Main.db.login(user, password);
+					
+					if (pair != null && !pair[0].isEmpty() && !pair[1].isEmpty()) {
 						System.out.println("Login successful.");
 						write(Integer.toString(sessionID));
+						write(pair[0]);
+						write(pair[1]);
 						isLoggedIn = true;
 						this.user = user;
 					} else {
 						System.out.println("Login insuccessful.");
-						write("-1");
+						write("");
 					}
 					
 				} else if (inputLine.equals("signup")) {
@@ -79,11 +82,19 @@ public class ClientConnection implements Runnable {
 					while (password.isEmpty()) {
 						password = read();
 					}
+					String pubKey = read();
+					while (pubKey.isEmpty()) {
+						pubKey = read();
+					}
+					String privKey = read();
+					while (privKey.isEmpty()) {
+						privKey = read();
+					}
 
 					System.out.println("Received sign up from '" + user + "' with password '" + password + "'.");
 
 					try {
-						Main.db.signUp(user, password);
+						Main.db.signUp(user, password, pubKey, privKey);
 						write("Sign up successful.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
@@ -139,17 +150,20 @@ public class ClientConnection implements Runnable {
 					while (name.isEmpty()) {
 						name = read();
 					}
-					
 					String index = read();
 					while (index.isEmpty()) {
 						index = read();
+					}
+					String key = read();
+					while (key.isEmpty()) {
+						key = read();
 					}
 
 					System.out.println("Received set album index from '" + user + "' with name '" +
 							name + "' and index '" + index + "'.");
 
 					try {
-						Main.db.setAlbumIndex(name, user, index);
+						Main.db.setAlbumIndex(name, user, index, key);
 						write("Album created successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
@@ -159,28 +173,32 @@ public class ClientConnection implements Runnable {
 							write("Album creation failed. Error code: " + e.getErrorCode());
 						}
 					}
-					
 				} else if (inputLine.equals("getusers")) {
-					
+
 					if (! isLoggedIn) {
 						write("You're not logged in!");
 						continue;
 					}
-					
+
 					if (! verifySessionId()) {
 						continue;
 					}
-					
+
 					System.out.println("Received get users from '" + user + "'.");
 
-					ArrayList<String> res = Main.db.getUsers();
-					
-					for (String s : res) {
-						write(s);
+					HashMap<String, String> res = Main.db.getUsers();
+
+					for (Map.Entry<String, String> entry : res.entrySet()) {
+						String key = entry.getKey();
+						String value = entry.getValue();
+						System.out.println("Key: " + key + "\nValue: " + value);
+						write(key);
+						write(value);
 					}
+
 					// send empty string for terminating
 					write("");
-				} else if (inputLine.equals("getuseralbums")) {
+				} else if (inputLine.equals("getusersownedalbums")) {
 					
 					if (! isLoggedIn) {
 						System.out.println("You're not logged in!");
@@ -192,9 +210,37 @@ public class ClientConnection implements Runnable {
 						continue;
 					}
 					
-					System.out.println("Received get user's albums from '" + user + "'.");
+					System.out.println("Received get user's owned albums from '" + user + "'.");
 
-					HashMap<Integer, String> res = Main.db.getUsersAlbums(user);
+					HashMap<Integer, String[]> res = Main.db.getUsersOwnedAlbums(user);
+					
+					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
+						Integer aid = entry.getKey();
+						String[] pair = entry.getValue();
+						String name = pair[0];
+						String key = pair[1];
+						System.out.println("Aid: " + key + "\nName: " + name + "\nKey: " + key);
+						write(Integer.toString(aid));
+						write(name);
+						write(key);
+					}
+					// send empty string for terminating
+					write("");
+				} else if (inputLine.equals("getusersallowedalbums")) {
+					
+					if (! isLoggedIn) {
+						System.out.println("You're not logged in!");
+						write("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
+					System.out.println("Received get user's allowed albums from '" + user + "'.");
+
+					HashMap<Integer, String> res = Main.db.getUsersAllowedAlbums(user);
 					
 					for (Map.Entry<Integer, String> entry : res.entrySet()) {
 						Integer key = entry.getKey();
@@ -224,12 +270,26 @@ public class ClientConnection implements Runnable {
 					
 					System.out.println("Received get album indexes from '" + user + "' with album name '" + name + "'.");
 
-					ArrayList<String> res = Main.db.getAlbumIndexes(name);
+					int uid = Main.db.getUid(user);
+					HashMap<Integer, String[]> res = Main.db.getAlbumIndexes(name);
 					
-					for (String entry : res) {
-						System.out.println("Index: " + entry);
-						write(entry);
+					// Write encrypted symmetric key that user can decrypt with his private key
+					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
+						int u = entry.getKey();
+						String key = entry.getValue()[1];
+						System.out.println("Key: " + key);
+						if(u == uid) {
+							write(key);
+						}
 					}
+					
+					// Write urls
+					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
+						String url = entry.getValue()[0];
+						System.out.println("Index: " + url);
+						write(url);
+					}
+
 					// send empty string for terminating
 					write("");
 				} else if (inputLine.equals("givepermission")) {
@@ -253,6 +313,11 @@ public class ClientConnection implements Runnable {
 						albumName = read();
 					}
 					
+					String key = read();
+					while (key.isEmpty()) {
+						key = read();
+					}
+					
 					// Can be empty
 					String index = read();
 
@@ -260,7 +325,7 @@ public class ClientConnection implements Runnable {
 							userName + "', for album '" + albumName + "' with index '" + index + "'.");
 
 					try {
-						Main.db.setAlbumIndex(albumName, userName, index);
+						Main.db.setAlbumIndex(albumName, userName, index, key);
 						write("Permission given successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint

@@ -51,10 +51,13 @@ public class ServerConnection {
         } catch (IOException e) {}
     }
 
-    public boolean login(String user, String password) throws IOException {
+    /**
+     * Returns private key in base64
+     */
+    public String[] login(String user, String password) throws IOException {
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
-            return false;
+            return null;
         }
         write("login");
         write(user);
@@ -65,18 +68,23 @@ public class ServerConnection {
         try {
             int res = Integer.parseInt(result);
             if (res < 0) {
-                return false;
+                return null;
             } else {
                 this.sessionID = res;
+                String[] pair = new String[2];
+                String encPrivKeyBase64 = read();
+                String pubKeyBase64 = read();
+                pair[0] = encPrivKeyBase64;
+                pair[1] = pubKeyBase64;
                 Log.d("ServerConnection", "Session ID: '" + this.sessionID + "'.");
-                return true;
+                return pair;
             }
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
-    public String signup(String user, String password) throws IOException {
+    public String signup(String user, String password, String pubKey, String privKey) throws IOException {
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return "Not connected to the server!";
@@ -84,6 +92,8 @@ public class ServerConnection {
         write("signup");
         write(user);
         write(password);
+        write(pubKey);
+        write(privKey);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
         String result = read();
         return result;
@@ -102,7 +112,7 @@ public class ServerConnection {
         return result;
     }
 
-    public String setAlbumIndex(String name, String index) throws IOException {
+    public String setAlbumIndex(String name, String index, String base64key) throws IOException {
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return "Not connected to the server!";
@@ -111,12 +121,13 @@ public class ServerConnection {
         write(Integer.toString(sessionID));
         write(name);
         write(index);
+        write(base64key);
         Log.d("ServerConnection", "Name: '" + name + "' Index: '" + index + "'.");
         String result = read();
         return result;
     }
 
-    public String givePermission(String userName, String albumName, String index) throws IOException {
+    public String givePermission(String userName, String albumName, String index, String key) throws IOException {
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return "Not connected to the server!";
@@ -125,6 +136,7 @@ public class ServerConnection {
         write(Integer.toString(sessionID));
         write(userName);
         write(albumName);
+        write(key);
         write(index);
         Log.d("ServerConnection", "User name: '" + userName +
                 "' Album name: '" + albumName + "' Index: '" + index + "'.");
@@ -132,8 +144,11 @@ public class ServerConnection {
         return result;
     }
 
-    public ArrayList<String> getUsers() throws IOException {
-        ArrayList<String> list = new ArrayList<>();
+    /**
+     * Returns username and publicKey in Base64
+     */
+    public HashMap<String, String> getUsers() throws IOException {
+        HashMap<String, String> list = new HashMap<>();
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
@@ -146,22 +161,46 @@ public class ServerConnection {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {
                 Log.d("ServerConnection", s);
-                list.add(s);
+                list.put(s, read());
             }
         } catch (Exception e) { }
 
         return list;
     }
 
-    public HashMap<Integer, String> getUserAlbums() throws IOException {
+    public HashMap<Integer, String[]> getUsersOwnedAlbums() throws IOException {
+        HashMap<Integer, String[]> list = new HashMap<>();
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getusersownedalbums");
+        write(Integer.toString(sessionID));
+        Log.d("ServerConnection", "Get user's owned albums.");
+
+        try {
+            String s;
+            while ((s = read()) != null && !s.isEmpty()) {
+                String[] pair = new String[2];
+                pair[0] = read();
+                pair[1] = read();
+                list.put(Integer.valueOf(s), pair);
+                Log.d("ServerConnection", s);
+            }
+        } catch (Exception e) { }
+
+        return list;
+    }
+
+    public HashMap<Integer, String> getUsersAllowedAlbums() throws IOException {
         HashMap<Integer, String> list = new HashMap<>();
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
         }
-        write("getuseralbums");
+        write("getusersallowedalbums");
         write(Integer.toString(sessionID));
-        Log.d("ServerConnection", "Get user's albums.");
+        Log.d("ServerConnection", "Get user's allowed albums.");
 
         try {
             String s;
@@ -186,6 +225,14 @@ public class ServerConnection {
         write(name);
         Log.d("ServerConnection", "Get album indexes.");
 
+        // Read encrypted key
+        String key = read();
+        while(key == null || key.isEmpty()) {
+            key = read();
+        }
+        list.add(key);
+
+        // Read urls
         try {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {

@@ -11,6 +11,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -36,18 +37,21 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     private GlobalClass ctx;
 
     String albumName;
+    String encryptedKeyBase64;
 
     private ListView userListView;
     private ArrayList<String> userArrayList;
     private ArrayAdapter<String> userArrayAdapter;
+    private HashMap<String, String> userMap;
 
-    public FindUserTask(FindUserActivity activity, String albumName) {
+    public FindUserTask(FindUserActivity activity, String albumName, String encryptedKeyBase64) {
 
         activityReference = new WeakReference<>(activity);
 
         ctx = (GlobalClass) activity.getApplicationContext();
 
         this.albumName = albumName;
+        this.encryptedKeyBase64 = encryptedKeyBase64;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -74,8 +78,8 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
         ServerConnection conn = ctx.getServerConnection();
 
         try {
-            ArrayList<String> list = conn.getUsers();
-            if (list == null) {
+            userMap = conn.getUsers();
+            if (userMap == null) {
                 conn.disconnect();
                 Log.d(TAG, ctx.getString(R.string.server_connect_fail));
 
@@ -85,7 +89,8 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
 
                 return false;
             } else {
-                this.userArrayList = list;
+                this.userArrayList = new ArrayList<>();
+                this.userArrayList.addAll(userMap.keySet());
 
                 this.activityReference.get().runOnUiThread(() -> {
                     this.userListView = activityReference.get().findViewById(R.id.listUsers);
@@ -97,9 +102,13 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String userName = itemAtPosition.toString();
 
+                        String publicKeyBase64 = userMap.get(userName);
+
                         Intent givePermissionIntent = new Intent(activityReference.get(), GivePermissionActivity.class);
                         givePermissionIntent.putExtra("GivePermissionUserName", userName);
                         givePermissionIntent.putExtra("GivePermissionAlbumName", albumName);
+                        givePermissionIntent.putExtra("GivePermissionPubKey", publicKeyBase64);
+                        givePermissionIntent.putExtra("GivePermissionEncKey", encryptedKeyBase64);
                         activityReference.get().startActivity(givePermissionIntent);
                     });
                 });

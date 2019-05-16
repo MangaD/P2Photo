@@ -9,12 +9,17 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.MainMenuActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -133,14 +138,32 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         Log.d(TAG, "Password: " + password);
 
         try {
-            boolean success = conn.login(username, password);
-            if(!success) {
+            String[] pair = conn.login(username, password);
+            if(pair == null || pair[0].isEmpty() || pair[1].isEmpty()) {
                 Log.d(TAG, context.getString(R.string.login_invalid));
                 activityReference.get().runOnUiThread(() ->
                     Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.login_invalid), Toast.LENGTH_LONG).show()
                 );
+                return false;
+            } else {
+                try {
+                    // Set public key in application context
+                    String pubKeyBase64 = pair[1];
+                    byte[] pubKey = Utility.base64ToBytes(pubKeyBase64);
+                    context.setPubKey(AsymmetricEncryption.publicKeyFromByteArray(pubKey));
+                    // Set private key in application context
+                    String encPrivKeyBase64 = pair[0];
+                    byte[] encPrivKey = Utility.base64ToBytes(encPrivKeyBase64);
+                    //TODO decrypt private key, use KeyStore
+                    context.setPrivKey(AsymmetricEncryption.privateKeyFromByteArray(encPrivKey));
+                    return true;
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    activityReference.get().runOnUiThread(() ->
+                            Toast.makeText(activityReference.get().getApplicationContext(), "Problem reading private key.", Toast.LENGTH_LONG).show()
+                    );
+                    return false;
+                }
             }
-            return success;
         } catch (IOException e) {
             conn.disconnect();
 

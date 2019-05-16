@@ -18,14 +18,6 @@ sqlite3 p2photo.db
 .quit
 ```
 
-### Populate database
-
-```sh
-sqlite3 p2photo.db
-.read populate.sql
-.quit
-```
-
 ### View tables
 
 ```sh

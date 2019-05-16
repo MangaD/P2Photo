@@ -10,12 +10,17 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.LoginActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.SignUpActivity;
+
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -29,7 +34,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.activities.SignUpActivity;
 public class SignUpTask extends AsyncTask<Void, Void, String> {
 
     public static final String TAG = "SignUpTask";
-    
+
     private GlobalClass context;
     private WeakReference<SignUpActivity> activityReference;
     private ProgressDialog pd;
@@ -70,7 +75,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
             Log.d(TAG, ctx.getString(R.string.network_disabled));
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, ctx.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
             );
 
             return ctx.getString(R.string.network_disabled);
@@ -85,7 +90,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
             Log.d(TAG, e.getMessage());
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, ctx.getString(R.string.server_connect_fail), Toast.LENGTH_LONG).show()
             );
 
             return ctx.getString(R.string.server_connect_fail);
@@ -101,7 +106,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
             Log.d(TAG, ctx.getString(R.string.user_pass_empty));
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, ctx.getString(R.string.user_pass_empty), Toast.LENGTH_LONG).show()
             );
 
             return ctx.getString(R.string.user_pass_empty);
@@ -110,15 +115,31 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         Log.d(TAG, "Username: " + username);
         Log.d(TAG, "Password: " + password);
 
+        String privKeyBase64;
+        String pubKeyBase64;
         try {
-            return conn.signup(username, password);
+            KeyPair keys = AsymmetricEncryption.generateKeyPair();
+            // TODO encrypt private key with password, use KeyStore
+            privKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.privateKeyToByteArray(keys.getPrivate()));
+            pubKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.publicKeyToByteArray(keys.getPublic()));
+        } catch (NoSuchAlgorithmException e) {
+            conn.disconnect();
+            Log.d(TAG, ctx.getString(R.string.failed_generate_keys));
+            activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(context, ctx.getString(R.string.failed_generate_keys), Toast.LENGTH_LONG).show()
+            );
+            return ctx.getString(R.string.failed_generate_keys);
+        }
+
+        try {
+            return conn.signup(username, password, pubKeyBase64, privKeyBase64);
         } catch (IOException e) {
             conn.disconnect();
 
             Log.d(TAG, ctx.getString(R.string.server_contact_fail));
 
             activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, ctx.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
             );
 
             return ctx.getString(R.string.server_contact_fail);

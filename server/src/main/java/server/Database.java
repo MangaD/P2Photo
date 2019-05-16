@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Database {
@@ -72,8 +71,8 @@ public class Database {
 		}
 	}
 	
-	public boolean login(String user, String password) {
-		String sql = "SELECT username, password FROM users WHERE username = ? AND password = ?";
+	public String[] login(String user, String password) {
+		String sql = "SELECT username, password, enc_priv_key, pub_key FROM users WHERE username = ? AND password = ?";
 		
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			pstmt.setString(1, user);
@@ -84,25 +83,32 @@ public class Database {
 			while (rs.next()) {
 				String u = rs.getString("username");
 				String p = rs.getString("password");
+				String encPrivKey = rs.getString("enc_priv_key");
+				String pubKey = rs.getString("pub_key");
+				String[] pair = new String[2];
+				pair[0] = encPrivKey;
+				pair[1] = pubKey;
 				if (u.equals(user) && p.equals(password)) {
-					return true;
+					return pair;
 				}
 			}
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-			return false;
+			return null;
 		}
 		
-		return false;
+		return null;
 	}
 	
-	public void signUp(String user, String password) throws SQLException {
-		String sql = "INSERT INTO users (username, password) VALUES(?, ?)";
+	public void signUp(String user, String password, String pubKey, String privKey) throws SQLException {
+		String sql = "INSERT INTO users (username, password, pub_key, enc_priv_key) VALUES(?, ?, ?, ?)";
 		
 		PreparedStatement pstmt  = conn.prepareStatement(sql);
 		pstmt.setString(1, user);
 		pstmt.setString(2, password);
+		pstmt.setString(3, pubKey);
+		pstmt.setString(4, privKey);
 		
 		pstmt.executeUpdate();
 	}
@@ -119,29 +125,30 @@ public class Database {
 		pstmt.executeUpdate();
 	}
 	
-	public void setAlbumIndex(String album_name, String user_name, String index) throws SQLException {
+	public void setAlbumIndex(String album_name, String user_name, String index, String key) throws SQLException {
 		
-		String sql = "INSERT INTO album_slices (aid, uid, url) " +
-				" VALUES((SELECT aid FROM albums WHERE name = ?), (SELECT uid FROM users WHERE username = ?), ?)";
+		String sql = "INSERT INTO album_slices (aid, uid, url, key) " +
+				" VALUES((SELECT aid FROM albums WHERE name = ?), (SELECT uid FROM users WHERE username = ?), ?, ?)";
 		
 		PreparedStatement pstmt  = conn.prepareStatement(sql);
 		pstmt.setString(1, album_name);
 		pstmt.setString(2, user_name);
 		pstmt.setString(3, index);
+		pstmt.setString(4, key);
 		
 		pstmt.executeUpdate();
 	}
 	
-	public ArrayList<String> getUsers() {
-		String sql = "SELECT username FROM users";
-		ArrayList<String> result = new ArrayList<>();
+	public HashMap<String, String> getUsers() {
+		String sql = "SELECT username, pub_key FROM users";
+		HashMap<String, String> result = new HashMap<>();
 		
 		try (Statement stmt = this.conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
 
 			// loop through the result set
 			while (rs.next()) {
-				result.add(rs.getString("username").trim());
+				result.put(rs.getString("username").trim(), rs.getString("pub_key").trim());
 			}
 			return result;
 			
@@ -151,7 +158,35 @@ public class Database {
 		}
 	}
 	
-	public HashMap<Integer, String> getUsersAlbums(String username) {
+	public HashMap<Integer, String[]> getUsersOwnedAlbums(String username) {
+		String sql = " SELECT A.aid, A.name, A_S.key " + 
+				" FROM albums A INNER JOIN album_slices A_S " + 
+				" ON A.aid = A_S.aid " + 
+				" WHERE A.owner_id IN " + 
+				" (SELECT uid FROM users WHERE username = ?) ";
+		HashMap<Integer, String[]> result = new HashMap<>();
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, username);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				int aid = rs.getInt("A.aid");
+				String[] pair = new String[2];
+				pair[0] = rs.getString("A.name").trim();
+				pair[1] = rs.getString("A_S.key").trim();
+				result.put(aid, pair);
+			}
+			return result;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	public HashMap<Integer, String> getUsersAllowedAlbums(String username) {
 		String sql = "SELECT aid, name FROM albums WHERE aid IN " +
 				" (SELECT aid FROM album_slices WHERE uid IN " +
 				" (SELECT uid FROM users WHERE username = ?) )";
@@ -173,19 +208,24 @@ public class Database {
 		}
 	}
 	
-	public ArrayList<String> getAlbumIndexes(String name) {
-		String sql = "SELECT url FROM album_slices WHERE aid IN (SELECT aid FROM albums WHERE name = ?);";
-		ArrayList<String> result = new ArrayList<>();
+	public HashMap<Integer, String[]> getAlbumIndexes(String albumName) {
+		String sql = "SELECT uid, url, key FROM album_slices WHERE aid IN (SELECT aid FROM albums WHERE name = ?);";
+		HashMap<Integer, String[]> result = new HashMap<>();
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
-			pstmt.setString(1, name);
+			pstmt.setString(1, albumName);
 			
 			ResultSet rs  = pstmt.executeQuery();
 
 			while (rs.next()) {
+				int uid = rs.getInt("uid");
 				String url = rs.getString("url").trim();
+				String key = rs.getString("key").trim();
+				String[] pair = new String[2];
+				pair[0] = url;
+				pair[1] = key;
 				if (!url.isEmpty()) {
-					result.add(url);
+					result.put(uid, pair);
 				}
 			}
 			return result;
@@ -193,5 +233,22 @@ public class Database {
 			System.out.println(e.getMessage());
 			return null;
 		}
+	}
+	
+	public Integer getUid(String username) {
+		String sql = "SELECT uid FROM users WHERE username = ?;";
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, username);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				return rs.getInt("uid");
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
 	}
 }

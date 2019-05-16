@@ -73,7 +73,7 @@ public class ListUserAlbumTask extends AsyncTask<Void, Void, Boolean> {
         //String msg = "Failed to contact the server.";
 
         try {
-            HashMap<Integer, String> list = conn.getUserAlbums();
+            HashMap<Integer, String> list = conn.getUsersAllowedAlbums();
             if (list == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));

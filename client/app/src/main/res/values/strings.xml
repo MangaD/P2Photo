@@ -36,6 +36,9 @@
     <string name="sign_up_success">Sign up successful.</string>
     <string name="failed_drive_login">Failed to login to Google Drive.</string>
 
+    <!-- Security -->
+    <string name="failed_generate_keys">Failed to generate user\'s keys.</string>
+
     <!-- Menu -->
     <string name="createalbum_opt">Create album</string>
     <string name="addphototoalbum_opt">Add photo to album</string>

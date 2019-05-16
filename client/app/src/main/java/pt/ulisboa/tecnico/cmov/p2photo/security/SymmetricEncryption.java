@@ -1,12 +1,8 @@
 package pt.ulisboa.tecnico.cmov.p2photo.security;
 
-import android.util.Base64;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -25,18 +21,18 @@ import javax.crypto.spec.SecretKeySpec;
  * Assymetric encryption tutorial: https://www.novixys.com/blog/how-to-generate-rsa-keys-java/
  * Why use EC: https://blog.cloudflare.com/ecdsa-the-digital-signature-algorithm-of-a-better-internet/
  */
-public class SimmetricEncryption {
+public class SymmetricEncryption {
 
     private Cipher cipher;
 
-    public SimmetricEncryption() throws NoSuchAlgorithmException, NoSuchPaddingException {
+    public SymmetricEncryption() throws NoSuchAlgorithmException, NoSuchPaddingException {
         this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     }
 
     /**
      * Symmetric encryption
      */
-    private SecretKey generateAESKey() throws NoSuchAlgorithmException {
+    public static SecretKey generateAESKey() throws NoSuchAlgorithmException {
         return KeyGenerator.getInstance("AES").generateKey();
     }
 
@@ -46,19 +42,6 @@ public class SimmetricEncryption {
 
     public static SecretKey secretKeyFromByteArray(byte[] data) {
         return new SecretKeySpec(data, 0, data.length, "AES");
-    }
-
-    /**
-     * For sending the keys as a string
-     *
-     * https://stackoverflow.com/questions/2418485/how-do-i-convert-a-byte-array-to-base64-in-java
-     */
-    public static String bytesToBase64(byte[] data) {
-        return Base64.encodeToString(data, Base64.DEFAULT);
-    }
-
-    public static byte[] base64ToBytes(String base64) {
-        return Base64.decode(base64, Base64.DEFAULT);
     }
 
     public byte[] encryptAES(String content, SecretKey secretKey)
@@ -74,31 +57,17 @@ public class SimmetricEncryption {
         }
     }
 
-    String decryptAES(byte[] encryptedBytes, SecretKey secretKey)
+    byte[] decryptAES(byte[] encryptedBytes, SecretKey secretKey)
             throws IOException, InvalidKeyException, InvalidAlgorithmParameterException {
 
-        String content;
-
-        try (ByteArrayInputStream in = new ByteArrayInputStream(encryptedBytes)) {
+        try (ByteArrayInputStream in = new ByteArrayInputStream(encryptedBytes);
+             CipherInputStream cipherIn = new CipherInputStream(in, cipher)) {
             byte[] fileIv = new byte[16];
             in.read(fileIv);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(fileIv));
-
-            try (
-                    CipherInputStream cipherIn = new CipherInputStream(in, cipher);
-                    InputStreamReader inputReader = new InputStreamReader(cipherIn);
-                    BufferedReader reader = new BufferedReader(inputReader)
-            ) {
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                content = sb.toString();
-            }
-
+            byte[] content = new byte[encryptedBytes.length-16];
+            cipherIn.read(content);
+            return content;
         }
-        return content;
     }
 }

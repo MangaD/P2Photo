@@ -16,8 +16,11 @@ public class GivePermissionActivity extends AppCompatActivity {
 
         String userName = getIntent().getStringExtra("GivePermissionUserName");
         String albumName = getIntent().getStringExtra("GivePermissionAlbumName");
+        String publicKeyBase64 = getIntent().getStringExtra("GivePermissionPubKey");
+        String encryptedKeyBase64 = getIntent().getStringExtra("GivePermissionEncKey");
 
-        new GivePermissionTask(GivePermissionActivity.this, userName, albumName).execute();
+        new GivePermissionTask(GivePermissionActivity.this, userName, albumName,
+                publicKeyBase64, encryptedKeyBase64).execute();
     }
 
 }
