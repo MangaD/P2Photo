@@ -139,7 +139,8 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                 byte[] encKey = ae.encrypt(context.getPubKey(), keyBytes);
                 encKeyBase64 = Utility.bytesToBase64(encKey);
             } catch (Exception e) {
-                return "Error generating symmetric key.\n" + e.getStackTrace();
+                Log.d(TAG, e.getMessage());
+                return "Error generating symmetric key.";
             }
 
             // Add index of album to server

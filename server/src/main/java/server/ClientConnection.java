@@ -338,7 +338,7 @@ public class ClientConnection implements Runnable {
 					
 				}
 			}
-
+			System.out.println("Waiting request from user '" + user + "'");
 		} catch (IOException e) {}
 
 		System.out.println("Thread " + threadName + " exiting.");
