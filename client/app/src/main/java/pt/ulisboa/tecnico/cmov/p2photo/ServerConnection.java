@@ -177,7 +177,7 @@ public class ServerConnection {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
         }
-        write("getusers");
+        write("getuserswithoutalbumaccess");
         write(Integer.toString(sessionID));
         Log.d("ServerConnection", "Get users without album access.");
         write(albumName);
