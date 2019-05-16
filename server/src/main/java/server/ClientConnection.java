@@ -125,9 +125,11 @@ public class ClientConnection implements Runnable {
 
 					try {
 						Main.db.createAlbum(user, name);
+						System.out.println("Album created successfully.");
 						write("Album created successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
+						System.out.println(e.getMessage());
 						if (e.getErrorCode() == 19) {
 							write("Album with that name already exists.");
 						} else {
