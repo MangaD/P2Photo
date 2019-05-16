@@ -108,24 +108,27 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
         Log.d(TAG, "Album name: " + albumName);
 
         try {
+
+            // Create album in drive
+            boolean exists = this.albumNameExists(albumName);
+            Log.d(TAG, Boolean.toString(exists));
+            if (!exists) {
+                this.createFolder(albumName);
+                try {
+                    indexSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    return "Error with thread synchronization.";
+                }
+            } else {
+                return "Album with that name already exists.";
+            }
+
             // Add album to server
             String msg = conn.createAlbum(albumName);
 
             // Add album to drive
-            if (msg.equals(context.getString(R.string.album_create_success))) {
-                //globalVariable.addAlbumToAlbumList(albumName); //saves the name of the album locally
-
-                boolean exists = this.albumNameExists(albumName);
-                Log.d(TAG, Boolean.toString(exists));
-                if (!exists) {
-                    this.createFolder(albumName);
-                }
-            }
-
-            try {
-                indexSemaphore.acquire();
-            } catch (InterruptedException e) {
-                return "Error with thread synchronization.";
+            if (!msg.equals(context.getString(R.string.album_create_success))) {
+                return msg;
             }
 
             String indexURL = getIndexURL();

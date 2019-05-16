@@ -125,11 +125,9 @@ public class ClientConnection implements Runnable {
 
 					try {
 						Main.db.createAlbum(user, name);
-						System.out.println("Album created successfully.");
 						write("Album created successfully.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
-						System.out.println(e.getMessage());
 						if (e.getErrorCode() == 19) {
 							write("Album with that name already exists.");
 						} else {
@@ -339,8 +337,8 @@ public class ClientConnection implements Runnable {
 					}
 					
 				}
+				System.out.println("Waiting request from user '" + user + "'");
 			}
-			System.out.println("Waiting request from user '" + user + "'");
 		} catch (IOException e) {}
 
 		System.out.println("Thread " + threadName + " exiting.");
