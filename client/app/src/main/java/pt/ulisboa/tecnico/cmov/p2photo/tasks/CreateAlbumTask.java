@@ -20,11 +20,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.ref.WeakReference;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;

@@ -282,6 +282,28 @@ public class ClientConnection implements Runnable {
 					}
 					// send empty string for terminating
 					write("");
+				} else if (inputLine.equals("getalbumkey")) {
+					if (! isLoggedIn) {
+						System.out.println("You're not logged in!");
+						write("You're not logged in!");
+						continue;
+					}
+					
+					if (! verifySessionId()) {
+						continue;
+					}
+					
+					String albumName = read();
+					while (albumName.isEmpty()) {
+						albumName = read();
+					}
+					
+					System.out.println("Received get album indexes from '" + user + "' with album name '" + albumName + "'.");
+
+					String key = Main.db.getAlbumKey(user, albumName);
+					
+					write(key);
+					
 				} else if (inputLine.equals("getalbumindexes")) {
 					
 					if (! isLoggedIn) {
@@ -301,23 +323,11 @@ public class ClientConnection implements Runnable {
 					
 					System.out.println("Received get album indexes from '" + user + "' with album name '" + name + "'.");
 
-					int uid = Main.db.getUid(user);
-					HashMap<Integer, String[]> res = Main.db.getAlbumIndexes(name);
-					
-					// Write encrypted symmetric key that user can decrypt with his private key
-					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
-						int u = entry.getKey();
-						String key = entry.getValue()[1];
-						System.out.println("Key: " + key);
-						if(u == uid) {
-							write(key);
-							break;
-						}
-					}
+					HashMap<Integer, String> res = Main.db.getAlbumIndexes(name);
 					
 					// Write urls
-					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
-						String url = entry.getValue()[0];
+					for (Map.Entry<Integer, String> entry : res.entrySet()) {
+						String url = entry.getValue();
 						System.out.println("Index: " + url);
 						write(url);
 					}

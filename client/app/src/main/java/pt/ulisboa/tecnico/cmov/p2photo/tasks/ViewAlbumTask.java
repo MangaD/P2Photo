@@ -80,15 +80,14 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
         try {
             Log.d(TAG, "Getting indexes for album: " + this.albumName);
+            String encKeyBase64 = conn.getAlbumKey(this.albumName);
             ArrayList<String> list = conn.getAlbumIndexes(this.albumName);
-            if (list == null) {
+            if (list == null || encKeyBase64 == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));
                 showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
-                String encKeyBase64 = list.get(0);
-                list.remove(0);
                 this.indexURLs = list;
 
                 Log.d(TAG, "List size: " + list.size());

@@ -238,6 +238,22 @@ public class ServerConnection {
         return list;
     }
 
+    public String getAlbumKey(String name) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getalbumkey");
+        write(Integer.toString(sessionID));
+
+        write(name);
+        Log.d("ServerConnection", "Get album key.");
+
+        String key = read();
+        Log.d("ServerConnection", key);
+        return key;
+    }
+
     public ArrayList<String> getAlbumIndexes(String name) throws IOException {
         ArrayList<String> list = new ArrayList<>();
         if (!isConnected()) {
@@ -249,13 +265,6 @@ public class ServerConnection {
 
         write(name);
         Log.d("ServerConnection", "Get album indexes.");
-
-        // Read encrypted key
-        String key = read();
-        while(key == null || key.isEmpty()) {
-            key = read();
-        }
-        list.add(key);
 
         // Read urls
         try {

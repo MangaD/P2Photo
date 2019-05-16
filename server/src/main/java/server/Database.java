@@ -232,9 +232,30 @@ public class Database {
 		}
 	}
 	
-	public HashMap<Integer, String[]> getAlbumIndexes(String albumName) {
-		String sql = "SELECT uid, url, key FROM album_slices WHERE aid IN (SELECT aid FROM albums WHERE name = ?);";
-		HashMap<Integer, String[]> result = new HashMap<>();
+	public String getAlbumKey(String username, String albumName) {
+		String sql = " SELECT key FROM album_slices "
+				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
+				+ " AND uid IN (SELECT uid FROM users WHERE username = ?); ";
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, albumName);
+			pstmt.setString(2, username);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				return rs.getString("key").trim();
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
+	public HashMap<Integer, String> getAlbumIndexes(String albumName) {
+		String sql = "SELECT uid, url FROM album_slices WHERE aid IN (SELECT aid FROM albums WHERE name = ?);";
+		HashMap<Integer, String> result = new HashMap<>();
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
 			pstmt.setString(1, albumName);
@@ -244,12 +265,7 @@ public class Database {
 			while (rs.next()) {
 				int uid = rs.getInt("uid");
 				String url = rs.getString("url").trim();
-				String key = rs.getString("key").trim();
-				System.out.println("Uid: " + uid + "\nUrl: " + url + "\nKey: " + key);
-				String[] pair = new String[2];
-				pair[0] = url;
-				pair[1] = key;
-				result.put(uid, pair);
+				result.put(uid, url);
 			}
 			return result;
 		} catch (SQLException e) {
