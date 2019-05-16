@@ -139,7 +139,29 @@ public class Database {
 		pstmt.executeUpdate();
 	}
 	
-	//TODO getUsersWithoutAccess
+	public HashMap<String, String> getUsersWithoutAlbumAccess(String albumName) {
+		String sql = "SELECT username, pub_key FROM users "
+				+ " WHERE uid NOT IN (SELECT uid FROM album_slices WHERE aid IN "
+				+ " (SELECT aid FROM albums WHERE name = ?) ";
+		HashMap<String, String> result = new HashMap<>();
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+
+			pstmt.setString(1, albumName);
+			
+			ResultSet rs  = pstmt.executeQuery();
+			
+			// loop through the result set
+			while (rs.next()) {
+				result.put(rs.getString("username").trim(), rs.getString("pub_key").trim());
+			}
+			return result;
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
 	
 	public HashMap<String, String> getUsers() {
 		String sql = "SELECT username, pub_key FROM users";

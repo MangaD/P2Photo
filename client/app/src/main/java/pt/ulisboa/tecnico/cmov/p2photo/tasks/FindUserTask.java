@@ -78,7 +78,7 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
         ServerConnection conn = ctx.getServerConnection();
 
         try {
-            userMap = conn.getUsers();
+            userMap = conn.getUsersWithoutAlbumAccess(albumName);
             if (userMap == null) {
                 conn.disconnect();
                 Log.d(TAG, ctx.getString(R.string.server_connect_fail));

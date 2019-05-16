@@ -168,6 +168,31 @@ public class ServerConnection {
         return list;
     }
 
+    /**
+     * Returns username and publicKey in Base64
+     */
+    public HashMap<String, String> getUsersWithoutAlbumAccess(String albumName) throws IOException {
+        HashMap<String, String> list = new HashMap<>();
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getusers");
+        write(Integer.toString(sessionID));
+        Log.d("ServerConnection", "Get users without album access.");
+        write(albumName);
+
+        try {
+            String s;
+            while ((s = read()) != null && !s.isEmpty()) {
+                Log.d("ServerConnection", s);
+                list.put(s, read());
+            }
+        } catch (Exception e) { }
+
+        return list;
+    }
+
     public HashMap<Integer, String[]> getUsersOwnedAlbums() throws IOException {
         HashMap<Integer, String[]> list = new HashMap<>();
         if (!isConnected()) {

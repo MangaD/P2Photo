@@ -198,6 +198,37 @@ public class ClientConnection implements Runnable {
 
 					// send empty string for terminating
 					write("");
+				} else if (inputLine.equals("getuserswithoutalbumaccess")) {
+
+					if (! isLoggedIn) {
+						write("You're not logged in!");
+						continue;
+					}
+
+					if (! verifySessionId()) {
+						continue;
+					}
+
+					String albumName = read();
+					while (albumName.isEmpty()) {
+						albumName = read();
+					}
+					
+					System.out.println("Received get users without album access from '" + user +
+							"' with album '" + albumName + "'.");
+
+					HashMap<String, String> res = Main.db.getUsersWithoutAlbumAccess(albumName);
+
+					for (Map.Entry<String, String> entry : res.entrySet()) {
+						String key = entry.getKey();
+						String value = entry.getValue();
+						System.out.println("Key: " + key + "\nValue: " + value);
+						write(key);
+						write(value);
+					}
+
+					// send empty string for terminating
+					write("");
 				} else if (inputLine.equals("getusersownedalbums")) {
 					
 					if (! isLoggedIn) {
