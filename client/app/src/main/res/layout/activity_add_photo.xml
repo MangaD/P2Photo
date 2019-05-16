@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical">
@@ -11,28 +15,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Find Picture" />
+        android:text="@string/find_picture" />
 
     <Button
         android:id="@+id/take_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Take Picture" />
-
-    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ListView
-            android:id="@+id/listViewAlbums"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
-
-    </LinearLayout>-->
-
-
+        android:text="@string/take_picture" />
 </LinearLayout>
+</RelativeLayout>
 

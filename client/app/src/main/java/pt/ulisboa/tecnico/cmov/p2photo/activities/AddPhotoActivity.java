@@ -49,7 +49,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
@@ -76,7 +75,9 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     AlertDialog.Builder alertDialogBuilder;
 
-    private String IndexURL = null; //to use just when album permission is added and the user downst have the album on its drive yet
+    private String IndexURL = null; //to use just when album permission is added and the user
+    // doesn't have the album on its drive yet
+
     //private boolean albumExists = true;
 
     //private Semaphore indexSemaphore = new Semaphore(0);

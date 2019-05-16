@@ -17,14 +17,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/username"
-            android:inputType="text" />
+            android:inputType="text"
+            android:autofillHints="true" />
 
         <EditText
             android:id="@+id/signin_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
-            android:inputType="textVisiblePassword" />
+            android:inputType="textVisiblePassword"
+            android:autofillHints="true" />
 
         <LinearLayout
             style="?android:attr/buttonBarButtonStyle"
