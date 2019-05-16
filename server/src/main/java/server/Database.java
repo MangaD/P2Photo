@@ -142,7 +142,7 @@ public class Database {
 	public HashMap<String, String> getUsersWithoutAlbumAccess(String albumName) {
 		String sql = "SELECT username, pub_key FROM users "
 				+ " WHERE uid NOT IN (SELECT uid FROM album_slices WHERE aid IN "
-				+ " (SELECT aid FROM albums WHERE name = ?) ";
+				+ " (SELECT aid FROM albums WHERE name = ?)) ";
 		HashMap<String, String> result = new HashMap<>();
 		
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
