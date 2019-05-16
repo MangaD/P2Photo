@@ -34,6 +34,9 @@ import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -41,8 +44,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
@@ -68,6 +75,11 @@ public class AddPhotoActivity extends AppCompatActivity {
     private String imageTitle = "";
 
     AlertDialog.Builder alertDialogBuilder;
+
+    private String IndexURL = null; //to use just when album permission is added and the user downst have the album on its drive yet
+    //private boolean albumExists = true;
+
+    //private Semaphore indexSemaphore = new Semaphore(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +120,10 @@ public class AddPhotoActivity extends AppCompatActivity {
         GlobalClass globalVariable = (GlobalClass) getApplicationContext();
         Log.i(TAG, "ALBUM NAME: " + itemString);
 
-        getAlbumByName(itemString, driveContents, image);
+
+        getAlbumByName(/*itemString*/"porto", driveContents, image);
+
+
 
         return null;
     }
@@ -123,16 +138,29 @@ public class AddPhotoActivity extends AppCompatActivity {
                         .query(query)
                         .addOnSuccessListener(this,
                                 metadataBuffer -> {
-                                    Log.i(TAG, "Album ID: " + metadataBuffer.get(0).getDriveId());
+                                    //Log.i(TAG, "Album ID: " + metadataBuffer.get(0).getDriveId());
+                                    if(metadataBuffer.getCount() == 0){
+                                        Log.i(TAG, "O Album: " + albumName + " nao existe!");
+                                        //setAlbumExists(false);
+                                        createFolder(albumName);
 
-                                    createImageInAlbum(metadataBuffer.get(0).getDriveId().asDriveFolder(), driveContents, image);
+
+
+                                        //getAlbumByName(albumName, driveContents, image);
+
+                                    }else {
+                                        Log.i(TAG, "O Album: " + albumName + " existe e vai ser criado!");
+                                        createImageInAlbum(metadataBuffer.get(0).getDriveId().asDriveFolder(), driveContents, image);
+                                        //setAlbumExists(true);
+                                    }
                                 }
                         )
                         .addOnFailureListener(this, e -> {
-                            Log.e(TAG, "Error retrieving files", e);
+                            Log.i(TAG, "Error retrieving files", e);
                             showMessage("Query album failed");
                             finish();
-                        });
+                        }
+                );
     }
 
     private Task<DriveFile> createImageInAlbum(final DriveFolder parent, DriveContents driveContents, Bitmap image) {
@@ -412,9 +440,182 @@ public class AddPhotoActivity extends AppCompatActivity {
                 String strName = albumArrayAdapter.getItem(which);
                 itemString = strName;
                 imageTitle = et.getText().toString();
-                saveFileToDrive();
 
+                saveFileToDrive();
             }
         });
     }
+
+    private void createFolder(String albumN) {
+        driveConn.getDriveResourceClient()
+                .getRootFolder()
+                .continueWithTask(task -> {
+                    DriveFolder parentFolder = task.getResult();
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle(albumN)
+                            .setMimeType(DriveFolder.MIME_TYPE)
+                            .setStarred(true)
+                            .build();
+                    return driveConn.getDriveResourceClient().createFolder(parentFolder, changeSet);
+                })
+                .addOnSuccessListener(this,
+                        driveFolder -> {
+                            context.getDriveConnection().addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
+                            insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
+                            Log.d(TAG, context.getString(R.string.album_created) +
+                                    driveFolder.getDriveId().encodeToString());
+
+
+                            new Thread(() -> {
+
+                                Permission newPermission = new Permission();
+                                newPermission.setType("anyone");
+                                newPermission.setRole("reader");
+                                try {
+                                    Thread.sleep(3000);
+                                    // Print the names and IDs for up to 10 files.
+                                    FileList result = null;
+                                    result = driveConn.getService().files().list()
+                                            .setPageSize(100)
+                                            .setFields("nextPageToken, files(id, name)")
+                                            .execute();
+                                    List<File> files = result.getFiles();
+                                    if (files == null || files.isEmpty()) {
+                                        Log.i("LINK", "No files found.");
+                                    } else {
+                                        Log.i("LINK", "Files:");
+                                        for (File file : files) {
+                                            Log.i("LINK", "%s " + file.getName() + " (%s) " + file.getId() + "\n");
+                                            driveConn.getService().permissions().create(file.getId(), newPermission).execute();
+                                        }
+                                    }
+
+                                /*String id = service.files().get("root").setFields("id").execute().getId();
+                                Log.i("LNK", "ID of RootFolder: " + id);
+                                service.permissions().create(id, newPermission).execute();*/
+
+                                } catch (Exception e) {
+                                    Log.i("LINK", "Failed to add permition: " + e);
+                                }
+                            }).start();
+
+
+                            this.runOnUiThread(() ->
+                                    Toast.makeText(context, context.getString(R.string.album_created) +
+                                            driveFolder.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
+                            );
+                        })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+                    this.runOnUiThread(() ->
+                            Toast.makeText(context, context.getString(R.string.file_create_error), Toast.LENGTH_LONG).show()
+                    );
+                   // indexSemaphore.release();
+                });
+    }
+
+    private void insertIndexFileInAlbum(String albumName, DriveFolder parent) {
+        driveConn.getDriveResourceClient()
+                .createContents()
+                .continueWithTask(task -> {
+                    DriveContents contents = task.getResult();
+                    OutputStream outputStream = contents.getOutputStream();
+                    try (Writer writer = new OutputStreamWriter(outputStream)) {
+                        //writer.write("Inserir URLS\n");
+                    }
+
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle("index" + albumName)
+                            .setMimeType("text/plain")
+                            .setStarred(true)
+                            .build();
+
+
+                    return driveConn.getDriveResourceClient().createFile(parent, changeSet, contents);
+                })
+                .addOnSuccessListener(this,
+                        driveFile -> {
+                            context.getDriveConnection().addIndexToIndexList("index" + albumName, driveFile.getDriveId()); // add to local indexes
+
+                            this.runOnUiThread(() ->
+                                    Toast.makeText(context, context.getString(R.string.file_created) +
+                                            driveFile.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
+                            );
+
+                            Log.d(TAG, context.getString(R.string.file_created) +
+                                    driveFile.getDriveId().encodeToString());
+
+                            try {
+                                Thread.sleep(6000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            Task<Metadata> queryTask = driveConn.getDriveResourceClient().getMetadata(driveFile);
+
+                            queryTask.addOnSuccessListener(this,
+                                    Metadata -> {
+                                        //String link2 = queryTask.getResult().getEmbedLink();
+                                        String link2 = queryTask.getResult().getWebContentLink();
+                                        Log.i(TAG, "Success getting URL Embeded " + link2);
+
+                                        this.runOnUiThread(() ->
+                                                Toast.makeText(context, "Success getting URL " + link2,
+                                                        Toast.LENGTH_LONG).show()
+                                        );
+
+                                        setIndexURL(link2);
+                                        Log.i(TAG, "URL: " + getIndexURL());
+                                        // Add index of album to server
+                                        try {
+                                            context.getServerConnection().setAlbumIndex(albumName, getIndexURL());
+                                        } catch (IOException e) {
+                                            Log.i(TAG, "Failed to add URL Index: " + e);
+                                        }
+
+                                        //indexSemaphore.release();
+                                    })
+                                    .addOnFailureListener(this, e -> {
+                                        Log.i(TAG, "Error getting URL");
+
+                                        this.runOnUiThread(() ->
+                                                Toast.makeText(context, "Error getting URL",
+                                                        Toast.LENGTH_LONG).show()
+                                        );
+
+                                        //indexSemaphore.release();
+                                    });
+                            finish();
+                        })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+
+                    this.runOnUiThread(() ->
+                            Toast.makeText(context, context.getString(R.string.file_create_error),
+                                    Toast.LENGTH_LONG).show()
+                    );
+
+                    //indexSemaphore.release();
+
+                });
+
+    }
+
+    private void setIndexURL(String url) {
+        this.IndexURL = url;
+    }
+
+    private String getIndexURL() {
+        return this.IndexURL;
+    }
+
+   /* private void setAlbumExists(boolean b) {
+        this.albumExists = b;
+    }
+
+    private boolean getAlbumExists() {
+        return this.albumExists;
+    }*/
+
+
 }
