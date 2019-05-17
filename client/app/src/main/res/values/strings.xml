@@ -80,4 +80,8 @@
     <string name="load_album_photos">Loading album photos&#8230;</string>
     <string name="load_album_photos_success">Loaded album photos successfully.</string>
     <string name="load_album_photos_fail">Failed to load album photos.</string>
+
+    <!-- Wifi Direct-->
+    <string name="local_storage_file">albumList</string>
+
 </resources>
