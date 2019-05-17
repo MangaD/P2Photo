@@ -18,12 +18,10 @@ See [Assignment.md](documentation/Assignment.md)
 
 - add photo
 - encrypt picture urls
-- key store for private key
 - wifi direct
 - tests
 
 ### Problems
 
-- Password should be stored as hash + salt (and possibly pepper)
 - When viewing an album, if we go back and forth the connection to the server will be lost
 
