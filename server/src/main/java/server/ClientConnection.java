@@ -70,6 +70,8 @@ public class ClientConnection implements Runnable {
 
 					String[] pair = Main.db.login(user, encPassword);
 					
+					System.out.println(pair);
+					
 					if (pair != null && !pair[0].isEmpty() && !pair[1].isEmpty()) {
 						System.out.println("Login successful.");
 						write(Integer.toString(sessionID));
