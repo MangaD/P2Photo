@@ -71,6 +71,26 @@ public class Database {
 		}
 	}
 	
+	public String getUserSalt(String user) {
+		String sql = "SELECT salt FROM users WHERE username = ?";
+		
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			pstmt.setString(1, user);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				return rs.getString("salt");
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+		
+		return null;
+	}
+	
 	public String[] login(String user, String password) {
 		String sql = "SELECT username, password, enc_priv_key, pub_key FROM users WHERE username = ? AND password = ?";
 		
@@ -101,14 +121,15 @@ public class Database {
 		return null;
 	}
 	
-	public void signUp(String user, String password, String pubKey, String privKey) throws SQLException {
-		String sql = "INSERT INTO users (username, password, pub_key, enc_priv_key) VALUES(?, ?, ?, ?)";
+	public void signUp(String user, String password, String salt, String pubKey, String privKey) throws SQLException {
+		String sql = "INSERT INTO users (username, password, salt, pub_key, enc_priv_key) VALUES(?, ?, ?, ?)";
 		
 		PreparedStatement pstmt  = conn.prepareStatement(sql);
 		pstmt.setString(1, user);
 		pstmt.setString(2, password);
-		pstmt.setString(3, pubKey);
-		pstmt.setString(4, privKey);
+		pstmt.setString(3, salt);
+		pstmt.setString(4, pubKey);
+		pstmt.setString(5, privKey);
 		
 		pstmt.executeUpdate();
 	}

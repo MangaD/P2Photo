@@ -63,13 +63,13 @@ public class ClientConnection implements Runnable {
 					while (password.isEmpty()) {
 						password = read();
 					}
-					
-					String encPassword = passwordProtect(password);
 
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
-					System.out.println(encPassword);
 					
-					String[] pair = Main.db.login(user, encPassword);
+					String saltBase64 = Main.db.getUserSalt(user);
+					byte[] salt = Base64.getDecoder().decode(saltBase64);
+					String[] encPasswordAndSalt = passwordProtect(password, salt);
+					String[] pair = Main.db.login(user, encPasswordAndSalt[0]);
 					
 					System.out.println(pair);
 					
@@ -104,12 +104,12 @@ public class ClientConnection implements Runnable {
 						privKey = read();
 					}
 					
-					String encPassword = passwordProtect(password);
+					String[] encPasswordAndSalt = passwordProtect(password, null);
 
 					System.out.println("Received sign up from '" + user + "' with password '" + password + "'.");
 
 					try {
-						Main.db.signUp(user, encPassword, pubKey, privKey);
+						Main.db.signUp(user, encPasswordAndSalt[0], encPasswordAndSalt[1], pubKey, privKey);
 						write("Sign up successful.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
@@ -442,15 +442,20 @@ public class ClientConnection implements Runnable {
 		}
 	}
 	
-	private String passwordProtect(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+	private String[] passwordProtect(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		// Password hashing tutorial: https://www.baeldung.com/java-password-hashing
-		SecureRandom random = new SecureRandom();
-		byte[] salt = new byte[16];
-		random.nextBytes(salt);
+		if(salt == null) {
+			SecureRandom random = new SecureRandom();
+			salt = new byte[16];
+			random.nextBytes(salt);
+		}
 		KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
 		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		byte[] hash = factory.generateSecret(spec).getEncoded();
-		return Base64.getEncoder().encodeToString(hash);
+		String[] result = new String[2];
+		result[0] = Base64.getEncoder().encodeToString(hash);
+		result[1] = Base64.getEncoder().encodeToString(salt);
+		return result;
 	}
 
 }

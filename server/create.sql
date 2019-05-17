@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`uid` INTEGER PRIMARY KEY,
 	`username` TEXT UNIQUE NOT NULL,
 	`password` TEXT NOT NULL,
+	`salt` TEXT NOT NULL,
 	`pub_key` TEXT NOT NULL,
 	`enc_priv_key` TEXT NOT NULL
 );
