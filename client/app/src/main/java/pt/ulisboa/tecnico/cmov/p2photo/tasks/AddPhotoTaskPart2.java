@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.p2photo.tasks;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
@@ -158,7 +159,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
      */
     private Task<DriveFile> createFileIntentSender(DriveContents driveContents, Bitmap image) {
         Log.i(TAG, "ALBUM NAME: " + albumName);
-        getAlbumByName(albumName, driveContents, image);
+        getAlbumByName(/*albumName*/"novoalbuns", driveContents, image);
         return null;
     }
 
@@ -289,6 +290,10 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
 
                             showMessage("Image created " +
                                     driveFile.getDriveId().encodeToString());
+
+                            Activity activity = activityReference.get();
+                            activity.finish();
+
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
                     Log.e(TAG, "Unable to create file", e);
