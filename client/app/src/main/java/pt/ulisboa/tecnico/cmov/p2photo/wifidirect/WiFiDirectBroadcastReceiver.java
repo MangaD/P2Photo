@@ -1,6 +1,5 @@
-package pt.ulisboa.tecnico.cmov.p2photo.wifidirect;
+package com.example.wifidirect;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,19 +7,15 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.widget.Toast;
 
-import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
-
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
     private  WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
-    private FindUserActivity mFindUserActivity;
-    private WifiDirectFindUser wifiDirectFindUser;
+    private MainActivity mActivity;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager mManager, WifiP2pManager.Channel mChannel, FindUserActivity mainActivity, WifiDirectFindUser wifiDirectFindUser){
+    public WiFiDirectBroadcastReceiver(WifiP2pManager mManager,WifiP2pManager.Channel mChannel, MainActivity mainActivity){
         this.mManager=mManager;
         this.mChannel = mChannel;
-        this.mFindUserActivity = mainActivity;
-        this.wifiDirectFindUser = wifiDirectFindUser;
+        this.mActivity = mainActivity;
     }
     @Override
     public void onReceive(Context context, Intent intent){
@@ -36,7 +31,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)){
             //Call WifiP2pManager.requestPeers() to get a list of current peers
             if(mManager!=null){
-                mManager.requestPeers(mChannel,wifiDirectFindUser.peerListListener); //alterei aqui
+                mManager.requestPeers(mChannel,mActivity.peerListListener);
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
             //Respond to new connection or disconnections
@@ -46,9 +41,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if(networkInfo.isConnected()){
-                mManager.requestConnectionInfo(mChannel,wifiDirectFindUser.connectionInfoListener);
+                mManager.requestConnectionInfo(mChannel,mActivity.connectionInfoListener);
             } else {
-                Toast.makeText(mFindUserActivity,"device disconnected",Toast.LENGTH_SHORT).show();
+                mActivity.connectionStatus.setText("Device Disconnected");
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
             //Respond to this device's Wi-Fi state changing
