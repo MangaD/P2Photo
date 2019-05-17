@@ -120,6 +120,9 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                     String encImgURLBase64;
                     while ((encImgURLBase64 = in.readLine()) != null) {
+                        if(encImgURLBase64.isEmpty()) {
+                            continue;
+                        }
                         Log.d(TAG, encImgURLBase64);
 
                         /*
