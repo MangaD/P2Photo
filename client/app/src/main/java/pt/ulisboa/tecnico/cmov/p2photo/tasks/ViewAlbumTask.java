@@ -84,7 +84,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
         try {
             Log.d(TAG, "Getting indexes for album: " + this.albumName);
 
-            /**
+            /*
              * SECURITY
              */
 
@@ -102,7 +102,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
 
             ArrayList<String> list = conn.getAlbumIndexes(this.albumName);
-            if (list == null || cipherKey == null) {
+            if (list == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));
                 showMessage(context.getString(R.string.server_contact_fail));
@@ -112,7 +112,6 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 Log.d(TAG, "List size: " + list.size());
 
-                // TODO decrypt urls in index
                 for (String entry : this.indexURLs) {
                     Log.d(TAG, entry);
                     URL index = new URL(entry);
@@ -123,7 +122,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     while ((encImgURLBase64 = in.readLine()) != null) {
                         Log.d(TAG, encImgURLBase64);
 
-                        /**
+                        /*
                          * SECURITY
                          */
                         String imageURL;
