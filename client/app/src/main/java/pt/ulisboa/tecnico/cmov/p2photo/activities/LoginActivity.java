@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
          */
         Button buttonLogin = findViewById(R.id.button_login);
         buttonLogin.setOnClickListener((View v) -> {
-            if(!setSettings()) {
+            if(!setSettingsLogIn()) {
                 return;
             }
             new LoginTask((GlobalClass) getApplicationContext(), LoginActivity.this).execute();
@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
          */
         Button buttonSignIn = findViewById(R.id.button_signIn);
         buttonSignIn.setOnClickListener((View v) -> {
-            if(!setSettings()) {
+            if(!setSettingsSignUp()) {
                 return;
             }
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
@@ -76,10 +76,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private boolean setSettings() {
+    private boolean setSettingsSignUp() {
         if(!setServerAddress()) {
             return false;
         } else if(!setStorageMode()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean setSettingsLogIn() {
+        if(!setSettingsSignUp()) {
             return false;
         } else if(!setSecurityPreferences()) {
             return false;
