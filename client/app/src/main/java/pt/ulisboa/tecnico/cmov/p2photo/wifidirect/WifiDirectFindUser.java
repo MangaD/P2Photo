@@ -4,12 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +42,7 @@ public class WifiDirectFindUser {
     private static final String TAG = "WIFI FIND USER";
     private WeakReference<FindUserActivity> activityReference;
     private GlobalClass context;
+    private String albumName;
 
 
     WifiManager wifiManager;
@@ -60,12 +64,18 @@ public class WifiDirectFindUser {
 
     private ListView userListView;
 
-    public WifiDirectFindUser(GlobalClass ctx, FindUserActivity activity){
+
+    public WifiDirectFindUser(GlobalClass ctx, FindUserActivity activity, String albumName){
+
         activityReference = new WeakReference<>(activity);
 
-        context = ctx;
+        this.context = ctx;
+
+        this.albumName = albumName;
 
         initialization();
+
+        wifiListener();
     }
 
     private void initialization() {
@@ -218,5 +228,44 @@ public class WifiDirectFindUser {
             return true;
         }
     });
+
+    private void wifiListener() {
+        Toast.makeText(context,"Wifi Listener",Toast.LENGTH_LONG).show();
+        mManager.discoverPeers(mChannel,new WifiP2pManager.ActionListener(){
+
+
+            @Override
+            public void onSuccess() {
+
+                Toast.makeText(context,"Discovery Started",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(context,"Discovery Starting Failed",Toast.LENGTH_LONG).show();
+            }
+        });
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final WifiP2pDevice device = deviceArray[i];
+                WifiP2pConfig config = new WifiP2pConfig();
+                config.deviceAddress = device.deviceAddress;
+
+                mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(context,"Connected to"+device.deviceName,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Toast.makeText(context,"Not Connected",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
 
 }

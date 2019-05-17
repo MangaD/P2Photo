@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.p2photo.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.tasks.CreateAlbumTask;
@@ -22,15 +23,13 @@ public class FindUserActivity extends AppCompatActivity {
         String albumName = getIntent().getStringExtra("FindActivityAlbumName");
         String encryptedKeyBase64 = getIntent().getStringExtra("FindActivityEncKey");
 
-        new FindUserTask(FindUserActivity.this, albumName, encryptedKeyBase64).execute();
-
         GlobalClass ctx = (GlobalClass) getApplicationContext();
 
         switch (ctx.getStorageMode()){
             case    "drive":new FindUserTask(FindUserActivity.this, albumName, encryptedKeyBase64).execute();
                 break;
 
-            case    "wifi": new WifiDirectFindUser(ctx,this);
+            case    "wifi": new WifiDirectFindUser(ctx,this,albumName);
                 break;
         }
 
