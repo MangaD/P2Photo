@@ -257,6 +257,20 @@ public class ServerConnection {
         return key;
     }
 
+    public String getUserAlbumIndex(String name) throws IOException {
+        if (!isConnected()) {
+            Log.d("ServerConnection", "Not connected to the server.");
+            return null;
+        }
+        write("getuseralbumindex");
+        write(Integer.toString(sessionID));
+
+        write(name);
+        Log.d("ServerConnection", "Get user album index.");
+
+        return read();
+    }
+
     public ArrayList<String> getAlbumIndexes(String name) throws IOException {
         ArrayList<String> list = new ArrayList<>();
         if (!isConnected()) {

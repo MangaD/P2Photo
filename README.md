@@ -18,6 +18,4 @@ See [Assignment.md](documentation/Assignment.md)
 
 - wifi direct
 - tests
-
-### 
-
+- availability

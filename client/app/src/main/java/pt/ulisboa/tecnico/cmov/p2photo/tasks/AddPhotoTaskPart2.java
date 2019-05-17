@@ -60,7 +60,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
     private String IndexURL = null; //to use just when album permission is added and the user
     // doesn't have the album on its drive yet
 
-    String albumName;
+    private String albumName;
     private String encKeyBase64;
     private SecretKey cipherKey;
 
@@ -97,6 +97,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
             showMessage(msg);
             return false;
         }
+        saveFileToDrive();
         return true;
     }
 
@@ -105,11 +106,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
      * can hide progress dialog.
      */
     @Override
-    protected void onPostExecute(Boolean success) {
-        if (success) {
-            saveFileToDrive();
-        }
-    }
+    protected void onPostExecute(Boolean success) { }
 
     private void showMessage(String msg) {
         activityReference.get().runOnUiThread(() ->
@@ -152,11 +149,21 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                 .addFilter(Filters.eq(SearchableField.TITLE, albumName))
                 .build();
 
+        String serverIndexURL;
+        try {
+            serverIndexURL = context.getServerConnection().getUserAlbumIndex(albumName);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            String msg = "Failed to get album key.";
+            showMessage(msg);
+            return;
+        }
+
         driveConn.getDriveResourceClient()
                 .query(query)
                 .addOnSuccessListener(activityReference.get(),
                         metadataBuffer -> {
-                            if (metadataBuffer.getCount() == 0) {
+                            if (metadataBuffer.getCount() == 0 || serverIndexURL.isEmpty()) {
                                 Log.i(TAG, "Album '" + albumName + "' does not exist. Creating...");
                                 createFolder(albumName);
                             } else {
@@ -344,7 +351,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                         String indexURL = getIndexURL();
                                         Log.i(TAG, "URL: " + indexURL);
 
-                                        // FIX ME
+                                        // FIXME
                                         AddPhotoTaskPart2.setAlbumIndex th = new AddPhotoTaskPart2.setAlbumIndex(this.encKeyBase64, indexURL);
                                         th.start();
 

@@ -271,6 +271,27 @@ public class Database {
 		return null;
 	}
 	
+	public String getUserAlbumIndex(String username, String albumName) {
+		String sql = "SELECT url FROM album_slices "
+				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
+				+ " AND username IN (SELECT uid FROM users WHERE username = ?); ";
+
+		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, albumName);
+			pstmt.setString(2, username);
+			
+			ResultSet rs  = pstmt.executeQuery();
+
+			while (rs.next()) {
+				return rs.getString("url").trim();
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
 	public HashMap<Integer, String> getAlbumIndexes(String albumName) {
 		String sql = "SELECT uid, url FROM album_slices "
 				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
