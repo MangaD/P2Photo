@@ -9,9 +9,14 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -154,10 +159,11 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
                     // Set private key in application context
                     String encPrivKeyBase64 = pair[0];
                     byte[] encPrivKey = Utility.base64ToBytes(encPrivKeyBase64);
-                    //TODO decrypt private key, use KeyStore
-                    context.setPrivKey(AsymmetricEncryption.privateKeyFromByteArray(encPrivKey));
+                    PrivateKey privKey = AsymmetricEncryption.decryptPrivateKey(encPrivKey, context.getKeyPassword());
+                    context.setPrivKey(privKey);
                     return true;
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
+                        | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                     activityReference.get().runOnUiThread(() ->
                             Toast.makeText(activityReference.get().getApplicationContext(), "Problem reading private key.", Toast.LENGTH_LONG).show()
                     );

@@ -10,8 +10,13 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
@@ -100,6 +105,8 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         String username = usernameEdit.getText().toString();
         EditText passwordEdit = activityReference.get().findViewById(R.id.signin_password);
         String password = passwordEdit.getText().toString();
+        EditText keyPasswordEdit = activityReference.get().findViewById(R.id.signin_keypassword);
+        String keyPassword = keyPasswordEdit.getText().toString();
 
         if (username.isEmpty() || password.isEmpty()) {
             conn.disconnect();
@@ -115,14 +122,15 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         Log.d(TAG, "Username: " + username);
         Log.d(TAG, "Password: " + password);
 
-        String privKeyBase64;
+        String encPrivKeyBase64;
         String pubKeyBase64;
         try {
             KeyPair keys = AsymmetricEncryption.generateKeyPair();
-            // TODO encrypt private key with password, use KeyStore
-            privKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.privateKeyToByteArray(keys.getPrivate()));
+            byte[] encPrivKey = AsymmetricEncryption.encryptPrivateKey(keys.getPrivate(), keyPassword);
+            encPrivKeyBase64 = Utility.bytesToBase64(encPrivKey);
             pubKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.publicKeyToByteArray(keys.getPublic()));
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException e) {
             conn.disconnect();
             Log.d(TAG, ctx.getString(R.string.failed_generate_keys));
             activityReference.get().runOnUiThread(() ->
@@ -132,7 +140,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         }
 
         try {
-            return conn.signup(username, password, pubKeyBase64, privKeyBase64);
+            return conn.signup(username, password, pubKeyBase64, encPrivKeyBase64);
         } catch (IOException e) {
             conn.disconnect();
 

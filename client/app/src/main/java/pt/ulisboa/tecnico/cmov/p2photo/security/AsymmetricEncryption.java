@@ -1,22 +1,36 @@
 package pt.ulisboa.tecnico.cmov.p2photo.security;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Key store tutorial: http://tutorials.jenkov.com/java-cryptography/keystore.html
+ */
 public class AsymmetricEncryption {
 
     private Cipher cipher;
+
+    private static final int keysize = 2048;
 
     public AsymmetricEncryption() throws NoSuchAlgorithmException, NoSuchPaddingException {
         this.cipher = Cipher.getInstance("RSA");
@@ -36,7 +50,7 @@ public class AsymmetricEncryption {
         SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 
         // Use 2048 key size
-        keyGen.initialize(2048, random);
+        keyGen.initialize(keysize, random);
         KeyPair keys = keyGen.generateKeyPair();
         //Key pub = kp.getPublic();
         //Key pvt = kp.getPrivate();
@@ -81,4 +95,24 @@ public class AsymmetricEncryption {
         byte[] decryptedBytes = cipher.doFinal(inputData);
         return decryptedBytes;
     }
+
+    public static byte[] encryptPrivateKey(PrivateKey privateKey, String password)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            BadPaddingException, IllegalBlockSizeException {
+        Key aesKey = new SecretKeySpec(password.getBytes(), "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+        return cipher.doFinal(privateKeyToByteArray(privateKey));
+
+    }
+
+    public static PrivateKey decryptPrivateKey(byte[] encryptedKey, String password)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+            BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+        Key aesKey = new SecretKeySpec(password.getBytes(), "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, aesKey);
+        return privateKeyFromByteArray(cipher.doFinal(encryptedKey));
+    }
+
 }

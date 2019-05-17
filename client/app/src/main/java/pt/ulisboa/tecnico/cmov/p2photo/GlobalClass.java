@@ -11,6 +11,8 @@ public class GlobalClass extends Application {
     private DriveConnection driveConn;
     private String storageMode;
 
+    private String keyPassword;
+
     private PublicKey pubKey;
     private PrivateKey privKey;
 
@@ -54,5 +56,13 @@ public class GlobalClass extends Application {
 
     public void setPubKey(PublicKey pubKey) {
         this.pubKey = pubKey;
+    }
+
+    public String getKeyPassword() {
+        return keyPassword;
+    }
+
+    public void setKeyPassword(String keyPassword) {
+        this.keyPassword = keyPassword;
     }
 }

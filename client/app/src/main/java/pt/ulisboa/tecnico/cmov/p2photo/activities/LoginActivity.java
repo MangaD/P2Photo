@@ -81,9 +81,22 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         } else if(!setStorageMode()) {
             return false;
+        } else if(!setSecurityPreferences()) {
+            return false;
         } else {
             return true;
         }
+    }
+
+    private boolean setSecurityPreferences() {
+        String keyPassword = sp.getString("keyPassword", "");
+        if (keyPassword.isEmpty()) {
+            Toast.makeText(getApplicationContext(), getString(R.string.keyPasswordEmpty), Toast.LENGTH_LONG).show();
+            Log.d("LoginActivity", getString(R.string.keyPasswordEmpty));
+            return false;
+        }
+        context.setKeyPassword(keyPassword);
+        return true;
     }
 
     private boolean setServerAddress() {
