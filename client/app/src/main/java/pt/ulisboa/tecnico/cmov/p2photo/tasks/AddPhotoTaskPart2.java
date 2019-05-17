@@ -421,7 +421,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                                         }
                                                         Log.d(TAG, "Encrypted URL: " + imageEncryptedURLBase64);
                                                         Log.d(TAG, Boolean.toString(imageEncryptedURLBase64.contains("\n")));
-                                                        appendContents(indexFile, imageEncryptedURLBase64 + "\n");
+                                                        appendContents(indexFile, imageEncryptedURLBase64);
                                                     })
                                             .addOnFailureListener(activityReference.get(), e -> {
                                                 Log.i("LINK", "Error getting URL");
