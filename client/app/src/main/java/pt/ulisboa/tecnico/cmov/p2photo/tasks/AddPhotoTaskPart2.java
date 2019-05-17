@@ -199,7 +199,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                         driveFolder -> {
                             context.getDriveConnection().addAlbumToAlbumList(albumN, driveFolder.getDriveId()); // add to local albums
                             insertIndexFileInAlbum(albumN, driveFolder.getDriveId().asDriveFolder());
-                            Log.d(TAG, context.getString(R.string.album_created) +
+                            Log.d(TAG, context.getString(R.string.album_created) + ". " +
                                     driveFolder.getDriveId().encodeToString());
 
 
@@ -328,7 +328,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                             driveFile.getDriveId().encodeToString(), Toast.LENGTH_LONG).show()
                             );
 
-                            Log.d(TAG, context.getString(R.string.file_created) +
+                            Log.d(TAG, context.getString(R.string.file_created) + ". " +
                                     driveFile.getDriveId().encodeToString());
 
                             try {
@@ -359,6 +359,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                         AddPhotoTaskPart2.setAlbumIndex th = new AddPhotoTaskPart2.setAlbumIndex(this.encKeyBase64, indexURL);
                                         th.start();
 
+                                        this.serverIndexURL = "dummy";
                                         saveFileToDrive();
 
                                     })
@@ -492,6 +493,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
         return this.IndexURL;
     }
 
+
     class setAlbumIndex extends Thread {
         String encKeyBase64;
         String indexURL;
@@ -504,6 +506,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
             super.run();
             try {
                 context.getServerConnection().setAlbumIndex(albumName, indexURL, this.encKeyBase64);
+                Log.d(TAG, "Album index url set to '" + indexURL + "' in server.");
             } catch (IOException e) {
                 Log.i(TAG, "Failed to add URL Index: " + e);
             }

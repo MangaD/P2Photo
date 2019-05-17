@@ -315,7 +315,7 @@ public class ClientConnection implements Runnable {
 						albumName = read();
 					}
 					
-					System.out.println("Received get album indexes from '" + user + "' with album name '" + albumName + "'.");
+					System.out.println("Received get album key from '" + user + "' with album name '" + albumName + "'.");
 
 					String key = Main.db.getAlbumKey(user, albumName);
 					
