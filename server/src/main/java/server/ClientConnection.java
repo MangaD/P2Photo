@@ -103,10 +103,10 @@ public class ClientConnection implements Runnable {
 					while (privKey.isEmpty()) {
 						privKey = read();
 					}
-					
-					String[] encPasswordAndSalt = passwordProtect(password, null);
 
 					System.out.println("Received sign up from '" + user + "' with password '" + password + "'.");
+					
+					String[] encPasswordAndSalt = passwordProtect(password, null);
 
 					try {
 						Main.db.signUp(user, encPasswordAndSalt[0], encPasswordAndSalt[1], pubKey, privKey);

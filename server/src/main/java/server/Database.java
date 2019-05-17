@@ -122,7 +122,7 @@ public class Database {
 	}
 	
 	public void signUp(String user, String password, String salt, String pubKey, String privKey) throws SQLException {
-		String sql = "INSERT INTO users (username, password, salt, pub_key, enc_priv_key) VALUES(?, ?, ?, ?)";
+		String sql = "INSERT INTO users (username, password, salt, pub_key, enc_priv_key) VALUES(?, ?, ?, ?, ?)";
 		
 		PreparedStatement pstmt  = conn.prepareStatement(sql);
 		pstmt.setString(1, user);
