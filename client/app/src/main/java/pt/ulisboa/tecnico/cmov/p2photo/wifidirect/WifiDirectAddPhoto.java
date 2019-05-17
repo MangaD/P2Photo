@@ -54,11 +54,12 @@ public class WifiDirectAddPhoto extends AppCompatActivity {
 
 
         ctx = (GlobalClass) getApplicationContext();
-
+        Log.v("WIFI","start");
         initializeButtons();
     }
 
     private void initializeButtons() {
+        Log.v("WIFI","enters init");
         albumArrayList = getUserAlbumsFromFile();
 
         this.albumListView = this.findViewById(R.id.listAlbumsAddPhotoWifi);
@@ -68,10 +69,11 @@ public class WifiDirectAddPhoto extends AppCompatActivity {
 
 
         this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+            Log.v("WIFI","enters on click listener");
             Object itemAtPosition = adapter.getItemAtPosition(position);
             String albumName = itemAtPosition.toString();
 
-            EditText photoNameEdit = this.findViewById(R.id.albumName);
+            EditText photoNameEdit = this.findViewById(R.id.photoNameWifi);
             String photoName = photoNameEdit.getText().toString();
 
             if (photoName.isEmpty()) {
@@ -84,11 +86,12 @@ public class WifiDirectAddPhoto extends AppCompatActivity {
                     imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
                     // PNG is a lossless format, the compression factor (100) is ignored
                 } catch (IOException e) {
-                    Toast.makeText(this,"ERROR",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
                 //add to index of album
-                writeToFile(photoName,this,albumName+".index");
+                writeToFile(photoName,getApplicationContext(),albumName+".index");
+
                 Intent mainMenuIntent = new Intent(this, MainMenuActivity.class);
 
                 this.startActivity(mainMenuIntent);

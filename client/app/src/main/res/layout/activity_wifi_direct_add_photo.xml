@@ -13,14 +13,14 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/photoNameWifi"
+            android:id="@+id/textView12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Photo Name" />
 
 
         <EditText
-            android:id="@+id/editText3"
+            android:id="@+id/photoNameWifi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
