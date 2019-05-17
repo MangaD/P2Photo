@@ -272,9 +272,11 @@ public class ServerConnection {
         // Read urls
         try {
             String s;
-            while ((s = read()) != null && !s.isEmpty()) {
-                list.add(s);
-                Log.d("ServerConnection", s);
+            while ((s = read()) != null) {
+                if (!s.isEmpty()) {
+                    list.add(s);
+                    Log.d("ServerConnection", s);
+                }
             }
         } catch (Exception e) { }
 

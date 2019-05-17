@@ -113,6 +113,9 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 Log.d(TAG, "List size: " + list.size());
 
                 for (String entry : this.indexURLs) {
+                    if (entry.isEmpty()) {
+                        continue;
+                    }
                     Log.d(TAG, entry);
                     URL index = new URL(entry);
                     BufferedReader in = new BufferedReader(
