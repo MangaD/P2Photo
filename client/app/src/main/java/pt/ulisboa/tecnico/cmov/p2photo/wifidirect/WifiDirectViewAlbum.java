@@ -34,12 +34,15 @@ public class WifiDirectViewAlbum {
     private String albumName;
 
     public WifiDirectViewAlbum(GlobalClass ctx, ViewAlbumActivity activity,String albumName){
+
         activityReference = new WeakReference<>(activity);
 
         this.context = ctx;
 
-        albumArrayList = getAlbumFromFile();
         this.albumName=albumName;
+
+        albumArrayList = getAlbumFromFile();
+
 
         this.albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
         this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
@@ -48,18 +51,20 @@ public class WifiDirectViewAlbum {
 
 
         this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+
             Object itemAtPosition = adapter.getItemAtPosition(position);
             String itemString = itemAtPosition.toString();
 
             Intent viewPhotoIntent = new Intent(activityReference.get(), ViewPhotoActivity.class);
 
-            viewPhotoIntent.putExtra("ViewPhotoName",itemString);
+            viewPhotoIntent.putExtra("ViewPhotoURL",itemString);
 
             activityReference.get().startActivity(viewPhotoIntent);
         });
     }
-    //TODO change this to get photo names
+
     private ArrayList<String> getAlbumFromFile() {
+        //Toast.makeText(context,albumName,Toast.LENGTH_SHORT).show();
         ArrayList<String> albumList = new ArrayList<>();
         try {
             InputStream inputStream = context.openFileInput(albumName+".index");
@@ -73,7 +78,6 @@ public class WifiDirectViewAlbum {
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
                     stringBuilder.append(receiveString);
                     albumList.add(receiveString);
-                    Toast.makeText(context,receiveString,Toast.LENGTH_SHORT).show();
                 }
                 inputStream.close();
 
