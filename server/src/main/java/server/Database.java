@@ -148,16 +148,29 @@ public class Database {
 	
 	public void setAlbumIndex(String album_name, String user_name, String index, String key) throws SQLException {
 		
-		String sql = "INSERT INTO album_slices (aid, uid, url, key) " +
-				" VALUES((SELECT aid FROM albums WHERE name = ?), (SELECT uid FROM users WHERE username = ?), ?, ?)";
-		
-		PreparedStatement pstmt  = conn.prepareStatement(sql);
-		pstmt.setString(1, album_name);
-		pstmt.setString(2, user_name);
-		pstmt.setString(3, index);
-		pstmt.setString(4, key);
-		
-		pstmt.executeUpdate();
+		try {
+			String sql = "INSERT INTO album_slices (aid, uid, url, key) " +
+					" VALUES((SELECT aid FROM albums WHERE name = ?), (SELECT uid FROM users WHERE username = ?), ?, ?)";
+			
+			PreparedStatement pstmt  = conn.prepareStatement(sql);
+			pstmt.setString(1, album_name);
+			pstmt.setString(2, user_name);
+			pstmt.setString(3, index);
+			pstmt.setString(4, key);
+			
+			pstmt.executeUpdate();
+		} catch(SQLException e) {
+			String sql = "UPDATE album_slices SET url = ? "
+					+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
+					+ " AND uid IN (SELECT uid FROM users WHERE username = ?); ";
+			
+			PreparedStatement pstmt  = conn.prepareStatement(sql);
+			pstmt.setString(1, index);
+			pstmt.setString(2, album_name);
+			pstmt.setString(3, user_name);
+			
+			pstmt.executeUpdate();
+		}
 	}
 	
 	public HashMap<String, String> getUsersWithoutAlbumAccess(String albumName) {

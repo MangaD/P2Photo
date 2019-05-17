@@ -356,8 +356,10 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                         Log.i(TAG, "URL: " + indexURL);
 
                                         // FIXME
-                                        AddPhotoTaskPart2.setAlbumIndex th = new AddPhotoTaskPart2.setAlbumIndex(this.encKeyBase64, indexURL);
-                                        th.start();
+                                        //AddPhotoTaskPart2.setAlbumIndex th = new AddPhotoTaskPart2.setAlbumIndex(this.encKeyBase64, indexURL);
+                                        //th.start();
+
+                                        new AddPhotoTaskPart3(context, this.activityReference.get(), this.albumName, indexURL, this.encKeyBase64).execute();
 
                                         this.serverIndexURL = "dummy";
                                         saveFileToDrive();
