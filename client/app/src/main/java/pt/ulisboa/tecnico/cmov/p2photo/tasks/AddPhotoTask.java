@@ -154,7 +154,18 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
             this.albumName = albumArrayAdapter.getItem(which);
             this.imageTitle = et.getText().toString();
 
-            new AddPhotoTaskPart2(context, this.activityReference.get(), this.albumName, this.imageTitle).execute();
+            ProgressDialog pd;
+            pd = new ProgressDialog(this.activityReference.get());
+            pd.setMessage("Adding image to album...");
+            pd.setTitle("");
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+            pd.show();
+
+            new AddPhotoTaskPart2(context, this.activityReference.get(), this.albumName, this.imageTitle, pd).execute();
+
+
+
         });
     }
 

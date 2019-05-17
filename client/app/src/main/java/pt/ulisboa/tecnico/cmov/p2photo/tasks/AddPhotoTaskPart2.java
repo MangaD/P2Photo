@@ -65,12 +65,16 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
     private String encKeyBase64;
     private SecretKey cipherKey;
 
-    public AddPhotoTaskPart2(GlobalClass ctx, AddPhotoActivity activity, String albumName, String imageTitle) {
+    private ProgressDialog pdAddingImg;
+
+    public AddPhotoTaskPart2(GlobalClass ctx, AddPhotoActivity activity, String albumName, String imageTitle, ProgressDialog pdAddingImg) {
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
         this.driveConn = ctx.getDriveConnection();
         this.albumName = albumName;
         this.imageTitle = imageTitle;
+
+        this.pdAddingImg = pdAddingImg;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -290,6 +294,8 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
 
                             showMessage("Image created " +
                                     driveFile.getDriveId().encodeToString());
+
+                            pdAddingImg.dismiss();
 
                             Activity activity = activityReference.get();
                             activity.finish();
