@@ -80,10 +80,21 @@ public class WifiDirectAddPhoto extends AppCompatActivity {
                 Toast.makeText(this,"Photo Name can't be empty",Toast.LENGTH_SHORT).show();
             }
             else {
+                //
+
                 //save photo to internal storage
                 photoName +=".png";
-                try (FileOutputStream out = new FileOutputStream(photoName)) {
-                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                try {
+
+                        FileOutputStream stream = this.openFileOutput(photoName, Context.MODE_PRIVATE);
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                        //Cleanup
+                        stream.close();
+
+
+                        //FileOutputStream out = new FileOutputStream(photoName)) {
+                    //imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
                     // PNG is a lossless format, the compression factor (100) is ignored
                 } catch (IOException e) {
                     Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
