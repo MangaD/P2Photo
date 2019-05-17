@@ -1,4 +1,6 @@
-package pt.ulisboa.tecnico.cmov.p2photo.wifidirect;
+package pt.ulisboa.tecnico.cmov.p2photo.activities;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +11,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -23,7 +26,6 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -31,19 +33,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.CreateAlbumActivity;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.wifidirect.WiFiDirectBroadcastReceiver;
 
-import static android.os.Looper.getMainLooper;
+public class FindUserWifiActivity extends AppCompatActivity {
 
-public class WifiDirectFindUser {
-    private static final String TAG = "WIFI FIND USER";
-    private WeakReference<FindUserActivity> activityReference;
-    private GlobalClass context;
-    private String albumName;
-
+    Button btnDiscover;
+    ListView listView;
 
     WifiManager wifiManager;
     WifiP2pManager mManager;
@@ -62,32 +58,81 @@ public class WifiDirectFindUser {
     ClientClass clientClass;
     SendReceive sendReceive;
 
-    private ListView userListView;
-
-
-    public WifiDirectFindUser(GlobalClass ctx, FindUserActivity activity, String albumName){
-
-        activityReference = new WeakReference<>(activity);
-
-        this.context = ctx;
-
-        this.albumName = albumName;
-
-        initialization();
-
-        wifiListener();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_find_user_wifi);
+        initialWork();
+        exqListener();
     }
 
-    private void initialization() {
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what){
+                case MESSAGE_READ:
+                    byte[] readBuff= (byte[]) msg.obj;
+                    String tempMsg = new String(readBuff,0,msg.arg1);
+                    break;
+            }
+            return true;
+        }
+    });
 
-        this.userListView = activityReference.get().findViewById(R.id.listUsers);
+    private void exqListener() {
 
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        btnDiscover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mManager.discoverPeers(mChannel,new WifiP2pManager.ActionListener(){
 
-        mManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(activityReference.get(),getMainLooper(),null);
 
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager,mChannel,activityReference.get(),this);
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getApplicationContext(),"Discovery Started",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                    }
+                });
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final WifiP2pDevice device = deviceArray[i];
+                WifiP2pConfig config = new WifiP2pConfig();
+                config.deviceAddress = device.deviceAddress;
+
+                mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getApplicationContext(),"Connected to"+device.deviceName,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Toast.makeText(getApplicationContext(),"Not Connected",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void initialWork() {
+
+        btnDiscover = (Button) findViewById(R.id.discover);
+
+        listView = (ListView) findViewById(R.id.peerListView);
+
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this,getMainLooper(),null);
+
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager,mChannel,this);
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -97,7 +142,7 @@ public class WifiDirectFindUser {
 
     }
 
-    WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
+    public WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peerList) {
             if(!peerList.getDeviceList().equals(peers)){
@@ -112,17 +157,17 @@ public class WifiDirectFindUser {
                     deviceArray[index]=device;
                     index++;
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,deviceNameArray);
-                userListView.setAdapter(adapter);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,deviceNameArray);
+                listView.setAdapter(adapter);
             }
             if(peers.size()==0){
-                Toast.makeText(context,"No Device Found",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"No Device Found",Toast.LENGTH_SHORT).show();
                 return;
             }
         }
     };
 
-    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+    public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
             final InetAddress groupOwnerAddress = wifiP2pInfo.groupOwnerAddress;
@@ -136,6 +181,18 @@ public class WifiDirectFindUser {
             }
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver,mIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
+    }
 
     public class ServerClass extends Thread{
         Socket socket;
@@ -214,58 +271,4 @@ public class WifiDirectFindUser {
             }
         }
     }
-
-    Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            switch (msg.what){
-                case MESSAGE_READ:
-                    byte[] readBuff= (byte[]) msg.obj;
-                    String tempMsg = new String(readBuff,0,msg.arg1);
-                    //read_msg_box.setText(tempMsg);
-                    break;
-            }
-            return true;
-        }
-    });
-
-    private void wifiListener() {
-        Toast.makeText(context,"Wifi Listener",Toast.LENGTH_LONG).show();
-        mManager.discoverPeers(mChannel,new WifiP2pManager.ActionListener(){
-
-
-            @Override
-            public void onSuccess() {
-
-                Toast.makeText(context,"Discovery Started",Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                Toast.makeText(context,"Discovery Starting Failed",Toast.LENGTH_LONG).show();
-            }
-        });
-
-        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final WifiP2pDevice device = deviceArray[i];
-                WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = device.deviceAddress;
-
-                mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(context,"Connected to"+device.deviceName,Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(int reason) {
-                        Toast.makeText(context,"Not Connected",Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-    }
-
 }

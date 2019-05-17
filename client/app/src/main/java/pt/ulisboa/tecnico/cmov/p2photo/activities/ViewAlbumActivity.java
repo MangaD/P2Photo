@@ -6,11 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.ListUserAlbumTask;
 import pt.ulisboa.tecnico.cmov.p2photo.tasks.ViewAlbumTask;
+import pt.ulisboa.tecnico.cmov.p2photo.wifidirect.WifiDirectListUserAlbum;
+import pt.ulisboa.tecnico.cmov.p2photo.wifidirect.WifiDirectViewAlbum;
 
 public class ViewAlbumActivity extends AppCompatActivity {
 
@@ -25,7 +29,18 @@ public class ViewAlbumActivity extends AppCompatActivity {
 
         String albumName = getIntent().getStringExtra("ViewAlbumName");
 
-        new ViewAlbumTask((GlobalClass) this.getApplicationContext(), ViewAlbumActivity.this, albumName).execute();
+        GlobalClass ctx = (GlobalClass) getApplicationContext();
+
+        switch (ctx.getStorageMode()){
+            case    "drive":    new ViewAlbumTask((GlobalClass) this.getApplicationContext(), ViewAlbumActivity.this, albumName).execute();
+                break;
+
+            case    "wifi":
+                //Toast.makeText(getApplicationContext(),albumName,Toast.LENGTH_SHORT).show();
+                new WifiDirectViewAlbum(ctx,this,albumName);
+                break;
+
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item){

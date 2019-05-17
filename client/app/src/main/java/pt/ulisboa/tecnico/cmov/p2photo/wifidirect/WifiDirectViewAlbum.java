@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,51 +16,58 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.AddUserToAlbumActivity;
-
-import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
-import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserWifiActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ListUserAlbumActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewPhotoActivity;
 
-public class WifiDirectAddUserToAlbum {
-    private static final String TAG = "WIFI ADD USER";
+public class WifiDirectViewAlbum {
 
-    private WeakReference<AddUserToAlbumActivity> activityReference;
+    private static final String TAG = "WIFI LIST USER ALBUM";
+
+    private WeakReference<ViewAlbumActivity> activityReference;
     private GlobalClass context;
 
     private ListView albumListView;
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
-    public WifiDirectAddUserToAlbum(GlobalClass ctx, AddUserToAlbumActivity activity){
+    private String albumName;
+
+    public WifiDirectViewAlbum(GlobalClass ctx, ViewAlbumActivity activity,String albumName){
+
         activityReference = new WeakReference<>(activity);
 
         this.context = ctx;
 
-        albumArrayList = getUserAlbumsFromFile();
+        this.albumName=albumName;
 
-        this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
+        albumArrayList = getAlbumFromFile();
+
+
+        this.albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
         this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
                 android.R.layout.simple_list_item_1, this.albumArrayList);
         this.albumListView.setAdapter(this.albumArrayAdapter);
 
 
         this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
+
             Object itemAtPosition = adapter.getItemAtPosition(position);
             String itemString = itemAtPosition.toString();
 
-            Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserWifiActivity.class);
+            Intent viewPhotoIntent = new Intent(activityReference.get(), ViewPhotoActivity.class);
 
-            viewAlbumIntent.putExtra("FindActivityAlbumName",itemString);
-            //viewAlbumIntent.putExtra("FindActivityEncKey","");//empty string because wifi direct doesn't use this
-            activityReference.get().startActivity(viewAlbumIntent);
+            viewPhotoIntent.putExtra("ViewPhotoURL",itemString);
+
+            activityReference.get().startActivity(viewPhotoIntent);
         });
     }
 
-    private ArrayList<String> getUserAlbumsFromFile() {
+    private ArrayList<String> getAlbumFromFile() {
+        //Toast.makeText(context,albumName,Toast.LENGTH_SHORT).show();
         ArrayList<String> albumList = new ArrayList<>();
         try {
-            InputStream inputStream = context.openFileInput(context.getString(R.string.local_storage_file));
+            InputStream inputStream = context.openFileInput(albumName+".index");
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -70,7 +78,6 @@ public class WifiDirectAddUserToAlbum {
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
                     stringBuilder.append(receiveString);
                     albumList.add(receiveString);
-                    //Toast.makeText(context,receiveString,Toast.LENGTH_SHORT).show();
                 }
                 inputStream.close();
 

@@ -16,11 +16,15 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
+import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
+import pt.ulisboa.tecnico.cmov.p2photo.tasks.ViewAlbumTask;
+import pt.ulisboa.tecnico.cmov.p2photo.wifidirect.WifiDirectViewAlbum;
+import pt.ulisboa.tecnico.cmov.p2photo.wifidirect.WifiDirectViewPhoto;
 
 public class ViewPhotoActivity extends AppCompatActivity  {
 
-    ImageView testImageView;
+    public ImageView testImageView;
 
     private String photo_url;
 
@@ -33,7 +37,19 @@ public class ViewPhotoActivity extends AppCompatActivity  {
 
         photo_url = getIntent().getStringExtra("ViewPhotoURL");
 
-        new ObtainPhotoTask(ViewPhotoActivity.this).execute();
+
+
+        GlobalClass ctx = (GlobalClass) getApplicationContext();
+
+        switch (ctx.getStorageMode()){
+            case    "drive":    new ObtainPhotoTask(ViewPhotoActivity.this).execute();
+                break;
+
+            case    "wifi":
+                new WifiDirectViewPhoto(ctx,this,photo_url);
+                break;
+
+        }
 
     }
 
@@ -92,6 +108,10 @@ public class ViewPhotoActivity extends AppCompatActivity  {
                 e.printStackTrace();
                 return null;
             }
+        }
+
+        public ImageView getTestImageView() {
+            return testImageView;
         }
     }
 }
