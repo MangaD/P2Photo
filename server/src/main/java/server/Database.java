@@ -273,7 +273,7 @@ public class Database {
 	
 	public HashMap<Integer, String> getAlbumIndexes(String albumName) {
 		String sql = "SELECT uid, url FROM album_slices "
-				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?)"
+				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
 				+ " AND url IS NOT NULL AND URL != ''; ";
 		HashMap<Integer, String> result = new HashMap<>();
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {

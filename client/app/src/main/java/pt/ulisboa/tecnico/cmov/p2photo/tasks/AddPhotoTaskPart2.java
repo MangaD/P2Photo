@@ -51,7 +51,6 @@ import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
 
     public static final String TAG = "AddPhotoTaskPart2";
-    private ProgressDialog pd;
 
     private WeakReference<AddPhotoActivity> activityReference;
     private GlobalClass context;
@@ -75,24 +74,6 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
         this.imageTitle = imageTitle;
 
         this.pdAddingImg = pdAddingImg;
-
-        // Create Progress dialog
-        pd = new ProgressDialog(activity);
-        pd.setMessage(context.getString(R.string.adding_photo));
-        pd.setTitle("");
-        pd.setIndeterminate(true);
-        pd.setCancelable(false);
-    }
-
-    /**
-     * onPreExecute called before the doInBackgroud start to display progress dialog.
-     */
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-
-        // Show Progress dialog
-        pd.show();
     }
 
     @Override
@@ -125,7 +106,6 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
      */
     @Override
     protected void onPostExecute(Boolean success) {
-        pd.dismiss();
         if (success) {
             saveFileToDrive();
         }
