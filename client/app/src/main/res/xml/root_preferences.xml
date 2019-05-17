@@ -28,12 +28,4 @@
             android:entryValues="@array/storage_values"/>
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/security_header">
-
-        <EditTextPreference
-            app:key="keyPassword"
-            app:title="@string/prefKeyPassword"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
 </androidx.preference.PreferenceScreen>

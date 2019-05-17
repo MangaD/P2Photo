@@ -15,9 +15,6 @@
     <string name="invalid_address">Invalid server address.</string>
     <string name="invalid_port">Port must be a number between 1024 and 65535.</string>
     <string name="invalid_mode">Must select a storage mode.</string>
-    <string name="security_header">Security</string>
-    <string name="prefKeyPassword">Key Password</string>
-    <string name="keyPasswordEmpty">Key password cannot be empty. Set it in Preferences.</string>
 
     <!-- Connection -->
     <string name="network_disabled">Network is disabled.</string>
@@ -32,7 +29,7 @@
     <string name="insertKeyPass">Insert a key password for extra security:</string>
     <string name="keypassword">Key password</string>
     <string name="loggin_in">Logging in…</string>
-    <string name="user_pass_empty">Username and passwords cannot be empty!</string>
+    <string name="user_pass_empty">Username and password cannot be empty!</string>
     <string name="login_invalid">Login invalid.</string>
     <string name="createaccount">Create account</string>
     <string name="logged_out">Logged out.</string>

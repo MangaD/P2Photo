@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
@@ -105,10 +106,8 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         String username = usernameEdit.getText().toString();
         EditText passwordEdit = activityReference.get().findViewById(R.id.signin_password);
         String password = passwordEdit.getText().toString();
-        EditText keyPasswordEdit = activityReference.get().findViewById(R.id.signup_keypassword);
-        String keyPassword = keyPasswordEdit.getText().toString();
 
-        if (username.isEmpty() || password.isEmpty() || keyPassword.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             conn.disconnect();
             Log.d(TAG, ctx.getString(R.string.user_pass_empty));
 
@@ -121,15 +120,19 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         Log.d(TAG, "Username: " + username);
         Log.d(TAG, "Password: " + password);
-        Log.d(TAG, "Key password: " + keyPassword);
 
         String encPrivKeyBase64;
         String pubKeyBase64;
+        String passwordBase64;
         try {
             KeyPair keys = AsymmetricEncryption.generateKeyPair();
-            byte[] encPrivKey = AsymmetricEncryption.encryptPrivateKey(keys.getPrivate(), keyPassword);
+            byte[] encPrivKey = AsymmetricEncryption.encryptPrivateKey(keys.getPrivate(), password);
             encPrivKeyBase64 = Utility.bytesToBase64(encPrivKey);
             pubKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.publicKeyToByteArray(keys.getPublic()));
+            // Has password with SHA-512 to be different than the hash that is used to cipher the private password
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            byte[] passwordHash = digest.digest(password.getBytes());
+            passwordBase64 = Utility.bytesToBase64(passwordHash);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                 BadPaddingException | IllegalBlockSizeException e) {
             conn.disconnect();
@@ -142,7 +145,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         }
 
         try {
-            return conn.signup(username, password, pubKeyBase64, encPrivKeyBase64);
+            return conn.signup(username, passwordBase64, pubKeyBase64, encPrivKeyBase64);
         } catch (IOException e) {
             conn.disconnect();
 

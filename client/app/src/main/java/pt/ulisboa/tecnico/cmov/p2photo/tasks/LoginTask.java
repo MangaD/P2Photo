@@ -159,7 +159,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
                     // Set private key in application context
                     String encPrivKeyBase64 = pair[0];
                     byte[] encPrivKey = Utility.base64ToBytes(encPrivKeyBase64);
-                    PrivateKey privKey = AsymmetricEncryption.decryptPrivateKey(encPrivKey, context.getKeyPassword());
+                    PrivateKey privKey = AsymmetricEncryption.decryptPrivateKey(encPrivKey, password);
                     context.setPrivKey(privKey);
                     return true;
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException

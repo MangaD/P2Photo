@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
          */
         Button buttonLogin = findViewById(R.id.button_login);
         buttonLogin.setOnClickListener((View v) -> {
-            if(!setSettingsLogIn()) {
+            if(!setSettings()) {
                 return;
             }
             new LoginTask((GlobalClass) getApplicationContext(), LoginActivity.this).execute();
@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
          */
         Button buttonSignIn = findViewById(R.id.button_signIn);
         buttonSignIn.setOnClickListener((View v) -> {
-            if(!setSettingsSignUp()) {
+            if(!setSettings()) {
                 return;
             }
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private boolean setSettingsSignUp() {
+    private boolean setSettings() {
         if(!setServerAddress()) {
             return false;
         } else if(!setStorageMode()) {
@@ -84,27 +84,6 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             return true;
         }
-    }
-
-    private boolean setSettingsLogIn() {
-        if(!setSettingsSignUp()) {
-            return false;
-        } else if(!setSecurityPreferences()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private boolean setSecurityPreferences() {
-        String keyPassword = sp.getString("keyPassword", "");
-        if (keyPassword.isEmpty()) {
-            Toast.makeText(getApplicationContext(), getString(R.string.keyPasswordEmpty), Toast.LENGTH_LONG).show();
-            Log.d("LoginActivity", getString(R.string.keyPasswordEmpty));
-            return false;
-        }
-        context.setKeyPassword(keyPassword);
-        return true;
     }
 
     private boolean setServerAddress() {
