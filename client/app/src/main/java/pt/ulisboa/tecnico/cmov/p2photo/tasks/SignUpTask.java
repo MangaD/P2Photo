@@ -130,9 +130,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
             encPrivKeyBase64 = Utility.bytesToBase64(encPrivKey);
             pubKeyBase64 = Utility.bytesToBase64(AsymmetricEncryption.publicKeyToByteArray(keys.getPublic()));
             // Has password with SHA-512 to be different than the hash that is used to cipher the private password
-            MessageDigest digest = MessageDigest.getInstance("SHA-512");
-            byte[] passwordHash = digest.digest(password.getBytes());
-            passwordBase64 = Utility.bytesToBase64(passwordHash);
+            passwordBase64 = Utility.passwordToSHA512Base64(password);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                 BadPaddingException | IllegalBlockSizeException e) {
             conn.disconnect();

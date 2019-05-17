@@ -142,13 +142,19 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         Log.d(TAG, "Username: " + username);
         Log.d(TAG, "Password: " + password);
 
+        String passwordBase64;
         try {
-            String[] pair = conn.login(username, password);
+            try {
+                passwordBase64 = Utility.passwordToSHA512Base64(password);
+            } catch (NoSuchAlgorithmException e) {
+                showMessage("Problem creating hash of password.");
+                return false;
+            }
+
+            String[] pair = conn.login(username, passwordBase64);
             if(pair == null || pair[0].isEmpty() || pair[1].isEmpty()) {
                 Log.d(TAG, context.getString(R.string.login_invalid));
-                activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.login_invalid), Toast.LENGTH_LONG).show()
-                );
+                showMessage(context.getString(R.string.login_invalid));
                 return false;
             } else {
                 try {
@@ -164,9 +170,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
                     return true;
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
                         | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                    activityReference.get().runOnUiThread(() ->
-                            Toast.makeText(activityReference.get().getApplicationContext(), "Problem reading private key.", Toast.LENGTH_LONG).show()
-                    );
+                    showMessage("Problem reading private key.");
                     return false;
                 }
             }
@@ -175,9 +179,7 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
 
             Log.d(TAG, context.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-            );
+            showMessage(context.getString(R.string.server_contact_fail));
 
             return false;
         }
@@ -194,5 +196,11 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
             Intent intent = new Intent(activityReference.get(), MainMenuActivity.class);
             activityReference.get().startActivity(intent);
         }
+    }
+
+    private void showMessage(String msg) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        );
     }
 }
