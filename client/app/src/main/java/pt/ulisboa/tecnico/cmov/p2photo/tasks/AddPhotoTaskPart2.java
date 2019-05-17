@@ -61,6 +61,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
     // doesn't have the album on its drive yet
 
     private String albumName;
+    private String serverIndexURL;
     private String encKeyBase64;
     private SecretKey cipherKey;
 
@@ -81,9 +82,11 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
 
         ServerConnection conn = context.getServerConnection();
 
-        /**
+        /*
          * SECURITY
          */
+
+        // Get album key
         try {
             this.encKeyBase64 = conn.getAlbumKey(this.albumName);
             byte[] encKey = Utility.base64ToBytes(encKeyBase64);
@@ -97,6 +100,17 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
             showMessage(msg);
             return false;
         }
+
+        // Get album index for this user
+        try {
+            serverIndexURL = context.getServerConnection().getUserAlbumIndex(albumName);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            String msg = "Failed to get album key.";
+            showMessage(msg);
+            return false;
+        }
+
         saveFileToDrive();
         return true;
     }
@@ -149,21 +163,11 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                 .addFilter(Filters.eq(SearchableField.TITLE, albumName))
                 .build();
 
-        String serverIndexURL;
-        try {
-            serverIndexURL = context.getServerConnection().getUserAlbumIndex(albumName);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-            String msg = "Failed to get album key.";
-            showMessage(msg);
-            return;
-        }
-
         driveConn.getDriveResourceClient()
                 .query(query)
                 .addOnSuccessListener(activityReference.get(),
                         metadataBuffer -> {
-                            if (metadataBuffer.getCount() == 0 || serverIndexURL.isEmpty()) {
+                            if (metadataBuffer.getCount() == 0 || this.serverIndexURL.isEmpty()) {
                                 Log.i(TAG, "Album '" + albumName + "' does not exist. Creating...");
                                 createFolder(albumName);
                             } else {

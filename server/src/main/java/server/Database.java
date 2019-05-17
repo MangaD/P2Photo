@@ -274,7 +274,7 @@ public class Database {
 	public String getUserAlbumIndex(String username, String albumName) {
 		String sql = "SELECT url FROM album_slices "
 				+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
-				+ " AND username IN (SELECT uid FROM users WHERE username = ?); ";
+				+ " AND uid IN (SELECT uid FROM users WHERE username = ?); ";
 
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
