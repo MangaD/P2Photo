@@ -74,7 +74,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
-        pd.setMessage(context.getString(R.string.load_user_album));
+        pd.setMessage(context.getString(R.string.adding_photo));
         pd.setTitle("");
         pd.setIndeterminate(true);
         pd.setCancelable(false);
@@ -121,10 +121,10 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
      */
     @Override
     protected void onPostExecute(Boolean success) {
+        pd.dismiss();
         if (success) {
             saveFileToDrive();
         }
-        pd.dismiss();
     }
 
     private void showMessage(String msg) {

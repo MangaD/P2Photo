@@ -36,6 +36,7 @@ public class ListUserAlbumActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
+        finish();
         Intent myIntent = new Intent(getApplicationContext(), MainMenuActivity.class);
         startActivityForResult(myIntent, 0);
         return true;

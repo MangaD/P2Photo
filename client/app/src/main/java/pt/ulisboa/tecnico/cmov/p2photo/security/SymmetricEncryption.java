@@ -1,10 +1,5 @@
 package pt.ulisboa.tecnico.cmov.p2photo.security;
 
-import android.util.Log;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -12,8 +7,6 @@ import java.security.SecureRandom;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
@@ -23,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Symmetric encryption tutorial: https://www.baeldung.com/java-cipher-input-output-stream
+ * https://gist.github.com/itarato/abef95871756970a9dad
  * Assymetric encryption tutorial: https://www.novixys.com/blog/how-to-generate-rsa-keys-java/
  * Why use EC: https://blog.cloudflare.com/ecdsa-the-digital-signature-algorithm-of-a-better-internet/
  */
