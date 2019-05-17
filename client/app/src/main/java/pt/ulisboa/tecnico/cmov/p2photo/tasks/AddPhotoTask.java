@@ -416,14 +416,11 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
                                         String indexURL = getIndexURL();
                                         Log.i(TAG, "URL: " + indexURL);
 
+                                        connectServ th = new connectServ(this.encKeyBase64, indexURL);
+                                        th.start();
 
-                                        try {
-                                            context.getServerConnection().setAlbumIndex(albumName, indexURL, this.encKeyBase64);
-                                        } catch (IOException e) {
-                                            Log.i(TAG, "Failed to add URL Index: " + e);
-                                        }
+                                        saveFileToDrive();
 
-                                        //indexSemaphore.release();
                                     })
                                     .addOnFailureListener(activityReference.get(), e -> {
                                         Log.i(TAG, "Error getting URL");
@@ -552,4 +549,22 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
         return this.IndexURL;
     }
 
+
+    class connectServ extends Thread{
+        String encKeyBase64;
+        String indexURL;
+        connectServ(String ekb64, String iURL){
+            encKeyBase64 = ekb64;
+            indexURL = iURL;
+        }
+        @Override
+        public void run() {
+            super.run();
+            try {
+                context.getServerConnection().setAlbumIndex(albumName, indexURL, this.encKeyBase64);
+            } catch (IOException e) {
+                Log.i(TAG, "Failed to add URL Index: " + e);
+            }
+        }
+    }
 }
