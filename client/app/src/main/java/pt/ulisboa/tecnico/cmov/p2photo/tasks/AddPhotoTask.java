@@ -154,6 +154,11 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
             this.albumName = albumArrayAdapter.getItem(which);
             this.imageTitle = et.getText().toString();
 
+            if(imageTitle.isEmpty()) {
+                showMessage("Image title cannot be empty.");
+                return;
+            }
+
             ProgressDialog pd;
             pd = new ProgressDialog(this.activityReference.get());
             pd.setMessage("Adding image to album...");
