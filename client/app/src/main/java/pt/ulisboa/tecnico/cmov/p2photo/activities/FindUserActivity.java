@@ -21,12 +21,11 @@ public class FindUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_find_user);
 
         String albumName = getIntent().getStringExtra("FindActivityAlbumName");
-        String encryptedKeyBase64 = getIntent().getStringExtra("FindActivityEncKey");
 
         GlobalClass ctx = (GlobalClass) getApplicationContext();
 
         switch (ctx.getStorageMode()){
-            case    "drive":new FindUserTask(FindUserActivity.this, albumName, encryptedKeyBase64).execute();
+            case    "drive":new FindUserTask(FindUserActivity.this, albumName).execute();
                 break;
 
             case    "wifi": new WifiDirectFindUser(ctx,this,albumName);

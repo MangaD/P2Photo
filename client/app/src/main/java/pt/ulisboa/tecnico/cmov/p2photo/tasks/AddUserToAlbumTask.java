@@ -42,7 +42,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
     private ArrayList<String> albumArrayList;
     private ArrayAdapter<String> albumArrayAdapter;
 
-    private HashMap<Integer, String[]> albumsMap;
+    private HashMap<Integer, String> albumsMap;
 
     public AddUserToAlbumTask(GlobalClass ctx, AddUserToAlbumActivity activity) {
 
@@ -79,15 +79,11 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             albumsMap = conn.getUsersOwnedAlbums();
             if (albumsMap == null) {
                 conn.disconnect();
-                Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
+                Log.d(TAG, context.getString(R.string.server_contact_fail));
                 showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
-                this.albumArrayList = new ArrayList<>();
-                for (Map.Entry<Integer, String[]> entry : albumsMap.entrySet()) {
-                    String name = entry.getValue()[0];
-                    albumArrayList.add(name);
-                }
+                this.albumArrayList = new ArrayList<>(albumsMap.values());
 
                 this.activityReference.get().runOnUiThread(() -> {
                     this.albumListView = activityReference.get().findViewById(R.id.listViewAlbumsAddUser);
@@ -99,20 +95,9 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String albumName = itemAtPosition.toString();
 
-                        String encryptedKeyBase64 = "";
-
-                        for (Map.Entry<Integer, String[]> entry : albumsMap.entrySet()) {
-                            String name = entry.getValue()[0];
-                            if (albumName.equals(name)) {
-                                encryptedKeyBase64 = entry.getValue()[1];
-                                break;
-                            }
-                        }
-
                         Intent findUserIntent = new Intent(activityReference.get(), FindUserActivity.class);
 
                         findUserIntent.putExtra("FindActivityAlbumName", albumName);
-                        findUserIntent.putExtra("FindActivityEncKey", encryptedKeyBase64);
 
                         activityReference.get().startActivity(findUserIntent);
                     });
@@ -122,7 +107,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
         } catch (IOException e) {
             conn.disconnect();
-            Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
+            Log.d(TAG, context.getString(R.string.server_contact_fail));
 
             showMessage(context.getString(R.string.server_contact_fail));
 

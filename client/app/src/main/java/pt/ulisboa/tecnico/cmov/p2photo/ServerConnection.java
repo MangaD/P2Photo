@@ -199,8 +199,8 @@ public class ServerConnection {
     /**
      * Returns Album id, album name and album encrypted key
      */
-    public HashMap<Integer, String[]> getUsersOwnedAlbums() throws IOException {
-        HashMap<Integer, String[]> list = new HashMap<>();
+    public HashMap<Integer, String> getUsersOwnedAlbums() throws IOException {
+        HashMap<Integer, String> list = new HashMap<>();
         if (!isConnected()) {
             Log.d("ServerConnection", "Not connected to the server.");
             return null;
@@ -212,10 +212,7 @@ public class ServerConnection {
         try {
             String s;
             while ((s = read()) != null && !s.isEmpty()) {
-                String[] pair = new String[2];
-                pair[0] = read();
-                pair[1] = read();
-                list.put(Integer.valueOf(s), pair);
+                list.put(Integer.valueOf(s), read());
                 Log.d("ServerConnection", s);
             }
         } catch (Exception e) { }
