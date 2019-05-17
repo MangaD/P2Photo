@@ -1,18 +1,15 @@
 package pt.ulisboa.tecnico.cmov.p2photo.security;
 
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -99,7 +96,12 @@ public class AsymmetricEncryption {
     public static byte[] encryptPrivateKey(PrivateKey privateKey, String password)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException {
-        Key aesKey = new SecretKeySpec(password.getBytes(), "AES");
+
+        // Generate key of 256 bits from key password entered by user
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] passwordHash = digest.digest(password.getBytes());
+
+        Key aesKey = new SecretKeySpec(passwordHash, "AES");
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, aesKey);
         return cipher.doFinal(privateKeyToByteArray(privateKey));
@@ -109,7 +111,12 @@ public class AsymmetricEncryption {
     public static PrivateKey decryptPrivateKey(byte[] encryptedKey, String password)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-        Key aesKey = new SecretKeySpec(password.getBytes(), "AES");
+
+        // Generate key of 256 bits from key password entered by user
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] passwordHash = digest.digest(password.getBytes());
+
+        Key aesKey = new SecretKeySpec(passwordHash, "AES");
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, aesKey);
         return privateKeyFromByteArray(cipher.doFinal(encryptedKey));

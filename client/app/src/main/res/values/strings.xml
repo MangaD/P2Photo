@@ -32,7 +32,7 @@
     <string name="insertKeyPass">Insert a key password for extra security:</string>
     <string name="keypassword">Key password</string>
     <string name="loggin_in">Logging in…</string>
-    <string name="user_pass_empty">Username and password cannot be empty!</string>
+    <string name="user_pass_empty">Username and passwords cannot be empty!</string>
     <string name="login_invalid">Login invalid.</string>
     <string name="createaccount">Create account</string>
     <string name="logged_out">Logged out.</string>

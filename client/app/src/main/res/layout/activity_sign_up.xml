@@ -36,7 +36,7 @@
             android:layout_marginTop="12pt" />
 
         <EditText
-            android:id="@+id/signin_keypassword"
+            android:id="@+id/signup_keypassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/keypassword"

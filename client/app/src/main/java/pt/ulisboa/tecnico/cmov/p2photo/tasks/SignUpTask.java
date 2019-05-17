@@ -105,10 +105,10 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
         String username = usernameEdit.getText().toString();
         EditText passwordEdit = activityReference.get().findViewById(R.id.signin_password);
         String password = passwordEdit.getText().toString();
-        EditText keyPasswordEdit = activityReference.get().findViewById(R.id.signin_keypassword);
+        EditText keyPasswordEdit = activityReference.get().findViewById(R.id.signup_keypassword);
         String keyPassword = keyPasswordEdit.getText().toString();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || keyPassword.isEmpty()) {
             conn.disconnect();
             Log.d(TAG, ctx.getString(R.string.user_pass_empty));
 
@@ -121,6 +121,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
 
         Log.d(TAG, "Username: " + username);
         Log.d(TAG, "Password: " + password);
+        Log.d(TAG, "Key password: " + keyPassword);
 
         String encPrivKeyBase64;
         String pubKeyBase64;
@@ -133,6 +134,7 @@ public class SignUpTask extends AsyncTask<Void, Void, String> {
                 BadPaddingException | IllegalBlockSizeException e) {
             conn.disconnect();
             Log.d(TAG, ctx.getString(R.string.failed_generate_keys));
+            Log.e(TAG, e.getMessage());
             activityReference.get().runOnUiThread(() ->
                     Toast.makeText(context, ctx.getString(R.string.failed_generate_keys), Toast.LENGTH_LONG).show()
             );
