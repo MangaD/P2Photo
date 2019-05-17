@@ -67,22 +67,27 @@ public class ClientConnection implements Runnable {
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
 					
 					String saltBase64 = Main.db.getUserSalt(user);
-					byte[] salt = Base64.getDecoder().decode(saltBase64);
-					String[] encPasswordAndSalt = passwordProtect(password, salt);
-					String[] pair = Main.db.login(user, encPasswordAndSalt[0]);
-					
-					System.out.println(pair);
-					
-					if (pair != null && !pair[0].isEmpty() && !pair[1].isEmpty()) {
-						System.out.println("Login successful.");
-						write(Integer.toString(sessionID));
-						write(pair[0]);
-						write(pair[1]);
-						isLoggedIn = true;
-						this.user = user;
-					} else {
+					if (saltBase64 == null) {
 						System.out.println("Login insuccessful.");
 						write("");
+					} else {
+						byte[] salt = Base64.getDecoder().decode(saltBase64);
+						String[] encPasswordAndSalt = passwordProtect(password, salt);
+						String[] pair = Main.db.login(user, encPasswordAndSalt[0]);
+						
+						System.out.println(pair);
+						
+						if (pair != null && !pair[0].isEmpty() && !pair[1].isEmpty()) {
+							System.out.println("Login successful.");
+							write(Integer.toString(sessionID));
+							write(pair[0]);
+							write(pair[1]);
+							isLoggedIn = true;
+							this.user = user;
+						} else {
+							System.out.println("Login insuccessful.");
+							write("");
+						}
 					}
 					
 				} else if (inputLine.equals("signup")) {

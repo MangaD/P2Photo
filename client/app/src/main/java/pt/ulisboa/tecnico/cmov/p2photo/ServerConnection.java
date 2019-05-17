@@ -64,6 +64,9 @@ public class ServerConnection {
         write(password);
         Log.d("ServerConnection", "User: '" + user + "' Password: '" + password + "'.");
         String result = read();
+        if (result.isEmpty()) {
+            return null;
+        }
         Log.d("ServerConnection", "Session ID: '" + result + "'.");
         try {
             int res = Integer.parseInt(result);
