@@ -160,16 +160,24 @@ public class Database {
 			
 			pstmt.executeUpdate();
 		} catch(SQLException e) {
-			String sql = "UPDATE album_slices SET url = ? "
-					+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
-					+ " AND uid IN (SELECT uid FROM users WHERE username = ?); ";
-			
-			PreparedStatement pstmt  = conn.prepareStatement(sql);
-			pstmt.setString(1, index);
-			pstmt.setString(2, album_name);
-			pstmt.setString(3, user_name);
-			
-			pstmt.executeUpdate();
+			if (e.getErrorCode() == 19) {
+				try {
+					String sql = "UPDATE album_slices SET url = ? "
+							+ " WHERE aid IN (SELECT aid FROM albums WHERE name = ?) "
+							+ " AND uid IN (SELECT uid FROM users WHERE username = ?); ";
+					
+					PreparedStatement pstmt  = conn.prepareStatement(sql);
+					pstmt.setString(1, index);
+					pstmt.setString(2, album_name);
+					pstmt.setString(3, user_name);
+					
+					pstmt.executeUpdate();
+				} catch(SQLException se) {
+					throw e;
+				}
+			} else {
+				throw e;
+			}
 		}
 	}
 	
