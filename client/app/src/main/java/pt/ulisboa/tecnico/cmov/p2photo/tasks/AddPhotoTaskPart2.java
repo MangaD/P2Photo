@@ -159,7 +159,7 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
      */
     private Task<DriveFile> createFileIntentSender(DriveContents driveContents, Bitmap image) {
         Log.i(TAG, "ALBUM NAME: " + albumName);
-        getAlbumByName(/*albumName*/"novoalbuns", driveContents, image);
+        getAlbumByName(albumName, driveContents, image);
         return null;
     }
 
