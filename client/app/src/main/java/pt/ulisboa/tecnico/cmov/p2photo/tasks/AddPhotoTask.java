@@ -39,16 +39,23 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.ref.WeakReference;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import pt.ulisboa.tecnico.cmov.p2photo.DriveConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.AddPhotoActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.SymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -77,6 +84,7 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
 
     private String albumName = null;
     private String encKeyBase64;
+    private SecretKey cipherKey;
 
     public AddPhotoTask(GlobalClass ctx, AddPhotoActivity activity) {
         activityReference = new WeakReference<>(activity);
@@ -170,9 +178,17 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
             this.albumName = albumArrayAdapter.getItem(which);
             imageTitle = et.getText().toString();
 
+            /**
+             * SECURITY
+             */
             try {
                 this.encKeyBase64 = context.getServerConnection().getAlbumKey(this.albumName);
-            } catch (IOException e) {
+                byte[] encKey = Utility.base64ToBytes(encKeyBase64);
+                AsymmetricEncryption ae = new AsymmetricEncryption();
+                byte[] key = ae.decrypt(context.getPrivKey(), encKey);
+                this.cipherKey = SymmetricEncryption.secretKeyFromByteArray(key);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
                 showMessage("Failed to get album key.");
                 return;
             }
@@ -450,16 +466,29 @@ public class AddPhotoTask extends AsyncTask<Void, Void, String> {
                                     queryTsk
                                             .addOnSuccessListener(activityReference.get(),
                                                     Metadata -> {
-                                                        //String link2 = queryTsk.getResult().getEmbedLink();
-                                                        String link2 = queryTsk.getResult().getWebContentLink();
-                                                        Log.i("LINK", "Success getting URL Embeded " + link2);
-                                                        //showMessage("Success getting URL " + link2);
-                                                        appendContents(indexFile, link2);
+                                                        //String imageURL = queryTsk.getResult().getEmbedLink();
+                                                        String imageURL = queryTsk.getResult().getWebContentLink();
+                                                        Log.i("LINK", "Success getting URL Embeded " + imageURL);
+                                                        //showMessage("Success getting URL " + imageURL);
+
+                                                        /**
+                                                         * SECURITY
+                                                         */
+                                                        String imageEncryptedURLBase64;
+                                                        try {
+                                                            SymmetricEncryption se = new SymmetricEncryption();
+                                                            byte[] encImageURL = se.encryptAES(imageURL, cipherKey);
+                                                            imageEncryptedURLBase64 = Utility.bytesToBase64(encImageURL);
+                                                        } catch (Exception e) {
+                                                            showMessage("Error encrypting image URL.");
+                                                            return;
+                                                        }
+
+                                                        appendContents(indexFile, imageEncryptedURLBase64);
                                                     })
                                             .addOnFailureListener(activityReference.get(), e -> {
                                                 Log.i("LINK", "Error getting URL");
                                                 showMessage("Error getting URL");
-                                                return;
                                             });
                                 }
                         )

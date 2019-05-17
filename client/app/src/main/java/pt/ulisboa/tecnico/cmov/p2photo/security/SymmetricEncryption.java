@@ -57,7 +57,7 @@ public class SymmetricEncryption {
         }
     }
 
-    byte[] decryptAES(byte[] encryptedBytes, SecretKey secretKey)
+    public String decryptAES(byte[] encryptedBytes, SecretKey secretKey)
             throws IOException, InvalidKeyException, InvalidAlgorithmParameterException {
 
         try (ByteArrayInputStream in = new ByteArrayInputStream(encryptedBytes);
@@ -67,7 +67,7 @@ public class SymmetricEncryption {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(fileIv));
             byte[] content = new byte[encryptedBytes.length-16];
             cipherIn.read(content);
-            return content;
+            return new String(content);
         }
     }
 }

@@ -14,11 +14,16 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 
+import javax.crypto.SecretKey;
+
 import pt.ulisboa.tecnico.cmov.p2photo.GlobalClass;
 import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.ServerConnection;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewPhotoActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.security.AsymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.SymmetricEncryption;
+import pt.ulisboa.tecnico.cmov.p2photo.security.Utility;
 
 /**
  * Uses AsyncTask to create a task away from the main UI thread (to avoid NetworkOnMainThreadException).
@@ -78,9 +83,26 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
         try {
             Log.d(TAG, "Getting indexes for album: " + this.albumName);
-            String encKeyBase64 = conn.getAlbumKey(this.albumName);
+
+            /**
+             * SECURITY
+             */
+
+            SecretKey cipherKey;
+            try {
+                String encKeyBase64 = conn.getAlbumKey(this.albumName);
+                byte[] encKey = Utility.base64ToBytes(encKeyBase64);
+                AsymmetricEncryption ae = new AsymmetricEncryption();
+                byte[] key = ae.decrypt(context.getPrivKey(), encKey);
+                cipherKey = SymmetricEncryption.secretKeyFromByteArray(key);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                showMessage("Failed to get album key.");
+                return false;
+            }
+
             ArrayList<String> list = conn.getAlbumIndexes(this.albumName);
-            if (list == null || encKeyBase64 == null) {
+            if (list == null || cipherKey == null) {
                 conn.disconnect();
                 Log.d(TAG, context.getString(R.string.server_contact_fail));
                 showMessage(context.getString(R.string.server_contact_fail));
@@ -97,10 +119,24 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     BufferedReader in = new BufferedReader(
                             new InputStreamReader(index.openStream()));
 
-                    String inputLine;
-                    while ((inputLine = in.readLine()) != null) {
-                        Log.d(TAG, inputLine);
-                        this.albumArrayList.add(inputLine);
+                    String encImgURLBase64;
+                    while ((encImgURLBase64 = in.readLine()) != null) {
+                        Log.d(TAG, encImgURLBase64);
+
+                        /**
+                         * SECURITY
+                         */
+                        String imageURL;
+                        try {
+                            byte[] encImgURL = Utility.base64ToBytes(encImgURLBase64);
+                            SymmetricEncryption se = new SymmetricEncryption();
+                            imageURL = se.decryptAES(encImgURL, cipherKey);
+                        } catch (Exception e) {
+                            showMessage("Error decrypting image URL.");
+                            return false;
+                        }
+
+                        this.albumArrayList.add(imageURL);
                     }
                     in.close();
                 }
