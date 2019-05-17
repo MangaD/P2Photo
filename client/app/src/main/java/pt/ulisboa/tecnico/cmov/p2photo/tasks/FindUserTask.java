@@ -44,14 +44,13 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
     private ArrayAdapter<String> userArrayAdapter;
     private HashMap<String, String> userMap;
 
-    public FindUserTask(FindUserActivity activity, String albumName, String encryptedKeyBase64) {
+    public FindUserTask(FindUserActivity activity, String albumName) {
 
         activityReference = new WeakReference<>(activity);
 
         ctx = (GlobalClass) activity.getApplicationContext();
 
         this.albumName = albumName;
-        this.encryptedKeyBase64 = encryptedKeyBase64;
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -78,6 +77,15 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
         ServerConnection conn = ctx.getServerConnection();
 
         try {
+            try {
+                this.encryptedKeyBase64 = conn.getAlbumKey(albumName);
+            } catch (IOException e) {
+                conn.disconnect();
+                Log.d(TAG, ctx.getString(R.string.server_contact_fail));
+                showMessage(ctx.getString(R.string.server_contact_fail));
+                return false;
+            }
+
             userMap = conn.getUsersWithoutAlbumAccess(albumName);
             if (userMap == null) {
                 conn.disconnect();
@@ -146,5 +154,11 @@ public class FindUserTask extends AsyncTask<Void, Void, Boolean> {
             Log.d(TAG, ctx.getString(R.string.load_user_list_fail));
             Toast.makeText(activityReference.get().getApplicationContext(), ctx.getString(R.string.load_user_list_fail), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showMessage(String msg) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+        );
     }
 }

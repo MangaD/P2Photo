@@ -35,8 +35,15 @@ public class MainMenuActivity extends AppCompatActivity {
          */
         Button buttonAddPhoto = findViewById(R.id.button_add_photo);
         buttonAddPhoto.setOnClickListener((View view) -> {
-            Intent intent = new Intent(MainMenuActivity.this, AddPhotoActivity.class);
-            startActivity(intent);
+            GlobalClass ctx = (GlobalClass) getApplicationContext();
+            switch (ctx.getStorageMode()){
+                case "drive": Intent intent = new Intent(MainMenuActivity.this, AddPhotoActivity.class);
+                    startActivity(intent);
+                    break;
+                case "wifi" : Intent intentWifi = new Intent(MainMenuActivity.this, AddPhotoWifiActivity.class);
+                    startActivity(intentWifi);
+            }
+
         });
         /**
          * ADD USER TO ALBUM

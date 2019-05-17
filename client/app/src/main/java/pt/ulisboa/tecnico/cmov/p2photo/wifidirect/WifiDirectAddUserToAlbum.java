@@ -18,6 +18,7 @@ import pt.ulisboa.tecnico.cmov.p2photo.R;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.AddUserToAlbumActivity;
 
 import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserActivity;
+import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserWifiActivity;
 import pt.ulisboa.tecnico.cmov.p2photo.activities.ViewAlbumActivity;
 
 public class WifiDirectAddUserToAlbum {
@@ -47,10 +48,10 @@ public class WifiDirectAddUserToAlbum {
             Object itemAtPosition = adapter.getItemAtPosition(position);
             String itemString = itemAtPosition.toString();
 
-            Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserActivity.class);
+            Intent viewAlbumIntent = new Intent(activityReference.get(), FindUserWifiActivity.class);
 
             viewAlbumIntent.putExtra("FindActivityAlbumName",itemString);
-            viewAlbumIntent.putExtra("FindActivityEncKey","");//empty string because wifi direct doesn't use this
+            //viewAlbumIntent.putExtra("FindActivityEncKey","");//empty string because wifi direct doesn't use this
             activityReference.get().startActivity(viewAlbumIntent);
         });
     }

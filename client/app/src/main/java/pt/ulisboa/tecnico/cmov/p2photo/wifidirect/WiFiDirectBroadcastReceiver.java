@@ -1,4 +1,4 @@
-package com.example.wifidirect;
+package pt.ulisboa.tecnico.cmov.p2photo.wifidirect;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,12 +7,14 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.widget.Toast;
 
+import pt.ulisboa.tecnico.cmov.p2photo.activities.FindUserWifiActivity;
+
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
     private  WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
-    private MainActivity mActivity;
+    private FindUserWifiActivity mActivity;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager mManager,WifiP2pManager.Channel mChannel, MainActivity mainActivity){
+    public WiFiDirectBroadcastReceiver(WifiP2pManager mManager, WifiP2pManager.Channel mChannel, FindUserWifiActivity mainActivity){
         this.mManager=mManager;
         this.mChannel = mChannel;
         this.mActivity = mainActivity;
@@ -43,7 +45,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
             if(networkInfo.isConnected()){
                 mManager.requestConnectionInfo(mChannel,mActivity.connectionInfoListener);
             } else {
-                mActivity.connectionStatus.setText("Device Disconnected");
+                Toast.makeText(mActivity.getApplicationContext(),"device disconnected",Toast.LENGTH_SHORT);
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
             //Respond to this device's Wi-Fi state changing

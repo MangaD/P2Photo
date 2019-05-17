@@ -8,11 +8,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-    <!-- Icon generated with https://appicon.co/ -->
     <application
         android:name=".GlobalClass"
         android:allowBackup="true"
@@ -21,9 +20,12 @@
         android:roundIcon="@mipmap/p2photo_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".wifidirect.WifiDirectAddPhoto"></activity>
+        <activity android:name=".activities.AddPhotoWifiActivity" />
+        <activity android:name=".activities.FindUserWifiActivity" />
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity android:name=".activities.ViewPhotoActivity" />
         <activity android:name=".activities.ViewAlbumActivity" />
         <activity android:name=".activities.ListUserAlbumActivity" />
