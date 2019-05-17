@@ -67,7 +67,8 @@ public class ClientConnection implements Runnable {
 					String encPassword = passwordProtect(password);
 
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
-
+					System.out.println(encPassword);
+					
 					String[] pair = Main.db.login(user, encPassword);
 					
 					System.out.println(pair);
