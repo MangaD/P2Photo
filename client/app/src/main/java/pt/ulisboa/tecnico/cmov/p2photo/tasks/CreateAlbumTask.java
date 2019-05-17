@@ -135,6 +135,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
             String encKeyBase64;
             try {
                 SecretKey key = SymmetricEncryption.generateAESKey();
+                Log.d(TAG, key.toString());
                 byte[] keyBytes = SymmetricEncryption.secretKeyToByteArray(key);
                 AsymmetricEncryption ae = new AsymmetricEncryption();
                 byte[] encKey = ae.encrypt(context.getPubKey(), keyBytes);

@@ -12,11 +12,11 @@ public class Utility {
      * https://stackoverflow.com/questions/2418485/how-do-i-convert-a-byte-array-to-base64-in-java
      */
     public static String bytesToBase64(byte[] data) {
-        return Base64.encodeToString(data, Base64.DEFAULT);
+        return Base64.encodeToString(data, Base64.NO_WRAP);
     }
 
     public static byte[] base64ToBytes(String base64) {
-        return Base64.decode(base64, Base64.DEFAULT);
+        return Base64.decode(base64, Base64.NO_WRAP);
     }
 
     public static String passwordToSHA512Base64(String password) throws NoSuchAlgorithmException {
