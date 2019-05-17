@@ -87,7 +87,6 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
             /*
              * SECURITY
              */
-
             SecretKey cipherKey;
             try {
                 String encKeyBase64 = conn.getAlbumKey(this.albumName);
@@ -95,6 +94,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 AsymmetricEncryption ae = new AsymmetricEncryption();
                 byte[] key = ae.decrypt(context.getPrivKey(), encKey);
                 cipherKey = SymmetricEncryption.secretKeyFromByteArray(key);
+                Log.d(TAG, cipherKey.toString());
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
                 showMessage("Failed to get album key.");
@@ -132,6 +132,7 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                             imageURL = se.decryptAES(encImgURL, cipherKey);
                         } catch (Exception e) {
                             showMessage("Error decrypting image URL.");
+                            Log.e(TAG, "Error decrypting image URL.\n" + e.getMessage());
                             return false;
                         }
 

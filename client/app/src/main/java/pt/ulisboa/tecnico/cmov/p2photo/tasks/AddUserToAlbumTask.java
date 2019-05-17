@@ -80,11 +80,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             if (albumsMap == null) {
                 conn.disconnect();
                 Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
-
-                activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-                );
-
+                showMessage(context.getString(R.string.server_contact_fail));
                 return false;
             } else {
                 this.albumArrayList = new ArrayList<>();
@@ -102,6 +98,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
                     this.albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
                         String albumName = itemAtPosition.toString();
+
                         String encryptedKeyBase64 = "";
 
                         for (Map.Entry<Integer, String[]> entry : albumsMap.entrySet()) {
@@ -127,9 +124,7 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             conn.disconnect();
             Log.d("AddUserToAlbumActivity", context.getString(R.string.server_contact_fail));
 
-            activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, context.getString(R.string.server_contact_fail), Toast.LENGTH_LONG).show()
-            );
+            showMessage(context.getString(R.string.server_contact_fail));
 
             return false;
         }
@@ -152,7 +147,13 @@ public class AddUserToAlbumTask extends AsyncTask<Void, Void, Boolean> {
             }
         } else {
             Log.d("AddUserToAlbumActivity", context.getString(R.string.load_user_album_fail));
-            Toast.makeText(activityReference.get().getApplicationContext(), context.getString(R.string.load_user_album_fail), Toast.LENGTH_LONG).show();
+            showMessage(context.getString(R.string.load_user_album_fail));
         }
+    }
+
+    private void showMessage(String msg) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        );
     }
 }

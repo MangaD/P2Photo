@@ -263,17 +263,14 @@ public class ClientConnection implements Runnable {
 					
 					System.out.println("Received get user's owned albums from '" + user + "'.");
 
-					HashMap<Integer, String[]> res = Main.db.getUsersOwnedAlbums(user);
+					HashMap<Integer, String> res = Main.db.getUsersOwnedAlbums(user);
 					
-					for (Map.Entry<Integer, String[]> entry : res.entrySet()) {
+					for (Map.Entry<Integer, String> entry : res.entrySet()) {
 						Integer aid = entry.getKey();
-						String[] pair = entry.getValue();
-						String name = pair[0];
-						String key = pair[1];
-						System.out.println("Aid: " + key + "\nName: " + name + "\nKey: " + key);
+						String name = entry.getValue();
+						System.out.println("Aid: " + aid + "\nName: " + name);
 						write(Integer.toString(aid));
 						write(name);
-						write(key);
 					}
 					// send empty string for terminating
 					write("");

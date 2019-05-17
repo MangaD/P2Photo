@@ -203,13 +203,12 @@ public class Database {
 		}
 	}
 	
-	public HashMap<Integer, String[]> getUsersOwnedAlbums(String username) {
-		String sql = " SELECT A.aid, A.name, A_S.key " + 
-				" FROM albums A INNER JOIN album_slices A_S " + 
-				" ON A.aid = A_S.aid " + 
-				" WHERE A.owner_id IN " + 
+	public HashMap<Integer, String> getUsersOwnedAlbums(String username) {
+		String sql = " SELECT aid, name " + 
+				" FROM albums " +
+				" WHERE owner_id IN " + 
 				" (SELECT uid FROM users WHERE username = ?) ";
-		HashMap<Integer, String[]> result = new HashMap<>();
+		HashMap<Integer, String> result = new HashMap<>();
 		
 		try (PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 			
@@ -219,10 +218,8 @@ public class Database {
 
 			while (rs.next()) {
 				int aid = rs.getInt("aid");
-				String[] pair = new String[2];
-				pair[0] = rs.getString("name").trim();
-				pair[1] = rs.getString("key").trim();
-				result.put(aid, pair);
+				String name = rs.getString("name").trim();
+				result.put(aid, name);
 			}
 			return result;
 		} catch (SQLException e) {

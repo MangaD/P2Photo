@@ -196,6 +196,9 @@ public class ServerConnection {
         return list;
     }
 
+    /**
+     * Returns Album id, album name and album encrypted key
+     */
     public HashMap<Integer, String[]> getUsersOwnedAlbums() throws IOException {
         HashMap<Integer, String[]> list = new HashMap<>();
         if (!isConnected()) {
