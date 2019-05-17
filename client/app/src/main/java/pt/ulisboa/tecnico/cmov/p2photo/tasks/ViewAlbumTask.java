@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
@@ -46,15 +48,17 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
     private ArrayList<String> indexURLs;
 
-    private ArrayList<String> albumArrayList;
-    private ArrayAdapter<String> albumArrayAdapter;
+    private LinkedHashMap<String, String> imagesMap;
+    private ArrayList<String> imageArrayList;
+    private ArrayAdapter<String> imageArrayAdapter;
 
     public ViewAlbumTask(GlobalClass ctx, ViewAlbumActivity activity, String albumName) {
 
         activityReference = new WeakReference<>(activity);
         this.context = ctx;
         this.albumName = albumName;
-        this.albumArrayList = new ArrayList<>();
+        this.imageArrayList = new ArrayList<>();
+        this.imagesMap = new LinkedHashMap();
 
         // Create Progress dialog
         pd = new ProgressDialog(activity);
@@ -113,47 +117,64 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
                 Log.d(TAG, "List size: " + list.size());
 
                 for (String entry : this.indexURLs) {
-                    Log.d(TAG, entry);
+                    Log.d(TAG, "Index URL: " + entry);
                     URL index = new URL(entry);
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(index.openStream()));
+                    try(BufferedReader in = new BufferedReader(
+                            new InputStreamReader(index.openStream()))) {
 
-                    String encImgURLBase64;
-                    while ((encImgURLBase64 = in.readLine()) != null && !encImgURLBase64.isEmpty()) {
-                        Log.d(TAG, encImgURLBase64);
+                        String encImgURLBase64;
+                        while ((encImgURLBase64 = in.readLine()) != null && !encImgURLBase64.isEmpty()) {
+                            Log.d(TAG, "Encrypted image title and URL: " + encImgURLBase64);
 
-                        /*
-                         * SECURITY
-                         */
-                        String imageURL;
-                        try {
-                            byte[] encImgURL = Utility.base64ToBytes(encImgURLBase64);
-                            SymmetricEncryption se = new SymmetricEncryption();
-                            imageURL = se.decryptAES(encImgURL, cipherKey);
-                        } catch (Exception e) {
-                            showMessage("Error decrypting image URL.");
-                            Log.e(TAG, "Error decrypting image URL.\n" + e.getMessage());
-                            return false;
+                            /*
+                             * SECURITY
+                             */
+                            String content;
+                            try {
+                                byte[] encImgURL = Utility.base64ToBytes(encImgURLBase64);
+                                SymmetricEncryption se = new SymmetricEncryption();
+                                content = se.decryptAES(encImgURL, cipherKey);
+                            } catch (Exception e) {
+                                showMessage("Error decrypting image URL.");
+                                Log.e(TAG, "Error decrypting image URL.\n" + e.getMessage());
+                                return false;
+                            }
+                            Log.d(TAG, "Decypted image title and url: " + content);
+                            String[] parts = content.split("\n");
+                            if (parts.length < 2) {
+                                showMessage("There is something wrong with the image title and url.");
+                                return false;
+                            }
+                            this.imagesMap.put(parts[1], parts[0]);
+                            this.imageArrayList.add(parts[0]);
                         }
-
-                        this.albumArrayList.add(imageURL);
                     }
-                    in.close();
                 }
 
                 this.activityReference.get().runOnUiThread(() -> {
                     activityReference.get().albumListView = activityReference.get().findViewById(R.id.listViewPhotoItems);
-                    this.albumArrayAdapter = new ArrayAdapter<>(activityReference.get(),
-                            android.R.layout.simple_list_item_1, this.albumArrayList);
-                    activityReference.get().albumListView.setAdapter(this.albumArrayAdapter);
+                    this.imageArrayAdapter = new ArrayAdapter<>(activityReference.get(),
+                            android.R.layout.simple_list_item_1, this.imageArrayList);
+                    activityReference.get().albumListView.setAdapter(this.imageArrayAdapter);
 
                     activityReference.get().albumListView.setOnItemClickListener((adapter, view, position, arg) -> {
                         Object itemAtPosition = adapter.getItemAtPosition(position);
-                        String itemString = itemAtPosition.toString();
+                        String imageTitle = itemAtPosition.toString();
+                        String imageURL = "";
+
+                        int count = 0;
+                        for (Map.Entry<String, String> entry : imagesMap.entrySet()) {
+                            if(count == position) {
+                                imageURL = entry.getKey();
+                                break;
+                            }
+                            count++;
+                        }
+                        Log.d(TAG, "Image URL at click: " + imageURL);
 
                         Intent viewPhotoIntent = new Intent(activityReference.get(), ViewPhotoActivity.class);
 
-                        viewPhotoIntent.putExtra("ViewPhotoName", itemString);
+                        viewPhotoIntent.putExtra("ViewPhotoURL", imageURL);
 
                         activityReference.get().startActivity(viewPhotoIntent);
                     });
