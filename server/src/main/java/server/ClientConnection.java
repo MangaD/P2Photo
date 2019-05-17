@@ -4,10 +4,17 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 public class ClientConnection implements Runnable {
 
@@ -55,10 +62,12 @@ public class ClientConnection implements Runnable {
 					while (password.isEmpty()) {
 						password = read();
 					}
+					
+					String encPassword = passwordProtect(password);
 
 					System.out.println("Received login from '" + user + "' with password '" + password + "'.");
 
-					String[] pair = Main.db.login(user, password);
+					String[] pair = Main.db.login(user, encPassword);
 					
 					if (pair != null && !pair[0].isEmpty() && !pair[1].isEmpty()) {
 						System.out.println("Login successful.");
@@ -90,11 +99,13 @@ public class ClientConnection implements Runnable {
 					while (privKey.isEmpty()) {
 						privKey = read();
 					}
+					
+					String encPassword = passwordProtect(password);
 
 					System.out.println("Received sign up from '" + user + "' with password '" + password + "'.");
 
 					try {
-						Main.db.signUp(user, password, pubKey, privKey);
+						Main.db.signUp(user, encPassword, pubKey, privKey);
 						write("Sign up successful.");
 					} catch (SQLException e) {
 						// https://www.sqlite.org/rescode.html#constraint
@@ -381,7 +392,9 @@ public class ClientConnection implements Runnable {
 				}
 				System.out.println("Waiting request from user '" + user + "'");
 			}
-		} catch (IOException e) {}
+		} catch (IOException e) {} catch(InvalidKeySpecException | NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 
 		System.out.println("Thread " + threadName + " exiting.");
 	}
@@ -423,6 +436,17 @@ public class ClientConnection implements Runnable {
 			t = new Thread(this, threadName);
 			t.start();
 		}
+	}
+	
+	private String passwordProtect(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		// Password hashing tutorial: https://www.baeldung.com/java-password-hashing
+		SecureRandom random = new SecureRandom();
+		byte[] salt = new byte[16];
+		random.nextBytes(salt);
+		KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		byte[] hash = factory.generateSecret(spec).getEncoded();
+		return new String(hash);
 	}
 
 }
