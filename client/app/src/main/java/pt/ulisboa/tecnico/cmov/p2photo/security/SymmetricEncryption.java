@@ -8,10 +8,13 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -47,29 +50,47 @@ public class SymmetricEncryption {
     }
 
     public byte[] encryptAES(String content, SecretKey secretKey)
-            throws InvalidKeyException, IOException {
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] iv = cipher.getIV();
+            throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException,
+            InvalidAlgorithmParameterException {
 
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             CipherOutputStream cipherOut = new CipherOutputStream(out, cipher)) {
-            out.write(iv);
-            cipherOut.write(content.getBytes());
-            return out.toByteArray();
-        }
+        // Generating IV.
+        int ivSize = 16;
+        byte[] iv = new byte[ivSize];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+        byte[] encrypted = cipher.doFinal(content.getBytes());
+
+        byte[] encryptedIVAndText = new byte[ivSize + encrypted.length];
+        System.arraycopy(iv, 0, encryptedIVAndText, 0, ivSize);
+        System.arraycopy(encrypted, 0, encryptedIVAndText, ivSize, encrypted.length);
+
+        return encryptedIVAndText;
     }
 
-    public String decryptAES(byte[] encryptedBytes, SecretKey secretKey)
-            throws IOException, InvalidKeyException, InvalidAlgorithmParameterException {
+    public String decryptAES(byte[] encryptedIvTextBytes, SecretKey secretKey)
+            throws InvalidKeyException, InvalidAlgorithmParameterException, BadPaddingException,
+            IllegalBlockSizeException, NoSuchAlgorithmException, NoSuchPaddingException {
 
-        try (ByteArrayInputStream in = new ByteArrayInputStream(encryptedBytes);
-             CipherInputStream cipherIn = new CipherInputStream(in, cipher)) {
-            byte[] fileIv = new byte[16];
-            in.read(fileIv);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(fileIv));
-            byte[] content = new byte[encryptedBytes.length-16];
-            cipherIn.read(content);
-            return new String(content);
-        }
+        int ivSize = 16;
+
+        // Extract IV.
+        byte[] iv = new byte[ivSize];
+        System.arraycopy(encryptedIvTextBytes, 0, iv, 0, iv.length);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        // Extract encrypted part.
+        int encryptedSize = encryptedIvTextBytes.length - ivSize;
+        byte[] encryptedBytes = new byte[encryptedSize];
+        System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
+
+        // Decrypt.
+        Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+        byte[] decrypted = cipherDecrypt.doFinal(encryptedBytes);
+
+        return new String(decrypted);
     }
 }
