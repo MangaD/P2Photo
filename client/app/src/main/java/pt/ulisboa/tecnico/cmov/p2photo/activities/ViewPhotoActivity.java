@@ -31,7 +31,7 @@ public class ViewPhotoActivity extends AppCompatActivity  {
 
         testImageView = this.findViewById(R.id.testImageView);
 
-        photo_url = getIntent().getStringExtra("ViewPhotoName");
+        photo_url = getIntent().getStringExtra("ViewPhotoURL");
 
         new ObtainPhotoTask(ViewPhotoActivity.this).execute();
 
@@ -49,14 +49,11 @@ public class ViewPhotoActivity extends AppCompatActivity  {
     private static class ObtainPhotoTask extends AsyncTask<Void, String, Bitmap> {
 
         private Context ctx;
-        private WeakReference<ViewPhotoActivity> activityReference;
         private ProgressDialog pd;
         private String imageURL;
         private ImageView testImageView;
 
         private ObtainPhotoTask(ViewPhotoActivity activity) {
-
-            activityReference = new WeakReference<>(activity);
             ctx = activity.getApplicationContext();
             imageURL = activity.photo_url;
             testImageView = activity.testImageView;
@@ -74,7 +71,7 @@ public class ViewPhotoActivity extends AppCompatActivity  {
 
         @Override
         protected void onPostExecute(Bitmap result) {
-            testImageView.setImageBitmap((Bitmap) result);
+            testImageView.setImageBitmap(result);
         }
 
         private Bitmap loadImageFromNetwork(String url) {

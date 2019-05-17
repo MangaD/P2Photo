@@ -406,22 +406,24 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                                                         Log.i("LINK", "Success getting URL Embeded " + imageURL);
                                                         //showMessage("Success getting URL " + imageURL);
 
+                                                        String content = imageTitle + "\n" + imageURL;
+                                                        Log.d(TAG, "Image title and URL: " + content);
                                                         /**
                                                          * SECURITY
                                                          */
-                                                        String imageEncryptedURLBase64;
+                                                        String contentEncryptedURLBase64;
                                                         try {
                                                             SymmetricEncryption se = new SymmetricEncryption();
-                                                            byte[] encImageURL = se.encryptAES(imageURL, cipherKey);
-                                                            imageEncryptedURLBase64 = Utility.bytesToBase64(encImageURL);
+                                                            byte[] encContent = se.encryptAES(content, cipherKey);
+                                                            Log.d(TAG, "Encoded content length: " + encContent.length);
+                                                            contentEncryptedURLBase64 = Utility.bytesToBase64(encContent);
                                                         } catch (Exception e) {
                                                             showMessage("Error encrypting image URL.");
                                                             Log.e(TAG, "Error encrypting image URL.\n" + e.getMessage());
                                                             return;
                                                         }
-                                                        Log.d(TAG, "Encrypted URL: " + imageEncryptedURLBase64);
-                                                        Log.d(TAG, Boolean.toString(imageEncryptedURLBase64.contains("\n")));
-                                                        appendContents(indexFile, imageEncryptedURLBase64);
+                                                        Log.d(TAG, "Encrypted URL: " + contentEncryptedURLBase64);
+                                                        appendContents(indexFile, contentEncryptedURLBase64);
                                                     })
                                             .addOnFailureListener(activityReference.get(), e -> {
                                                 Log.i("LINK", "Error getting URL");
@@ -432,7 +434,6 @@ public class AddPhotoTaskPart2 extends AsyncTask<Void, Void, Boolean> {
                         .addOnFailureListener(activityReference.get(), e -> {
                             Log.e(TAG, "Error retrieving files", e);
                             showMessage("Query album failed");
-                            return;
                         });
     }
 

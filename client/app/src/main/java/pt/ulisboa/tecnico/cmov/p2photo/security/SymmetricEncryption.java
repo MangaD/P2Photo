@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.p2photo.security;
 
+import android.util.Log;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
