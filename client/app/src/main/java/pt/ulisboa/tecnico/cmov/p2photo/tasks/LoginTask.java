@@ -69,6 +69,22 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... values) {
 
+        ServerConnection conn = context.getServerConnection();
+
+        /*
+         * Check if network is disabled
+         */
+        if (!ServerConnection.isOnline(context)) {
+            Log.d(TAG, context.getString(R.string.network_disabled));
+
+            // https://stackoverflow.com/questions/34026903/how-runnable-is-created-from-java8-lambda
+            activityReference.get().runOnUiThread(() ->
+                    Toast.makeText(context, context.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
+            );
+
+            return false;
+        }
+
         /*
          * Login to drive
          */
@@ -93,18 +109,6 @@ public class LoginTask extends AsyncTask<Void, Void, Boolean> {
         /*
          * Login to server
          */
-        ServerConnection conn = context.getServerConnection();
-
-        if (!ServerConnection.isOnline(context)) {
-            Log.d(TAG, context.getString(R.string.network_disabled));
-
-            // https://stackoverflow.com/questions/34026903/how-runnable-is-created-from-java8-lambda
-            activityReference.get().runOnUiThread(() ->
-                Toast.makeText(context, context.getString(R.string.network_disabled), Toast.LENGTH_LONG).show()
-            );
-
-            return false;
-        }
 
         try {
             conn.connect();
