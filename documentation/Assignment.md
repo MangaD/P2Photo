@@ -53,7 +53,7 @@ In addition to the baseline features, students must also implement two advanced 
 
 ### Testing mechanisms
 
-In order to allow testing the system, the following additional features should be implemented. The mobile app should produce a timestamped log of all operations it performs (including all detections of nearby devices) and provide a GUI mechanism to display that log. The server should produce a timestamped log of all operations it performs and the mobile app should display the server log. If the availability advanced feature is implementedthe mobile app GUI should include a mechanism to restrict the amount of storage to store other users’ album-slices.
+In order to allow testing the system, the following additional features should be implemented. The mobile app should produce a timestamped log of all operations it performs (including all detections of nearby devices) and provide a GUI mechanism to display that log. The server should produce a timestamped log of all operations it performs and the mobile app should display the server log. If the availability advanced feature is implemented the mobile app GUI should include a mechanism to restrict the amount of storage to store other users’ album-slices.
 
 ## Implementation
 
