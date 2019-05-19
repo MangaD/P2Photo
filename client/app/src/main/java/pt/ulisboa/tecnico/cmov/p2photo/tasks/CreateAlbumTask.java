@@ -226,7 +226,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                 newPermission.setType("anyone");
                                 newPermission.setRole("reader");
                                 try {
-                                    Thread.sleep(3000);
+                                    Thread.sleep(6000);
                                     // Print the names and IDs for up to 10 files.
                                     FileList result = null;
                                     result = dc.getService().files().list()
@@ -298,7 +298,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                     driveFile.getDriveId().encodeToString());
 
                             try {
-                                Thread.sleep(6000);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
