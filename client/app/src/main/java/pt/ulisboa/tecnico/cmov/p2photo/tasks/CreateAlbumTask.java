@@ -132,11 +132,16 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
             String indexURL = getIndexURL();
             Log.d(TAG, "indexURL: " + indexURL);
 
+            /**
+             * SECURITY
+             */
+            // Generate encrypted symmetric key to store in server
+            SecretKey cipherKey;
             String encKeyBase64;
             try {
-                SecretKey key = SymmetricEncryption.generateAESKey();
-                Log.d(TAG, key.toString());
-                byte[] keyBytes = SymmetricEncryption.secretKeyToByteArray(key);
+                cipherKey = SymmetricEncryption.generateAESKey();
+                Log.d(TAG, cipherKey.toString());
+                byte[] keyBytes = SymmetricEncryption.secretKeyToByteArray(cipherKey);
                 AsymmetricEncryption ae = new AsymmetricEncryption();
                 byte[] encKey = ae.encrypt(context.getPubKey(), keyBytes);
                 encKeyBase64 = Utility.bytesToBase64(encKey);
@@ -145,19 +150,29 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                 return "Error generating symmetric key.";
             }
 
+            // Encrypt index url
+            String encryptedIndexURLBase64;
+            try {
+                SymmetricEncryption se = new SymmetricEncryption();
+                byte[] encContent = se.encryptAES(indexURL, cipherKey);
+                encryptedIndexURLBase64 = Utility.bytesToBase64(encContent);
+            } catch (Exception e) {
+                String errorMsg = "Error encrypting index URL.";
+                showMessage(errorMsg);
+                Log.e(TAG, errorMsg + "\n" + e.getMessage());
+                return errorMsg;
+            }
+            Log.d(TAG, "Encrypted index URL: " + encryptedIndexURLBase64);
+
             // Add index of album to server
-            msg = conn.setAlbumIndex(albumName, indexURL, encKeyBase64);
+            msg = conn.setAlbumIndex(albumName, encryptedIndexURLBase64, encKeyBase64);
 
             return msg;
         } catch (IOException e) {
             conn.disconnect();
             String msg = context.getString(R.string.server_connect_fail);
             Log.d(TAG, msg);
-
-            activityReference.get().runOnUiThread(() ->
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            );
-
+            showMessage(msg);
             return msg;
         }
     }
@@ -246,9 +261,7 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
                     Log.e(TAG, "Unable to create file", e);
-                    activityReference.get().runOnUiThread(() ->
-                            Toast.makeText(context, context.getString(R.string.file_create_error), Toast.LENGTH_LONG).show()
-                    );
+                    showMessage(context.getString(R.string.file_create_error));
                     indexSemaphore.release();
                 });
     }
@@ -310,24 +323,14 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
                                     })
                                     .addOnFailureListener(activityReference.get(), e -> {
                                         Log.i(TAG, "Error getting URL");
-
-                                        activityReference.get().runOnUiThread(() ->
-                                                Toast.makeText(context, "Error getting URL",
-                                                        Toast.LENGTH_LONG).show()
-                                        );
-
+                                        showMessage("Error getting URL");
                                         indexSemaphore.release();
                                     });
 
                         })
                 .addOnFailureListener(activityReference.get(), e -> {
                     Log.e(TAG, "Unable to create file", e);
-
-                    activityReference.get().runOnUiThread(() ->
-                            Toast.makeText(context, context.getString(R.string.file_create_error),
-                                    Toast.LENGTH_LONG).show()
-                    );
-
+                    showMessage(context.getString(R.string.file_create_error));
                     indexSemaphore.release();
 
                 });
@@ -340,5 +343,11 @@ public class CreateAlbumTask extends AsyncTask<Void, Void, String> {
 
     private String getIndexURL() {
         return this.IndexURL;
+    }
+
+    private void showMessage(String msg) {
+        activityReference.get().runOnUiThread(() ->
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        );
     }
 }

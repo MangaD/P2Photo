@@ -116,9 +116,25 @@ public class ViewAlbumTask extends AsyncTask<Void, Void, Boolean> {
 
                 Log.d(TAG, "List size: " + list.size());
 
-                for (String entry : this.indexURLs) {
-                    Log.d(TAG, "Index URL: " + entry);
-                    URL index = new URL(entry);
+                for (String encIndexURLBase64 : this.indexURLs) {
+                    Log.d(TAG, "Index URL: " + encIndexURLBase64);
+
+                    /*
+                     * SECURITY
+                     */
+                    String indexURL;
+                    try {
+                        byte[] encImgURL = Utility.base64ToBytes(encIndexURLBase64);
+                        SymmetricEncryption se = new SymmetricEncryption();
+                        indexURL = se.decryptAES(encImgURL, cipherKey);
+                    } catch (Exception e) {
+                        showMessage("Error decrypting index URL.");
+                        Log.e(TAG, "Error decrypting index URL.\n" + e.getMessage());
+                        return false;
+                    }
+                    Log.d(TAG, "Decypted index url: " + indexURL);
+
+                    URL index = new URL(indexURL);
                     try(BufferedReader in = new BufferedReader(
                             new InputStreamReader(index.openStream()))) {
 
